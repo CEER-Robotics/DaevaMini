@@ -1,0 +1,76 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:DaevaMini.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+             x:Class="DaevaMini.CocktailsMenu"
+             x:DataType="vm:CocktailsMenuViewModel">
+
+    <Grid Background="#B3E5FC"
+          RowDefinitions="Auto,*"
+          ColumnDefinitions="*">
+
+        <!-- Header with logo -->
+        <Grid ColumnDefinitions="*,*,*">
+            <Button
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Margin="10,0,0,0"
+                Background="Transparent"
+                Click="OnBackArrow">
+                <TextBlock Text="←"
+                           FontSize="40"
+                           Foreground="White" />
+                           
+            </Button>
+            <Border Grid.Column="1" 
+                    Background="#101418"
+                    Padding="15"
+                    HorizontalAlignment="Center"
+                    Width="295"
+                    CornerRadius="0,0,30,30">
+                <Image Source="avares://DaevaMini/Assets/logo_white.png"
+                       Stretch="Uniform"
+                       HorizontalAlignment="Center"
+                       Height="30"/>
+            </Border>
+        </Grid>
+        
+
+        <ScrollViewer Grid.Row="1"
+            Margin="40"
+            HorizontalScrollBarVisibility="Disabled"
+            VerticalScrollBarVisibility="Auto">
+
+            <ItemsControl ItemsSource="{Binding Cocktails}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="2"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CocktailVm">
+                        <Border Background="#E6FF99"
+                                CornerRadius="12"
+                                Padding="30"
+                                MinHeight="200"
+                                Margin="0,0,20,20">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <Button Content="{Binding Name}"
+                                           Foreground="#0B0E10"
+                                           FontSize="36"
+                                           FontWeight="SemiBold"
+                                           HorizontalAlignment="Center"
+                                           Click="DispenseCocktail"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+        </ScrollViewer>
+    </Grid>
+</UserControl>

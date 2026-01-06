@@ -1,0 +1,75 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:DaevaMini.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+             x:Class="DaevaMini.Views.SplashPage"
+             x:DataType="vm:ModesViewModel">
+
+    <!-- Single-page splash -->
+    <Grid Background="#131818"
+          RowDefinitions="Auto,*,Auto">
+
+        <!-- Top segmented control -->
+        <Grid Grid.Row="0" Margin="0,28,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Centered mode -->
+            <Border
+                Grid.Column="1"
+                Background="{Binding CurrentModeColor}"
+                CornerRadius="28"
+                Padding="22,10">
+                <TextBlock
+                    Text="{Binding CurrentModeName}"
+                    Foreground="#000000"
+                    FontSize="30"
+                    FontWeight="SemiBold"
+                    VerticalAlignment="Center"/>
+            </Border>
+
+            <!-- Settings button -->
+            <Button
+                Grid.Column="2"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,0,16,0"
+                Content="⚙"
+                Background="Transparent"
+                FontSize="30"
+                Click="OnSettingsClick"/>
+        </Grid>
+
+        <!-- Center logo -->
+        <Grid Row="1" VerticalAlignment="Center">
+            <StackPanel HorizontalAlignment="Center" Spacing="10">
+                <Image Source="avares://DaevaMini/Assets/logo_white.png"
+                       Stretch="Uniform"
+                       HorizontalAlignment="Right"
+                       Width="650"/>
+            </StackPanel>
+        </Grid>
+
+        <Grid Row="2" Margin="0,0,0,0">
+            <Button HorizontalAlignment="Center"
+                    Background="{Binding CurrentModeColor}"
+                    Click="OnTouchToStart"
+                    Padding="50,32"
+                    Width="550"
+                    CornerRadius="26,26,0,0">
+                <TextBlock Text="Touch to start"
+                           Foreground="#000000"
+                           FontSize="30"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>
+
