@@ -28,7 +28,7 @@ public partial class MainWindow : Window
     {
         if (_pageContainer != null)
         {
-            _pageContainer.Content = new CocktailsMenu();
+            _pageContainer.Content = new CocktailsMenu(_modesViewModel);
         }
     }
     

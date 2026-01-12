@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <TargetFramework>net9.0</TargetFramework>
@@ -19,6 +19,7 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="System.IO.Ports" Version="10.0.1" />
+        <PackageReference Include="YamlDotNet" Version="16.1.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -27,6 +28,12 @@
       <None Remove="Assets\logo-white.png" />
       <None Remove="Assets\logo_white.png" />
       <AvaloniaResource Include="Assets\logo_white.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="appsettings.yaml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>

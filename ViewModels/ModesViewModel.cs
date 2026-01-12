@@ -1,8 +1,10 @@
-﻿using System;
+using System;
+using System.Linq;
 using Avalonia.Media;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using DaevaMini.Config;
 
 namespace DaevaMini.ViewModels;
 
@@ -29,13 +31,27 @@ public sealed class Mode
 
 public sealed class ModesViewModel : INotifyPropertyChanged
 {
-    public static ObservableCollection<Mode> Modes { get; } = new()
+    private static ObservableCollection<Mode>? _modes;
+    
+    public static ObservableCollection<Mode> Modes
     {
-        // Position 0: Top-Left, 1: Bottom-Left, 2: Top-Right, 3: Bottom-Right
-        new("Gin Mode", "#559CAD", ["Gin", "Tonic", "Lemon", "Red-bull"]),
-        new("Vodka Mode", "#F5F749", ["Vodka", "Lemon", "Red-bull", "Lemon"]),
-        new("OG Mode", "#F46036", ["Gin", "Vodka", "Tonic", "Lemon"])
-    };
+        get
+        {
+            if (_modes == null)
+            {
+                LoadModesFromConfig();
+            }
+            return _modes ?? new ObservableCollection<Mode>();
+        }
+    }
+
+    private static void LoadModesFromConfig()
+    {
+        var config = AppConfigService.Instance.Config;
+        _modes = new ObservableCollection<Mode>(
+            config.Modes.Select(m => new Mode(m.Name, m.Color, m.LiquidAssignments))
+        );
+    }
 
     private Mode _currentMode = Modes[0];
     public Mode CurrentMode
@@ -55,7 +71,6 @@ public sealed class ModesViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(Position1Liquid));
             OnPropertyChanged(nameof(Position2Liquid));
             OnPropertyChanged(nameof(Position3Liquid));
-            Console.Write("Called set on current mode");
         }
     }
 
@@ -70,7 +85,10 @@ public sealed class ModesViewModel : INotifyPropertyChanged
 
     public ModesViewModel()
     {
-        CurrentMode = Modes[0];
+        if (Modes.Count > 0)
+        {
+            CurrentMode = Modes[0];
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

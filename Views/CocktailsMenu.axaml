@@ -66,6 +66,7 @@
                                            FontSize="36"
                                            FontWeight="SemiBold"
                                            HorizontalAlignment="Center"
+                                           IsEnabled="{Binding $parent[ItemsControl].DataContext.IsDispensing, Converter={StaticResource InvertedBoolConverter}}"
                                            Click="DispenseCocktail"/>
                             </StackPanel>
                         </Border>

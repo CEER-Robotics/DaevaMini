@@ -1,10 +1,14 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:DaevaMini.Converters"
              x:Class="DaevaMini.App"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.Resources>
+        <!-- Converters -->
+        <converters:InvertedBoolConverter x:Key="InvertedBoolConverter"/>
+        
         <!-- Color Resources -->
         <Color x:Key="PrimaryBackgroundColor">#131818</Color>
         <Color x:Key="SecondaryBackgroundColor">#2A2A2A</Color>
