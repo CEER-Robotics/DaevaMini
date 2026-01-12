@@ -7,7 +7,7 @@
              x:Class="DaevaMini.CocktailsMenu"
              x:DataType="vm:CocktailsMenuViewModel">
 
-    <Grid Background="#B3E5FC"
+    <Grid Background="{StaticResource PrimaryBackgroundBrush}"
           RowDefinitions="Auto,*"
           ColumnDefinitions="*">
 
@@ -22,11 +22,11 @@
                 Click="OnBackArrow">
                 <TextBlock Text="←"
                            FontSize="40"
-                           Foreground="White" />
+                           Foreground="{StaticResource TextPrimaryBrush}" />
                            
             </Button>
             <Border Grid.Column="1" 
-                    Background="#101418"
+                    Background="{StaticResource SecondaryBackgroundBrush}"
                     Padding="15"
                     HorizontalAlignment="Center"
                     Width="295"
@@ -53,14 +53,16 @@
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:CocktailVm">
-                        <Border Background="#E6FF99"
+                        <Border Background="{StaticResource CardBackgroundBrush}"
                                 CornerRadius="12"
                                 Padding="30"
                                 MinHeight="200"
                                 Margin="0,0,20,20">
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <Button Content="{Binding Name}"
-                                           Foreground="#0B0E10"
+                                           Background="Transparent"
+                                           BorderThickness="0"
+                                           Foreground="{StaticResource TextPrimaryBrush}"
                                            FontSize="36"
                                            FontWeight="SemiBold"
                                            HorizontalAlignment="Center"

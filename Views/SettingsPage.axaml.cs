@@ -9,12 +9,20 @@ namespace DaevaMini.Views;
 
 public partial class SettingsPage : UserControl
 {
-    public SettingsPage()
+    private readonly ModesViewModel _modesViewModel;
+    private readonly ModesViewModel _localViewModel;
+
+    public SettingsPage(ModesViewModel modesViewModel)
     {
         InitializeComponent();
-        var vm = new ModesViewModel();
-        DataContext = vm;
-        vm.PropertyChanged += (s, e) =>
+        _modesViewModel = modesViewModel;
+        _localViewModel = new ModesViewModel
+        {
+            CurrentMode = _modesViewModel.CurrentMode
+        };
+
+        DataContext = _localViewModel;
+        _localViewModel.PropertyChanged += (s, e) =>
         {
             if (e.PropertyName == nameof(ModesViewModel.CurrentMode))
             {
@@ -62,6 +70,14 @@ public partial class SettingsPage : UserControl
                 }
             }
         }
+    }
+
+    private void OnSave(object? sender, RoutedEventArgs e)
+    {
+        _modesViewModel.CurrentMode = _localViewModel.CurrentMode;
+
+        if (VisualRoot is MainWindow mainWindow)
+            mainWindow.ShowContainerSetupPage();
     }
 
     private void OnBackArrow(object? sender, RoutedEventArgs e)

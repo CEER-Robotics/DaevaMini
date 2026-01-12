@@ -8,7 +8,7 @@
              x:DataType="vm:ModesViewModel">
 
     <!-- Single-page splash -->
-    <Grid Background="#131818"
+    <Grid Background="{StaticResource PrimaryBackgroundBrush}"
           RowDefinitions="Auto,*,Auto">
 
         <!-- Top segmented control -->

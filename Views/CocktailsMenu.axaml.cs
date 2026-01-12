@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using System.IO.Ports;
+using System;
 using System.Threading.Tasks;
 using Avalonia.Interactivity;
 using DaevaMini.ViewModels;
@@ -8,36 +8,43 @@ namespace DaevaMini;
 
 public partial class CocktailsMenu : UserControl
 {
-    private SerialPort? _serial;
-    
     public CocktailsMenu()
     {
+        Console.WriteLine("[CocktailsMenu] Constructor called");
         InitializeComponent();
         DataContext = new CocktailsMenuViewModel();
-        
-        _serial = new SerialPort("/dev/ttyUSB0", 115200)
-        {
-            NewLine = "\n",
-            WriteTimeout = 500
-        };
-
-        try
-        {
-            _serial.Open();
-        }
-        catch
-        {
-            _serial = null;
-        }
     }
 
     private async void DispenseCocktail(object? sender, RoutedEventArgs e)
     {
-        // Fire-and-forget serial write
+        // Fire-and-forget serial write with error handling
         await Task.Run(() =>
         {
-            if (_serial?.IsOpen == true)
-                _serial.WriteLine("c1:2000,c4:4000");
+            try
+            {
+                var manager = ArduinoSerialManager.Instance;
+                if (manager.IsConnected)
+                {
+                    Console.WriteLine("[CocktailsMenu] Sending command: c1:2000,c4:4000");
+                    bool success = manager.Send("c1:2000,c4:4000");
+                    if (!success)
+                    {
+                        Console.WriteLine("[CocktailsMenu] Failed to send command to Arduino");
+                    }
+                    else
+                    {
+                        Console.WriteLine("[CocktailsMenu] Command sent successfully");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("[CocktailsMenu] Cannot send command - Arduino is not connected");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[CocktailsMenu] Error sending command to Arduino: {ex.Message}");
+            }
         });
     }
     
@@ -46,4 +53,6 @@ public partial class CocktailsMenu : UserControl
         if (VisualRoot is MainWindow mainWindow)
             mainWindow.ShowSplash();
     }
+
+    // No cleanup needed - singleton manages its own lifecycle
 }

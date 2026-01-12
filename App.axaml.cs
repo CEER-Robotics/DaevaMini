@@ -16,8 +16,18 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow();
+            
+            // Initialize Arduino connection when app starts
+            desktop.Exit += OnExit;
+            ArduinoSerialManager.Instance.Initialize();
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void OnExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
+    {
+        // Clean up Arduino connection when app exits
+        ArduinoSerialManager.Instance.Dispose();
     }
 }
