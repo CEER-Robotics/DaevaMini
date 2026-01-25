@@ -144,3 +144,5 @@ LED5 ON for 500 ms
 - Extra characters like `{ } , " ` are ignored.
 
 - The line must end with newline (Enter in Serial Monitor).
+
+- The simulation can be find here https://wokwi.com/projects/454125454770316289
