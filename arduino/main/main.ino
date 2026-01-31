@@ -1,8 +1,9 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
+#include <array>
 
 /* ===================== USER PARAMETERS ===================== */
-static const uint32_t BAUD = 9600;
+static const uint32_t BAUD = 115200;
 
 // Discrete LEDs (LED1..LED17)
 static const uint8_t LED_COUNT = 17;
@@ -16,18 +17,14 @@ static const uint8_t PWM_VALUE = 180;
 // WS2812 strips
 static const uint8_t STRIP1_PIN = 2;
 static const uint8_t STRIP2_PIN = 3;
-static const uint16_t STRIP1_N = 16;
-static const uint16_t STRIP2_N = 16;
-
-// Colors (parameterized)
-static const uint8_t CYAN_R = 0,   CYAN_G = 255, CYAN_B = 255;
-static const uint8_t YELL_R = 255, YELL_G = 255, YELL_B = 0;
+static const uint16_t STRIP1_N = 24;//stiscia inf
+static const uint16_t STRIP2_N = 34;//striscia sup 33
 
 // How long to run the “end status” animation after the last LED switches off
 static const uint32_t EndStatusMs = 3000;
 
 // Choose which ACTIVE animation to run (1 or 2)
-static const uint8_t ACTIVE_ANIM = 1;
+static const uint8_t ACTIVE_ANIM = 3;
 // Choose which END animation to run (1 or 2)
 static const uint8_t END_ANIM = 1;
 
@@ -45,6 +42,15 @@ static size_t rxLen = 0;
 // WS2812 objects
 Adafruit_NeoPixel strip1(STRIP1_N, STRIP1_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel strip2(STRIP2_N, STRIP2_PIN, NEO_GRB + NEO_KHZ800);
+
+// Colors (parameterized)
+static const std::array<uint8_t, 3> CYAN_ = {0, 255, 255};
+static const std::array<uint8_t, 3> YELL_ = {0, 255, 255};
+static const std::array<uint8_t, 3> BLU_DAEVA_ = {202,240,248};
+
+uint32_t CYAN = strip1.Color(CYAN_[0], CYAN_[1], CYAN_[2]);
+uint32_t YELL = strip1.Color(YELL_[0], YELL_[1], YELL_[2]);
+uint32_t BLU_DAEVA = strip1.Color(BLU_DAEVA_[0], BLU_DAEVA_[1], BLU_DAEVA_[2]);
 
 // ---------- Strip/Program state machine ----------
 enum ProgramState { ST_START_WAIT, ST_ACTIVE, ST_ENDING };
@@ -122,6 +128,19 @@ static void breatheFill_step(uint32_t color) {
   strip2.show();
 }
 
+/* Fill both strips with a STATIC (no breathing) version of the passed color */
+static void staticFill(uint32_t color) {
+  // If you still want to respect the current global brightness setting of the strip,
+  // keep the next line; otherwise, just use `uint32_t c = color;`
+  uint32_t c = color;
+
+  for (uint16_t i = 0; i < strip1.numPixels(); i++) strip1.setPixelColor(i, c);
+  for (uint16_t i = 0; i < strip2.numPixels(); i++) strip2.setPixelColor(i, c);
+
+  strip1.show();
+  strip2.show();
+}
+
 /* ============================================================
    PARSING: returns max OFF timestamp among LEDs scheduled by THIS message
    ============================================================ */
@@ -166,12 +185,13 @@ static uint32_t parseAndScheduleGetMaxEnd(const char* s) {
   return maxEnd;
 }
 
+
 /* ============================================================
    SERIAL: accept a NEW command only when in ST_START_WAIT
    ============================================================ */
 static void readSerialLineNonBlocking() {
-  while (Serial.available() > 0) {
-    char c = (char)Serial.read();
+  while (SerialUSB.available() > 0) {
+    char c = (char)SerialUSB.read();
     if (c == '\r') continue;
 
     if (c == '\n') {
@@ -219,14 +239,14 @@ static void updateLedTimers() {
    ============================================================ */
 
 // START_WAIT: breathing CYAN (color passed as variable)
-static void waitAnim_step(uint32_t breatheColor) {
-  breatheFill_step(breatheColor);
+static void waitAnim_step(uint32_t Color) {
+  //breatheFill_step(Color);
+  staticFill(Color);
 }
 
 // ACTIVE ANIM 1: two-dot chase cyan/yellow
 static void activeAnim1_step() {
-  uint32_t CYAN = strip1.Color(CYAN_R, CYAN_G, CYAN_B);
-  uint32_t YELL = strip1.Color(YELL_R, YELL_G, YELL_B);
+  
 
   strip1.clear();
   strip2.clear();
@@ -249,8 +269,8 @@ static void activeAnim1_step() {
 
 // ACTIVE ANIM 2: cross-breath (still uses the SAME breathing engine)
 static void activeAnim2_step() {
-  uint32_t CYAN = strip1.Color(CYAN_R, CYAN_G, CYAN_B);
-  uint32_t YELL = strip2.Color(YELL_R, YELL_G, YELL_B);
+  //uint32_t CYAN = strip1.Color(CYAN_R, CYAN_G, CYAN_B);
+  //uint32_t YELL = strip2.Color(YELL_R, YELL_G, YELL_B);
 
   uint8_t up = breatheUpdate_getBrightness();       // 0..255
   uint8_t dn = (uint8_t)(255 - breathePhase);       // 255..0 (same phase)
@@ -267,8 +287,8 @@ static void activeAnim2_step() {
 
 // END ANIM 1: solid cyan on strip1, solid yellow on strip2
 static void endAnim1_step() {
-  uint32_t CYAN = strip1.Color(CYAN_R, CYAN_G, CYAN_B);
-  uint32_t YELL = strip2.Color(YELL_R, YELL_G, YELL_B);
+  //uint32_t CYAN = strip1.Color(CYAN_R, CYAN_G, CYAN_B);
+  //uint32_t YELL = strip2.Color(YELL_R, YELL_G, YELL_B);
 
   for (uint16_t i = 0; i < strip1.numPixels(); i++) strip1.setPixelColor(i, CYAN);
   for (uint16_t i = 0; i < strip2.numPixels(); i++) strip2.setPixelColor(i, YELL);
@@ -279,17 +299,17 @@ static void endAnim1_step() {
 
 // END ANIM 2: alternating blocks cyan/yellow scrolling
 static void endAnim2_step() {
-  uint32_t CYAN = strip1.Color(CYAN_R, CYAN_G, CYAN_B);
-  uint32_t YELL = strip1.Color(YELL_R, YELL_G, YELL_B);
+  //uint32_t CYAN = strip1.Color(CYAN_R, CYAN_G, CYAN_B);
+  //uint32_t YELL = strip1.Color(YELL_R, YELL_G, YELL_B);
 
   const uint8_t block = 4;
   for (uint16_t i = 0; i < strip1.numPixels(); i++) {
     bool sel = ((i + altPos) / block) % 2;
-    strip1.setPixelColor(i, sel ? CYAN : YELL);
+    strip1.setPixelColor(i, BLU_DAEVA);
   }
   for (uint16_t i = 0; i < strip2.numPixels(); i++) {
     bool sel = ((i + altPos) / block) % 2;
-    strip2.setPixelColor(i, sel ? YELL : CYAN);
+    strip2.setPixelColor(i, BLU_DAEVA);
   }
 
   strip1.show();
@@ -297,9 +317,143 @@ static void endAnim2_step() {
   altPos++;
 }
 
+
+
+
+// ===================== BOUNCING DOT (per strip, start/end, time-based) =====================
+// - One dot per strip.
+// - Each strip has its own START index and END index.
+// - The dot moves START -> END in `bounceHalfPeriodMs`, then END -> START in `bounceHalfPeriodMs`.
+// - Total cycle = 2 * bounceHalfPeriodMs (e.g. 500ms + 500ms = 1s per round trip).
+// - Repeats until `bounceDurationMs` (use your longest duration / active duration).
+// - Non-blocking (millis-based).
+
+static uint32_t bounceStartMs     = 0;
+static uint32_t bounceDurationMs  = 0;   // how long to keep bouncing (e.g. longest duration)
+static uint32_t bounceHalfPeriodMs = 2000; // configurable: time for one leg (start->end OR end->start)
+
+// Per-strip config
+static uint16_t up_a = 0, up_b = 24;   // strip1 start/end
+static uint16_t dn_a = 4, dn_b = 33-4;   // strip2 start/end
+static uint32_t up_col = 0;
+static uint32_t dn_col = 0;
+
+static inline uint16_t clampU16(int32_t v, uint16_t lo, uint16_t hi) {
+  if (v < (int32_t)lo) return lo;
+  if (v > (int32_t)hi) return hi;
+  return (uint16_t)v;
+}
+
+static inline uint16_t lerpIndexU16(uint16_t a, uint16_t b, float t) {
+  // t in [0,1]
+  float v = (float)a + ((float)b - (float)a) * t;
+  int32_t vi = (int32_t)(v + 0.5f);
+  uint16_t lo = (a < b) ? a : b;
+  uint16_t hi = (a > b) ? a : b;
+  return clampU16(vi, lo, hi);
+}
+
+static void bounceAnim_begin(uint32_t longestDurationMs,
+                             uint32_t halfPeriodMs,
+                             // STRIP UP (strip1)
+                             uint16_t strip1_start, uint16_t strip1_end, uint32_t strip1_color,
+                             // STRIP DOWN (strip2)
+                             uint16_t strip2_start, uint16_t strip2_end, uint32_t strip2_color) {
+  bounceStartMs     = millis();
+  bounceDurationMs  = (longestDurationMs == 0) ? 1 : longestDurationMs;
+  bounceHalfPeriodMs = halfPeriodMs;
+
+  // Clamp indices to valid ranges
+  uint16_t n1 = strip1.numPixels();
+  uint16_t n2 = strip2.numPixels();
+  up_a = (n1 > 0) ? (strip1_start % n1) : 0;
+  up_b = (n1 > 0) ? (strip1_end   % n1) : 0;
+  dn_a = (n2 > 0) ? (strip2_start % n2) : 0;
+  dn_b = (n2 > 0) ? (strip2_end   % n2) : 0;
+
+  up_col = strip1_color;
+  dn_col = strip2_color;
+
+  // Start OFF
+  strip1.clear(); strip1.show();
+  strip2.clear(); strip2.show();
+}
+
+static void bounceAnim_step() {
+  uint32_t now = millis();
+  uint32_t dt  = now - bounceStartMs;
+
+  // If duration elapsed, keep last frame or clear; here: keep running pattern clamped
+  if (dt > bounceDurationMs) dt = bounceDurationMs;
+
+  // Phase in a full cycle [0, 2*halfPeriod)
+  uint32_t cycleMs = 2u * bounceHalfPeriodMs;
+  uint32_t ph = (cycleMs > 0) ? (dt % cycleMs) : 0;
+
+  // legT: 0..1
+  float t = (bounceHalfPeriodMs > 0) ? ((float)(ph % bounceHalfPeriodMs) / (float)bounceHalfPeriodMs) : 1.0f;
+
+  bool forward = (ph < bounceHalfPeriodMs); // first half: start->end, second half: end->start
+
+  // Compute positions
+  uint16_t pUp = forward ? lerpIndexU16(up_a, up_b, t) : lerpIndexU16(up_b, up_a, t);
+  uint16_t pDn = forward ? lerpIndexU16(dn_a, dn_b, t) : lerpIndexU16(dn_b, dn_a, t);
+
+  strip1.clear();
+  strip2.clear();
+
+  if (strip1.numPixels() > 0) strip1.setPixelColor(pUp, up_col);
+  if (strip2.numPixels() > 0) strip2.setPixelColor(pDn, dn_col);
+
+  strip1.show();
+  strip2.show();
+}
+
+
+
+
 // Main strip update (non-blocking, state-driven)
 static void updateStripsNonBlocking() {
   uint32_t now = millis();
+
+  static uint8_t prevProgState = ST_START_WAIT;
+
+  if (progState != prevProgState) {
+    if (progState == ST_ACTIVE && ACTIVE_ANIM == 3) {
+
+      // total ACTIVE duration at entry (matches your "longest time passed through serial")
+      uint32_t durMs = (uint32_t)(activeUntil - now);
+      if (durMs == 0) durMs = 1;
+
+      // -------- BOUNCE CONFIG (per strip start/end + speed) --------
+      // Half-period: time to go from START -> END (and same time END -> START)
+      // Example: 500 ms out + 500 ms back = 1 second round trip
+      uint32_t halfPeriodMs = 1500;     // <-- set this (0.5 sec)
+
+      // STRIP UP = strip1
+      uint16_t upStart = 0;                                // <-- set this
+      uint16_t upEnd   = 24;  // <-- set this
+
+      // STRIP DOWN = strip2
+      uint16_t dnStart = 4;                                // <-- set this
+      uint16_t dnEnd   = 33-4;  // <-- set this
+
+      uint32_t upCol = BLU_DAEVA;                          // <-- set this
+      uint32_t dnCol = BLU_DAEVA;                          // <-- set this
+      // ------------------------------------------------------------
+
+      // Begin bouncing animation (runs for durMs total)
+      bounceAnim_begin(
+        durMs,
+        halfPeriodMs,
+        upStart, upEnd, upCol,
+        dnStart, dnEnd, dnCol
+      );
+    }
+
+    prevProgState = progState;
+  }
+  // ============================================================
 
   // Transitions
   if (progState == ST_ACTIVE) {
@@ -307,6 +461,7 @@ static void updateStripsNonBlocking() {
       progState = ST_ENDING;
       endingUntil = now + EndStatusMs;
       nextFrameAt = 0;
+      SerialUSB.println("DONE");
     }
   } else if (progState == ST_ENDING) {
     if ((int32_t)(now - endingUntil) >= 0) {
@@ -323,29 +478,39 @@ static void updateStripsNonBlocking() {
   if ((int32_t)(now - nextFrameAt) < 0) return;
 
   if (progState == ST_START_WAIT) {
-    // Pass ANY color here (variable)
-    uint32_t waitColor = strip1.Color(CYAN_R, CYAN_G, CYAN_B);
-    waitAnim_step(waitColor);
+    waitAnim_step(BLU_DAEVA);
     nextFrameAt = now + 40;
     return;
   }
 
   if (progState == ST_ACTIVE) {
-    if (ACTIVE_ANIM == 1) activeAnim1_step();
-    else activeAnim2_step();
-    nextFrameAt = now + 33;
+
+    if (ACTIVE_ANIM == 1) {
+      activeAnim1_step();
+
+    } else if (ACTIVE_ANIM == 2) {
+      activeAnim2_step();
+
+    } else if (ACTIVE_ANIM == 3) {
+      bounceAnim_step();      // <-- BOUNCING DOT animation
+    }
+
+    nextFrameAt = now + 33;  // ~30 FPS, non-blocking
     return;
   }
 
   // ST_ENDING
   if (END_ANIM == 1) endAnim1_step();
   else endAnim2_step();
+
   nextFrameAt = now + 80;
 }
 
+
+
 /* ---------------- Arduino setup/loop ---------------- */
 void setup() {
-  Serial.begin(BAUD);
+  SerialUSB.begin(BAUD);
 
   // Init discrete LEDs LOW
   for (uint8_t i = 0; i < LED_COUNT; i++) {
@@ -364,7 +529,7 @@ void setup() {
   progState = ST_START_WAIT;
   nextFrameAt = 0;
 
-  Serial.println("Ready. Send: {\"P1:700\",\"P3:1000\",\"P5:500\"}");
+  SerialUSB.println("Ready. Send: {\"P1:700\",\"P3:1000\",\"P5:500\"}");
 }
 
 void loop() {
