@@ -1,148 +1,156 @@
-# Arduino Mega — Serial-Controlled LEDs & WS2812 State-Machine Animations
+# Arduino Due Firmware (Pumps + WS2812 Animations)
 
-This project controls:
+Firmware for an Arduino Due that controls:
 
-- **17 discrete LEDs** (LED1…LED17) on an **Arduino Mega**
-- **2 WS2812 / NeoPixel LED strips** (pins **2** and **3**)
-- A **non-blocking, time-driven state machine** for LED strip animations
+- 17 pump outputs (time-scheduled, non-blocking)
+- 2 WS2812 strips (state-based animations)
+- A serial command interface for runtime control
 
-The system listens for **serial commands** that specify which LEDs to turn ON and for how long.  
-The LED strips visually reflect the system state (waiting, active, ending).
+The code is split into focused modules:
 
----
+- `main.ino`: serial parsing and command dispatch
+- `PumpControl.*`: pump pin control and ON-duration scheduling
+- `LedStateMachine.*`: finite state machine and transitions
+- `LedAnimations.*`: animation rendering per state
 
-## ✨ Features
+## Features
 
-- Fully **non-blocking** (`millis()`-based, no `delay()`)
-- Robust serial parsing (tolerant, not strict JSON)
-- Deterministic **state machine** for LED strips
-- Parametric animations (speed, colors, duration)
-- Clear separation between:
-  - Discrete LED timing
-  - WS2812 animation logic
-  - Serial communication
+- Fully non-blocking (`millis()` driven)
+- Explicit state machine (`STARTUP`, `WAIT`, `ACTIVE`, `ENDING`, `TOXIC`, `MANUTENZIONE`)
+- Pump scheduling from one serial line with multiple `P<n>:<ms>` segments
+- Active animation color selection via named presets
+- Status/error acknowledgements over serial
 
----
+## Hardware Mapping
 
-## 🧠 System Overview
+### Pump outputs (17)
 
-### Discrete LEDs
-- Each LED can be switched ON for a specified duration
-- Multiple LEDs can run **in parallel**
-- Each LED has its own timer
+Pins:
 
-### WS2812 LED Strips
-- Driven by a **3-state finite state machine**
-- Animations are frame-based and time-scheduled
+`6, 7, 8, 9, 10, 11, 12, 13, 22, 24, 26, 28, 30, 32, 34, 36, 38`
 
----
+### WS2812 strips
 
-## 🔁 LED Strip State Machine
+- Strip 1: pin `2`, length `24`
+- Strip 2: pin `3`, length `34`
+
+## Serial Protocol
+
+Baud rate: `115200` on `SerialUSB`.
+
+Send one command line terminated by `\n`.
+
+### 1. ACTIVE command
+
+Format:
+
+```text
+ACTIVE, BASE:<COLOR_NAME>, P1:<ms>, P2:<ms>, ...
+```
+
+Example:
+
+```text
+ACTIVE, BASE:ORANGE, P1:700, P3:1000
+```
+
+Behavior:
+
+- Accepted only in `WAIT`
+- Sets active LED animation color from `BASE` (or `COLOR`)
+- Schedules pumps with provided durations
+- Enters `ACTIVE` state when at least one valid pump duration is provided
+
+### 2. READY command
+
+```text
+READY
+```
+
+Behavior:
+
+- If in `TOXIC` or `MANUTENZIONE`, returns to `WAIT`
+- If already in `WAIT`, refreshes inactivity timeout
+
+### 3. TOXIC command
+
+```text
+TOXIC
+```
+
+Behavior:
+
+- Enters `TOXIC` state
+- Turns all pumps off
+
+### 4. MANUTENZIONE command
+
+```text
+MANUTENZIONE
+```
+
+Behavior:
+
+- Enters maintenance state
+- Turns all pumps off
+
+## Firmware Responses
+
+Possible serial responses:
+
+- `OK ACTIVE`
+- `OK READY`
+- `OK TOXIC`
+- `OK MANUTENZIONE`
+- `ERR ACTIVE COLOR`
+- `ERR ACTIVE PARAMS`
+- `IGNORED ACTIVE`
+- `DONE` (emitted when `ACTIVE` finishes and transitions to `ENDING`)
+
+### Startup and ending status
+
+- On boot, firmware prints one banner line:
+  `Ready. ACTIVE, BASE:ORANGE, P1:700, P3:1000`
+- There is no dedicated `OK STARTUP` response.
+- For ending, firmware emits `DONE` at `ACTIVE -> ENDING`.
+- There is no dedicated `OK ENDING` response.
+
+## State Machine
 
 ### States
 
-| State | Description |
-|-----|-------------|
-| `ST_START_WAIT` | Waiting for a new serial command (breathing animation) |
-| `ST_ACTIVE` | Active animation while LEDs from the last command are ON |
-| `ST_ENDING` | End-status animation after all LEDs turn OFF |
+- `ST_STARTUP`: startup animation
+- `ST_WAIT`: idle/waiting for valid commands
+- `ST_ACTIVE`: active run with pumps scheduled
+- `ST_ENDING`: final flashing animation
+- `ST_TOXIC`: toxic alarm mode
+- `ST_MANUTENZIONE`: maintenance mode
 
-**State transitions**
+### Main transitions
 
-- START_WAIT → ACTIVE: serial command received
-- ACTIVE → ENDING: time ≥ longest LED duration
-- ENDING → START_WAIT: time ≥ EndStatusMs
+- `STARTUP -> WAIT` after startup timeout (`10000 ms`)
+- `WAIT -> ACTIVE` on valid `ACTIVE,...` command
+- `ACTIVE -> ENDING` when the latest pump schedule expires
+- `ENDING -> WAIT` after end animation duration
+- `WAIT -> TOXIC` after inactivity timeout (`30000 ms`) if no `READY`
+- `TOXIC -> WAIT` on `READY`
+- `MANUTENZIONE -> WAIT` on `READY`
 
-New serial commands are accepted only in ST_START_WAIT.
+## Color Presets for ACTIVE
 
----
+Accepted preset names:
 
-## 🔌 Hardware Setup
+- `ORANGE`
+- `RED`
+- `GREEN`
+- `BLUE`
+- `CYAN`
+- `MAGENTA`
+- `YELLOW`
+- `WHITE`
+- `WARM_WHITE`
+- `PURPLE`
 
-### Discrete LEDs (LED1…LED17)
+## Dependency
 
-| LED | Pin | PWM |
-|----:|----:|:---:|
-| LED1 | 6  | ✔ |
-| LED2 | 7  | ✔ |
-| LED3 | 8  | ✔ |
-| LED4 | 9  | ✔ |
-| LED5 | 10 | ✔ |
-| LED6 | 11 | ✔ |
-| LED7 | 12 | ✔ |
-| LED8 | 13 | ✔ |
-| LED9 | 22 | ✖ |
-| LED10 | 24 | ✖ |
-| LED11 | 26 | ✖ |
-| LED12 | 28 | ✖ |
-| LED13 | 30 | ✖ |
-| LED14 | 32 | ✖ |
-| LED15 | 34 | ✖ |
-| LED16 | 36 | ✖ |
-| LED17 | 38 | ✖ |
-
-⚠️ **Arduino Mega PWM pins:** `2–13`, `44–46`  
-Non-PWM pins behave as **ON/OFF only** with `analogWrite()`.
-
----
-
-### WS2812 (NeoPixel) Strips
-
-| Strip | Data Pin | Length |
-|------:|---------:|-------:|
-| Strip 1 | 2 | 16 LEDs |
-| Strip 2 | 3 | 16 LEDs |
-
-**Power notes**
-- Use an external **5V supply** if brightness is high
-- Connect **GND ↔ GND** (Arduino ↔ strips)
-- Recommended:
-  - 330–470 Ω resistor on data line
-  - ≥1000 µF capacitor on 5V rail
-
----
-
-## 📦 Dependencies
-
-- **Arduino IDE** or **PlatformIO**
-- **Adafruit NeoPixel** library  
-  (Arduino IDE → Library Manager → search *Adafruit NeoPixel*)
-
----
-
-## Serial message format
-
-Send one line over the serial port with one or more commands in this form:
-
-```
- P<n>:<time_ms>
-```
-n = LED number (1–17)
-
-time_ms = how long the LED stays ON (milliseconds)
-
-**Example**
-```
-{"P1:700","P3:1000","P5:500"}
-```
-
-
-This means:
-
-LED1 ON for 700 ms
-
-LED3 ON for 1000 ms
-
-LED5 ON for 500 ms
-
- **Notes**
-
-- You can include multiple ` P<n>:<time_ms> ` commands in the same line.
-
-- Order does not matter.
-
-- Extra characters like `{ } , " ` are ignored.
-
-- The line must end with newline (Enter in Serial Monitor).
-
-- The simulation can be find here https://wokwi.com/projects/454125454770316289
+- `Adafruit NeoPixel` library
