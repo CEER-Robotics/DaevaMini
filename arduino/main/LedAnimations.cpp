@@ -1,4 +1,5 @@
 #include "LedAnimations.h"
+#include "ProjectConfig.h"
 #include "LedStateMachine.h"
 
 #include <Adafruit_NeoPixel.h>
@@ -8,32 +9,12 @@
 
 namespace {
 
-static const uint8_t kStrip1Pin = 2;
-static const uint8_t kStrip2Pin = 3;
-static const uint16_t kStrip1Len = 24;
-static const uint16_t kStrip2Len = 34;
-static const uint16_t kStrip1Start = 0;
-static const uint16_t kStrip1End = kStrip1Len - 1;
-static const uint16_t kStrip2Start = 4;
-static const uint16_t kStrip2End = 33 - 4;
-
-static const uint32_t STARTUP_DURATION_MS = 10000;
-static const uint32_t TOXIC_TIMEOUT_MS = 30000;
-
-static uint8_t endFlashCount = 5;
-static uint32_t endFlashPeriodMs = 500;
-static uint8_t endFlashOnPart = 60;
-static uint8_t endFlashOffPart = 40;
-static const uint8_t kActiveAnim = 3;
-static const int16_t kBreatheStep = 10;
-
-Adafruit_NeoPixel strip1(kStrip1Len, kStrip1Pin, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel strip2(kStrip2Len, kStrip2Pin, NEO_GRB + NEO_KHZ800);
-
-static const std::array<uint8_t, 3> kCyanRgb = {0, 255, 255};
-static const std::array<uint8_t, 3> kYellRgb = {255, 255, 0};
-static const std::array<uint8_t, 3> kBluDaevaRgb = {202, 240, 248};
-static const std::array<uint8_t, 3> kStartupDefaultRgb = {255, 120, 0};
+Adafruit_NeoPixel strip1(ProjectConfig::Strips::kStrip1Len,
+                         ProjectConfig::Strips::kStrip1Pin,
+                         NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip2(ProjectConfig::Strips::kStrip2Len,
+                         ProjectConfig::Strips::kStrip2Pin,
+                         NEO_GRB + NEO_KHZ800);
 
 uint32_t CYAN = 0;
 uint32_t YELL = 0;
@@ -53,19 +34,19 @@ static uint32_t nextFrameAt = 0;
 static uint16_t chasePos = 0;
 
 static int16_t breathePhase = 0;
-static int16_t breatheStep = kBreatheStep;
+static int16_t breatheStep = ProjectConfig::Animation::kWaitBreatheStep;
 
 static int16_t maintPhase = 0;
-static int16_t maintStep = 3;
+static int16_t maintStep = ProjectConfig::Animation::kMaintenanceBreatheStep;
 
 static uint32_t bounceStartMs = 0;
 static uint32_t bounceDurationMs = 0;
-static uint32_t bounceHalfPeriodMs = 2000;
+static uint32_t bounceHalfPeriodMs = ProjectConfig::Animation::kBounceHalfPeriodMs;
 
 static uint16_t upA = 0;
-static uint16_t upB = kStrip1Len - 1;
-static uint16_t dnA = 4;
-static uint16_t dnB = 33 - 4;
+static uint16_t upB = ProjectConfig::Strips::kStrip1End;
+static uint16_t dnA = ProjectConfig::Strips::kStrip2Start;
+static uint16_t dnB = ProjectConfig::Strips::kStrip2End;
 static uint32_t upCol = 0;
 static uint32_t dnCol = 0;
 static uint32_t endAnimStartMs = 0;
@@ -80,25 +61,13 @@ static ToxicPattern toxicPattern = TOXIC_STROBE;
 static uint32_t toxicPatternStartMs = 0;
 static uint16_t toxicChasePos = 0;
 
-struct PresetColorEntry {
-  const char* name;
-  uint8_t r;
-  uint8_t g;
-  uint8_t b;
-};
-
-static const PresetColorEntry kPresetColors[] = {
-    {"ORANGE", 255, 120, 0},      {"RED", 255, 0, 0},
-    {"GREEN", 0, 255, 0},         {"BLUE", 0, 0, 255},
-    {"CYAN", 0, 255, 255},        {"MAGENTA", 255, 0, 255},
-    {"YELLOW", 255, 255, 0},      {"WHITE", 255, 255, 255},
-    {"WARM_WHITE", 255, 180, 110},{"PURPLE", 128, 0, 255}};
-
 static uint32_t endStatusDurationMs() {
-  if (endFlashCount == 0 || endFlashPeriodMs == 0) {
+  if (ProjectConfig::Timing::kEndFlashCount == 0 ||
+      ProjectConfig::Timing::kEndFlashPeriodMs == 0) {
     return 1;
   }
-  return (uint32_t)endFlashCount * endFlashPeriodMs;
+  return (uint32_t)ProjectConfig::Timing::kEndFlashCount *
+         ProjectConfig::Timing::kEndFlashPeriodMs;
 }
 
 static uint32_t scaleColor(Adafruit_NeoPixel& s, uint32_t c, uint8_t b) {
@@ -163,7 +132,8 @@ static void activeAnim1Step(uint32_t color) {
 
   const uint16_t p1 = chasePos % strip1.numPixels();
   const uint16_t p2 = (chasePos + strip1.numPixels() / 2) % strip1.numPixels();
-  const uint32_t accent = scaleColor(strip1, color, 120);
+  const uint32_t accent = scaleColor(
+      strip1, color, ProjectConfig::Animation::kActiveAccentBrightness);
 
   strip1.setPixelColor(p1, color);
   strip1.setPixelColor(p2, accent);
@@ -198,11 +168,16 @@ static void activeAnim2Step(uint32_t color) {
 }
 
 static void endFlashStep(uint32_t now) {
-  const uint32_t periodMs = (endFlashPeriodMs == 0) ? 1 : endFlashPeriodMs;
-  const uint16_t ratioTotal =
-      (uint16_t)endFlashOnPart + (uint16_t)endFlashOffPart;
+  const uint32_t periodMs = (ProjectConfig::Timing::kEndFlashPeriodMs == 0)
+                                ? 1
+                                : ProjectConfig::Timing::kEndFlashPeriodMs;
+  const uint16_t ratioTotal = (uint16_t)ProjectConfig::Timing::kEndFlashOnPart +
+                              (uint16_t)ProjectConfig::Timing::kEndFlashOffPart;
   const uint32_t onMs =
-      (ratioTotal == 0) ? 0 : (periodMs * (uint32_t)endFlashOnPart) / ratioTotal;
+      (ratioTotal == 0)
+          ? 0
+          : (periodMs * (uint32_t)ProjectConfig::Timing::kEndFlashOnPart) /
+                ratioTotal;
   const uint32_t phaseMs = (now - endAnimStartMs) % periodMs;
   const bool isOn = (onMs > 0) && (phaseMs < onMs);
   staticFill(isOn ? endingColor : 0);
@@ -290,15 +265,23 @@ static void bounceAnimStep() {
 static void startupAnimStep() {
   const uint32_t now = millis();
   uint32_t elapsed = now - startupAnimStartMs;
-  const uint32_t durationMs = (STARTUP_DURATION_MS == 0) ? 1 : STARTUP_DURATION_MS;
+  const uint32_t durationMs = (ProjectConfig::Timing::kStartupDurationMs == 0)
+                                  ? 1
+                                  : ProjectConfig::Timing::kStartupDurationMs;
   if (elapsed > durationMs) {
     elapsed = durationMs;
   }
 
   const uint16_t strip1Len =
-      (kStrip1End >= kStrip1Start) ? (kStrip1End - kStrip1Start + 1) : 0;
+      (ProjectConfig::Strips::kStrip1End >= ProjectConfig::Strips::kStrip1Start)
+          ? (ProjectConfig::Strips::kStrip1End -
+             ProjectConfig::Strips::kStrip1Start + 1)
+          : 0;
   const uint16_t strip2Len =
-      (kStrip2End >= kStrip2Start) ? (kStrip2End - kStrip2Start + 1) : 0;
+      (ProjectConfig::Strips::kStrip2End >= ProjectConfig::Strips::kStrip2Start)
+          ? (ProjectConfig::Strips::kStrip2End -
+             ProjectConfig::Strips::kStrip2Start + 1)
+          : 0;
   const uint16_t strip1Steps = (uint16_t)((strip1Len + 1) / 2);
   const uint16_t strip2Steps = (uint16_t)((strip2Len + 1) / 2);
   const uint16_t totalSteps = (strip1Steps > strip2Steps) ? strip1Steps : strip2Steps;
@@ -312,10 +295,14 @@ static void startupAnimStep() {
     }
   }
 
-  const uint16_t strip1MidLeft = kStrip1Start + ((strip1Len - 1) / 2);
-  const uint16_t strip1MidRight = kStrip1Start + (strip1Len / 2);
-  const uint16_t strip2MidLeft = kStrip2Start + ((strip2Len - 1) / 2);
-  const uint16_t strip2MidRight = kStrip2Start + (strip2Len / 2);
+  const uint16_t strip1MidLeft =
+      ProjectConfig::Strips::kStrip1Start + ((strip1Len - 1) / 2);
+  const uint16_t strip1MidRight =
+      ProjectConfig::Strips::kStrip1Start + (strip1Len / 2);
+  const uint16_t strip2MidLeft =
+      ProjectConfig::Strips::kStrip2Start + ((strip2Len - 1) / 2);
+  const uint16_t strip2MidRight =
+      ProjectConfig::Strips::kStrip2Start + (strip2Len / 2);
 
   strip1.clear();
   strip2.clear();
@@ -326,10 +313,11 @@ static void startupAnimStep() {
   for (uint16_t i = 0; i < strip1Lit; i++) {
     const int16_t left = (int16_t)strip1MidLeft - (int16_t)i;
     const int16_t right = (int16_t)strip1MidRight + (int16_t)i;
-    if (left >= (int16_t)kStrip1Start && left < (int16_t)strip1.numPixels()) {
+    if (left >= (int16_t)ProjectConfig::Strips::kStrip1Start &&
+        left < (int16_t)strip1.numPixels()) {
       strip1.setPixelColor((uint16_t)left, STARTUP_COLOR);
     }
-    if (right <= (int16_t)kStrip1End &&
+    if (right <= (int16_t)ProjectConfig::Strips::kStrip1End &&
         right < (int16_t)strip1.numPixels() &&
         right != left) {
       strip1.setPixelColor((uint16_t)right, STARTUP_COLOR);
@@ -339,10 +327,11 @@ static void startupAnimStep() {
   for (uint16_t i = 0; i < strip2Lit; i++) {
     const int16_t left = (int16_t)strip2MidLeft - (int16_t)i;
     const int16_t right = (int16_t)strip2MidRight + (int16_t)i;
-    if (left >= (int16_t)kStrip2Start && left < (int16_t)strip2.numPixels()) {
+    if (left >= (int16_t)ProjectConfig::Strips::kStrip2Start &&
+        left < (int16_t)strip2.numPixels()) {
       strip2.setPixelColor((uint16_t)left, STARTUP_COLOR);
     }
-    if (right <= (int16_t)kStrip2End &&
+    if (right <= (int16_t)ProjectConfig::Strips::kStrip2End &&
         right < (int16_t)strip2.numPixels() &&
         right != left) {
       strip2.setPixelColor((uint16_t)right, STARTUP_COLOR);
@@ -365,12 +354,17 @@ static void toxicPickPattern() {
 }
 
 static void toxicAnimStep(uint32_t now) {
-  if ((int32_t)(now - (toxicPatternStartMs + 1800)) >= 0) {
+  if ((int32_t)(now - (toxicPatternStartMs +
+                       ProjectConfig::Timing::kToxicPatternDurationMs)) >= 0) {
     toxicPickPattern();
   }
 
   if (toxicPattern == TOXIC_STROBE) {
-    const bool on = (((now / 120) % 2) == 0);
+    const uint32_t halfPeriodMs =
+        (ProjectConfig::Animation::kToxicStrobeHalfPeriodMs == 0)
+            ? 1
+            : ProjectConfig::Animation::kToxicStrobeHalfPeriodMs;
+    const bool on = (((now / halfPeriodMs) % 2) == 0);
     staticFill(on ? TOXIC_RED : 0);
     return;
   }
@@ -394,7 +388,11 @@ static void toxicAnimStep(uint32_t now) {
     return;
   }
 
-  const bool phase = (((now / 180) % 2) == 0);
+  const uint32_t halfPeriodMs =
+      (ProjectConfig::Animation::kToxicAlternateHalfPeriodMs == 0)
+          ? 1
+          : ProjectConfig::Animation::kToxicAlternateHalfPeriodMs;
+  const bool phase = (((now / halfPeriodMs) % 2) == 0);
   for (uint16_t i = 0; i < strip1.numPixels(); i++) {
     const bool even = ((i % 2) == 0);
     strip1.setPixelColor(i, (even == phase) ? TOXIC_MAGENTA : CYAN);
@@ -418,17 +416,17 @@ static void enterActiveState() {
   breathePhase = 0;
   breatheStep = abs(breatheStep);
 
-  if (kActiveAnim == 3) {
+  if (ProjectConfig::Animation::kActiveAnim == 3) {
     uint32_t durMs = (uint32_t)(LedStateMachine::activeUntilMs() - millis());
     if (durMs == 0) {
       durMs = 1;
     }
 
-    uint32_t halfPeriodMs = 1500;
-    uint16_t upStart = kStrip1Start;
-    uint16_t upEnd = kStrip1End;
-    uint16_t dnStart = kStrip2Start;
-    uint16_t dnEnd = kStrip2End;
+    uint32_t halfPeriodMs = ProjectConfig::Animation::kBounceHalfPeriodMs;
+    uint16_t upStart = ProjectConfig::Strips::kStrip1Start;
+    uint16_t upEnd = ProjectConfig::Strips::kStrip1End;
+    uint16_t dnStart = ProjectConfig::Strips::kStrip2Start;
+    uint16_t dnEnd = ProjectConfig::Strips::kStrip2End;
     uint32_t runColor = currentActiveColor();
 
     bounceAnimBegin(durMs,
@@ -479,11 +477,11 @@ static bool parsePresetColorInternal(const char* name, uint32_t& outColor) {
   }
   norm[w] = '\0';
 
-  for (uint8_t i = 0; i < (uint8_t)(sizeof(kPresetColors) / sizeof(kPresetColors[0])); i++) {
-    if (strcmp(norm, kPresetColors[i].name) == 0) {
-      outColor = strip1.Color(kPresetColors[i].r,
-                              kPresetColors[i].g,
-                              kPresetColors[i].b);
+  for (uint8_t i = 0; i < ProjectConfig::Colors::kPresetColors.size(); i++) {
+    const ProjectConfig::Colors::NamedColor& preset =
+        ProjectConfig::Colors::kPresetColors[i];
+    if (strcmp(norm, preset.name) == 0) {
+      outColor = strip1.Color(preset.rgb.r, preset.rgb.g, preset.rgb.b);
       return true;
     }
   }
@@ -497,20 +495,34 @@ namespace LedAnimations {
 void begin() {
   strip1.begin();
   strip2.begin();
-  strip1.setBrightness(255);
-  strip2.setBrightness(255);
+  strip1.setBrightness(ProjectConfig::Animation::kGlobalBrightness);
+  strip2.setBrightness(ProjectConfig::Animation::kGlobalBrightness);
 
-  CYAN = strip1.Color(kCyanRgb[0], kCyanRgb[1], kCyanRgb[2]);
-  YELL = strip1.Color(kYellRgb[0], kYellRgb[1], kYellRgb[2]);
-  BLU_DAEVA = strip1.Color(kBluDaevaRgb[0], kBluDaevaRgb[1], kBluDaevaRgb[2]);
-  STARTUP_COLOR = strip1.Color(kStartupDefaultRgb[0],
-                               kStartupDefaultRgb[1],
-                               kStartupDefaultRgb[2]);
+  CYAN = strip1.Color(ProjectConfig::Colors::kCyan.r,
+                      ProjectConfig::Colors::kCyan.g,
+                      ProjectConfig::Colors::kCyan.b);
+  YELL = strip1.Color(ProjectConfig::Colors::kYellow.r,
+                      ProjectConfig::Colors::kYellow.g,
+                      ProjectConfig::Colors::kYellow.b);
+  BLU_DAEVA = strip1.Color(ProjectConfig::Colors::kBluDaeva.r,
+                           ProjectConfig::Colors::kBluDaeva.g,
+                           ProjectConfig::Colors::kBluDaeva.b);
+  STARTUP_COLOR = strip1.Color(ProjectConfig::Colors::kStartupDefault.r,
+                               ProjectConfig::Colors::kStartupDefault.g,
+                               ProjectConfig::Colors::kStartupDefault.b);
 
-  TOXIC_RED = strip1.Color(255, 0, 0);
-  TOXIC_ORANGE = strip1.Color(255, 120, 0);
-  TOXIC_MAGENTA = strip1.Color(255, 0, 255);
-  MAINT_ORANGE = strip1.Color(255, 120, 0);
+  TOXIC_RED = strip1.Color(ProjectConfig::Colors::kToxicRed.r,
+                           ProjectConfig::Colors::kToxicRed.g,
+                           ProjectConfig::Colors::kToxicRed.b);
+  TOXIC_ORANGE = strip1.Color(ProjectConfig::Colors::kToxicOrange.r,
+                              ProjectConfig::Colors::kToxicOrange.g,
+                              ProjectConfig::Colors::kToxicOrange.b);
+  TOXIC_MAGENTA = strip1.Color(ProjectConfig::Colors::kToxicMagenta.r,
+                               ProjectConfig::Colors::kToxicMagenta.g,
+                               ProjectConfig::Colors::kToxicMagenta.b);
+  MAINT_ORANGE = strip1.Color(ProjectConfig::Colors::kMaintenanceOrange.r,
+                              ProjectConfig::Colors::kMaintenanceOrange.g,
+                              ProjectConfig::Colors::kMaintenanceOrange.b);
 
   activeColor = BLU_DAEVA;
   activeColorValid = false;
@@ -518,8 +530,8 @@ void begin() {
 
   randomSeed(analogRead(A0) ^ micros());
 
-  LedStateMachine::setStartupDurationMs(STARTUP_DURATION_MS);
-  LedStateMachine::setToxicTimeoutMs(TOXIC_TIMEOUT_MS);
+  LedStateMachine::setStartupDurationMs(ProjectConfig::Timing::kStartupDurationMs);
+  LedStateMachine::setToxicTimeoutMs(ProjectConfig::Timing::kToxicTimeoutMs);
   LedStateMachine::begin();
   nextFrameAt = 0;
   onStateEntered(LedStateMachine::state(), millis());
@@ -598,44 +610,44 @@ bool update() {
 
   if (tickRes.state == LedStateMachine::ST_STARTUP) {
     startupAnimStep();
-    nextFrameAt = now + 50;
+    nextFrameAt = now + ProjectConfig::Animation::kFrameStartupMs;
     return doneEvent;
   }
 
   if (tickRes.state == LedStateMachine::ST_WAIT) {
     waitAnimStep(BLU_DAEVA);
-    nextFrameAt = now + 40;
+    nextFrameAt = now + ProjectConfig::Animation::kFrameWaitMs;
     return doneEvent;
   }
 
   if (tickRes.state == LedStateMachine::ST_TOXIC) {
     toxicAnimStep(now);
-    nextFrameAt = now + 50;
+    nextFrameAt = now + ProjectConfig::Animation::kFrameToxicMs;
     return doneEvent;
   }
 
   if (tickRes.state == LedStateMachine::ST_MANUTENZIONE) {
     maintenanceAnimStep();
-    nextFrameAt = now + 45;
+    nextFrameAt = now + ProjectConfig::Animation::kFrameMaintenanceMs;
     return doneEvent;
   }
 
   if (tickRes.state == LedStateMachine::ST_ACTIVE) {
     const uint32_t color = currentActiveColor();
-    if (kActiveAnim == 1) {
+    if (ProjectConfig::Animation::kActiveAnim == 1) {
       activeAnim1Step(color);
-    } else if (kActiveAnim == 2) {
+    } else if (ProjectConfig::Animation::kActiveAnim == 2) {
       activeAnim2Step(color);
-    } else if (kActiveAnim == 3) {
+    } else if (ProjectConfig::Animation::kActiveAnim == 3) {
       bounceAnimStep();
     }
 
-    nextFrameAt = now + 33;
+    nextFrameAt = now + ProjectConfig::Animation::kFrameActiveMs;
     return doneEvent;
   }
 
   endFlashStep(now);
-  nextFrameAt = now + 20;
+  nextFrameAt = now + ProjectConfig::Animation::kFrameEndingMs;
 
   return doneEvent;
 }

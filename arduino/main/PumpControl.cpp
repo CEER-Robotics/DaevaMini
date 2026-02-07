@@ -1,21 +1,17 @@
 #include "PumpControl.h"
+#include "ProjectConfig.h"
 
 namespace {
 
-static const uint8_t kPumpCount = 17;
-static const uint8_t kPwmValue = 110;
-static const uint8_t kPumpPins[kPumpCount] = {
-    6, 7, 8, 9, 10, 11, 12, 13, 22, 24, 26, 28, 30, 32, 34, 36, 38};
-
-static uint32_t offAtMs[kPumpCount];
+static uint32_t offAtMs[ProjectConfig::Pump::kCount];
 
 static inline void pumpOff(uint8_t idx) {
-  analogWrite(kPumpPins[idx], 0);
+  analogWrite(ProjectConfig::Pump::kPins[idx], 0);
   offAtMs[idx] = 0;
 }
 
 static inline void pumpOnFor(uint8_t idx, uint32_t durationMs) {
-  analogWrite(kPumpPins[idx], kPwmValue);
+  analogWrite(ProjectConfig::Pump::kPins[idx], ProjectConfig::Pump::kDefaultPwm);
   offAtMs[idx] = millis() + durationMs;
 }
 
@@ -24,23 +20,23 @@ static inline void pumpOnFor(uint8_t idx, uint32_t durationMs) {
 namespace PumpControl {
 
 void begin() {
-  for (uint8_t i = 0; i < kPumpCount; i++) {
-    pinMode(kPumpPins[i], OUTPUT);
-    digitalWrite(kPumpPins[i], LOW);
+  for (uint8_t i = 0; i < ProjectConfig::Pump::kCount; i++) {
+    pinMode(ProjectConfig::Pump::kPins[i], OUTPUT);
+    digitalWrite(ProjectConfig::Pump::kPins[i], LOW);
     offAtMs[i] = 0;
   }
 }
 
 void allOff() {
-  for (uint8_t i = 0; i < kPumpCount; i++) {
-    analogWrite(kPumpPins[i], 0);
+  for (uint8_t i = 0; i < ProjectConfig::Pump::kCount; i++) {
+    analogWrite(ProjectConfig::Pump::kPins[i], 0);
     offAtMs[i] = 0;
   }
 }
 
 void update() {
   const uint32_t now = millis();
-  for (uint8_t i = 0; i < kPumpCount; i++) {
+  for (uint8_t i = 0; i < ProjectConfig::Pump::kCount; i++) {
     if (offAtMs[i] != 0 && (int32_t)(now - offAtMs[i]) >= 0) {
       pumpOff(i);
     }
@@ -59,7 +55,7 @@ uint32_t scheduleFromLine(const char* s) {
         pumpNum = pumpNum * 10 + (*s - '0');
         s++;
       }
-      if (pumpNum < 1 || pumpNum > (int)kPumpCount) {
+      if (pumpNum < 1 || pumpNum > (int)ProjectConfig::Pump::kCount) {
         continue;
       }
 
@@ -100,4 +96,3 @@ uint32_t scheduleFromLine(const char* s) {
 }
 
 }  // namespace PumpControl
-

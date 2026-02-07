@@ -8,10 +8,12 @@ Firmware for an Arduino Due that controls:
 
 The code is split into focused modules:
 
-- `main.ino`: serial parsing and command dispatch
+- `main.ino`: top-level setup/loop orchestration
+- `SerialCommandHandler.*`: serial RX, command parsing, and dispatch
 - `PumpControl.*`: pump pin control and ON-duration scheduling
 - `LedStateMachine.*`: finite state machine and transitions
 - `LedAnimations.*`: animation rendering per state
+- `ProjectConfig.h`: centralized pins, timings, animation parameters, and colors
 
 ## Features
 
@@ -150,6 +152,8 @@ Accepted preset names:
 - `WHITE`
 - `WARM_WHITE`
 - `PURPLE`
+
+All state colors (startup, wait/base, toxic, maintenance, ending fallback) and preset color entries are defined in `ProjectConfig.h`.
 
 ## Dependency
 
