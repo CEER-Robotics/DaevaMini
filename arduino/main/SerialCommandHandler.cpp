@@ -116,7 +116,8 @@ static void handleSerialLine(const char* line) {
   }
 
   if (isExactCommand(line, "READY")) {
-    if (LedAnimations::handleReadyCommand()) {
+    const bool wasWaiting = LedAnimations::isWaitingForCommand();
+    if (LedAnimations::handleReadyCommand() && wasWaiting) {
       SerialUSB.println("OK READY");
     }
     return;

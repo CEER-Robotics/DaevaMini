@@ -22,7 +22,7 @@ struct TickResult {
 
 void begin();
 void setStartupDurationMs(uint32_t durationMs);
-void setToxicTimeoutMs(uint32_t timeoutMs);
+void setToxicTimeoutMs(int32_t timeoutMs);
 bool startActive(uint32_t activeUntilMs);
 bool enterMaintenance();
 bool enterToxic();

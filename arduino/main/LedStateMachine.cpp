@@ -5,6 +5,7 @@ namespace {
 static LedStateMachine::ProgramState progState = LedStateMachine::ST_STARTUP;
 static uint32_t startupDurationMs = 10000;
 static uint32_t toxicTimeoutMs = 30000;
+static bool toxicTimeoutEnabled = true;
 static uint32_t stateEnteredAt = 0;
 static uint32_t waitLastValidAt = 0;
 static uint32_t activeUntil = 0;
@@ -40,8 +41,14 @@ void setStartupDurationMs(uint32_t durationMs) {
   startupDurationMs = (durationMs == 0) ? 1 : durationMs;
 }
 
-void setToxicTimeoutMs(uint32_t timeoutMs) {
-  toxicTimeoutMs = (timeoutMs == 0) ? 1 : timeoutMs;
+void setToxicTimeoutMs(int32_t timeoutMs) {
+  if (timeoutMs > 0) {
+    toxicTimeoutMs = (uint32_t)timeoutMs;
+    toxicTimeoutEnabled = true;
+  } else {
+    toxicTimeoutMs = 0;
+    toxicTimeoutEnabled = false;
+  }
 }
 
 bool startActive(uint32_t activeUntilMs) {
@@ -109,7 +116,8 @@ TickResult tick(uint32_t now, uint32_t endStatusMs) {
       result.enteredState = enterState(ST_WAIT, now);
     }
   } else if (progState == ST_WAIT) {
-    if ((uint32_t)(now - waitLastValidAt) >= toxicTimeoutMs) {
+    if (toxicTimeoutEnabled &&
+        (uint32_t)(now - waitLastValidAt) >= toxicTimeoutMs) {
       result.enteredState = enterState(ST_TOXIC, now);
     }
   } else if (progState == ST_ACTIVE) {

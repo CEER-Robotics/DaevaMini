@@ -60,6 +60,8 @@ enum ToxicPattern : uint8_t {
 static ToxicPattern toxicPattern = TOXIC_STROBE;
 static uint32_t toxicPatternStartMs = 0;
 static uint16_t toxicChasePos = 0;
+static int16_t toxicBreathePhase = 0;
+static int16_t toxicBreatheStep = ProjectConfig::Animation::kToxicBreatheStep;
 
 static uint32_t endStatusDurationMs() {
   if (ProjectConfig::Timing::kEndFlashCount == 0 ||
@@ -353,7 +355,26 @@ static void toxicPickPattern() {
   toxicChasePos = 0;
 }
 
-static void toxicAnimStep(uint32_t now) {
+static uint8_t toxicBreatheUpdateBrightness() {
+  toxicBreathePhase += toxicBreatheStep;
+
+  if (toxicBreathePhase >= 255) {
+    toxicBreathePhase = 255;
+    toxicBreatheStep = -abs(toxicBreatheStep);
+  } else if (toxicBreathePhase <= 0) {
+    toxicBreathePhase = 0;
+    toxicBreatheStep = abs(toxicBreatheStep);
+  }
+  return (uint8_t)toxicBreathePhase;
+}
+
+static void toxicAnimSlowBreatheStep() {
+  const uint8_t b = toxicBreatheUpdateBrightness();
+  const uint32_t c = scaleColor(strip1, BLU_DAEVA, b);
+  staticFill(c);
+}
+
+static void toxicAnimPatternStep(uint32_t now) {
   if ((int32_t)(now - (toxicPatternStartMs +
                        ProjectConfig::Timing::kToxicPatternDurationMs)) >= 0) {
     toxicPickPattern();
@@ -449,7 +470,12 @@ static void onStateEntered(LedStateMachine::ProgramState st, uint32_t now) {
     breathePhase = 0;
     breatheStep = abs(breatheStep);
   } else if (st == LedStateMachine::ST_TOXIC) {
-    toxicPickPattern();
+    if (ProjectConfig::Animation::kToxicAnim == 2) {
+      toxicBreathePhase = 0;
+      toxicBreatheStep = abs(ProjectConfig::Animation::kToxicBreatheStep);
+    } else {
+      toxicPickPattern();
+    }
   } else if (st == LedStateMachine::ST_MANUTENZIONE) {
     maintPhase = 0;
     maintStep = abs(maintStep);
@@ -562,6 +588,9 @@ bool handleReadyCommand() {
   const LedStateMachine::ProgramState after = LedStateMachine::state();
   if (handled && before != after) {
     onStateEntered(after, millis());
+    if (after == LedStateMachine::ST_WAIT) {
+      SerialUSB.println("OK READY");
+    }
   }
   return handled;
 }
@@ -602,6 +631,9 @@ bool update() {
 
   if (tickRes.enteredState) {
     onStateEntered(tickRes.state, now);
+    if (tickRes.state == LedStateMachine::ST_WAIT) {
+      SerialUSB.println("OK READY");
+    }
   }
 
   if ((int32_t)(now - nextFrameAt) < 0) {
@@ -621,7 +653,11 @@ bool update() {
   }
 
   if (tickRes.state == LedStateMachine::ST_TOXIC) {
-    toxicAnimStep(now);
+    if (ProjectConfig::Animation::kToxicAnim == 2) {
+      toxicAnimSlowBreatheStep();
+    } else {
+      toxicAnimPatternStep(now);
+    }
     nextFrameAt = now + ProjectConfig::Animation::kFrameToxicMs;
     return doneEvent;
   }

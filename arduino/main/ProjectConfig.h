@@ -47,7 +47,8 @@ namespace Timing {
 // Duration of STARTUP state before entering WAIT.
 constexpr uint32_t kStartupDurationMs = 10000;
 // Inactivity timeout in WAIT before auto-entering TOXIC.
-constexpr uint32_t kToxicTimeoutMs = 30000;
+// Set to -1 to disable automatic TOXIC and allow only serial command activation.
+constexpr int32_t kToxicTimeoutMs = -1;
 
 // Number of flashes shown in ENDING state.
 constexpr uint8_t kEndFlashCount = 5;
@@ -79,6 +80,10 @@ constexpr uint32_t kBounceHalfPeriodMs = 1000;
 constexpr uint32_t kToxicStrobeHalfPeriodMs = 120;
 // Half-period for TOXIC alternate checker pattern.
 constexpr uint32_t kToxicAlternateHalfPeriodMs = 180;
+// TOXIC animation mode: 1 = random toxic patterns, 2 = slow breathe in WAIT color.
+constexpr uint8_t kToxicAnim = 2;
+// Brightness step per TOXIC frame when kToxicAnim == 2 (lower = slower).
+constexpr int16_t kToxicBreatheStep = 5;
 // Frame interval (ms) between animation updates for each state.
 // Lower value = smoother/faster motion but higher CPU load.
 // Higher value = slower/choppier motion but lower CPU load.

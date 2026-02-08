@@ -23,6 +23,13 @@ The code is split into focused modules:
 - Active animation color selection via named presets
 - Status/error acknowledgements over serial
 
+### Toxic animation mode selection
+
+In `ProjectConfig.h`:
+
+- `Animation::kToxicAnim = 1`: current toxic random patterns (strobe/chase/alternate)
+- `Animation::kToxicAnim = 2`: slow breathing animation using the WAIT color (`kBluDaeva`)
+
 ## Hardware Mapping
 
 ### Pump outputs (17)
@@ -41,6 +48,8 @@ Pins:
 Baud rate: `115200` on `SerialUSB`.
 
 Send one command line terminated by `\n`.
+
+For a full host-integration reference (parser behavior, edge cases, and implementation notes), see `SERIAL_PROTOCOL.md`.
 
 ### 1. ACTIVE command
 
@@ -134,9 +143,11 @@ Possible serial responses:
 - `WAIT -> ACTIVE` on valid `ACTIVE,...` command
 - `ACTIVE -> ENDING` when the latest pump schedule expires
 - `ENDING -> WAIT` after end animation duration
-- `WAIT -> TOXIC` after inactivity timeout (`30000 ms`) if no `READY`
+- `WAIT -> TOXIC` after inactivity timeout (if `Timing::kToxicTimeoutMs > 0` and no `READY`)
 - `TOXIC -> WAIT` on `READY`
 - `MANUTENZIONE -> WAIT` on `READY`
+
+`Timing::kToxicTimeoutMs = -1` disables automatic `WAIT -> TOXIC`; in that case `TOXIC` is entered only by serial command.
 
 ## Color Presets for ACTIVE
 
