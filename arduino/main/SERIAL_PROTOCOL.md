@@ -1,0 +1,186 @@
+# Serial Command Protocol (Host -> Arduino Due)
+
+This document is the reference for anyone writing software that communicates with this firmware over USB serial.
+
+## 1. Connection
+
+- Port: Arduino Due native USB port (`SerialUSB`)
+- Baud rate: `115200`
+- Data bits / parity / stop bits: `8N1`
+- Flow control: none
+- Line ending expected by firmware: newline `\n`
+
+Notes:
+- `\r` is ignored by firmware.
+- Each command must be sent as one full line.
+
+## 2. Startup Behavior
+
+On boot, the board prints:
+
+```text
+Ready. ACTIVE, BASE:ORANGE, P1:700, P3:1000
+```
+
+This is only a banner/example, not an acknowledgement for a command.
+
+## 3. Supported Commands
+
+Commands are case-sensitive unless noted.
+
+## 3.1 `READY`
+
+```text
+READY
+```
+
+Meaning:
+- If state is `TOXIC` or `MANUTENZIONE`: transition to `WAIT`
+- If state is `WAIT`: refresh inactivity timeout
+
+Possible response:
+- `OK READY`
+
+If sent in other states (`STARTUP`, `ACTIVE`, `ENDING`), it is ignored with no response.
+
+## 3.2 `TOXIC`
+
+```text
+TOXIC
+```
+
+Meaning:
+- Enter `TOXIC` state
+- Turn all pumps off
+
+Possible response:
+- `OK TOXIC`
+
+If sent in `STARTUP`, it is ignored with no response.
+
+## 3.3 `MANUTENZIONE`
+
+```text
+MANUTENZIONE
+```
+
+Meaning:
+- Enter maintenance state (`MANUTENZIONE`)
+- Turn all pumps off
+
+Possible response:
+- `OK MANUTENZIONE`
+
+If sent in `STARTUP`, it is ignored with no response.
+
+## 3.4 `ACTIVE`
+
+General format:
+
+```text
+ACTIVE, BASE:<COLOR_NAME>, P1:<ms>, P2:<ms>, ...
+```
+
+`COLOR` can be used instead of `BASE`:
+
+```text
+ACTIVE, COLOR:<COLOR_NAME>, P1:<ms>
+```
+
+Valid color names:
+- `ORANGE`
+- `RED`
+- `GREEN`
+- `BLUE`
+- `CYAN`
+- `MAGENTA`
+- `YELLOW`
+- `WHITE`
+- `WARM_WHITE`
+- `PURPLE`
+
+Color parsing details:
+- Case-insensitive for user input (`orange` works).
+- Spaces and `-` in color names are normalized to `_` (`warm white`, `warm-white`, `WARM_WHITE` all work).
+
+Pump parsing details:
+- Valid pump IDs are `P1` to `P17`.
+- Lowercase `p` is accepted (`p3:1000`).
+- Duration unit is milliseconds.
+- `P<n>:0` explicitly turns that pump off.
+- At least one pump must have duration `> 0` for command acceptance.
+
+Possible responses:
+- `OK ACTIVE`
+- `ERR ACTIVE COLOR` (missing/invalid color field)
+- `ERR ACTIVE PARAMS` (no valid non-zero pump duration found)
+- `IGNORED ACTIVE` (command is syntactically valid but board is not in `WAIT`)
+
+## 4. State Constraints
+
+State machine summary:
+- `STARTUP -> WAIT` after ~10 s
+- `WAIT -> ACTIVE` on valid `ACTIVE`
+- `ACTIVE -> ENDING` when scheduled pumps complete
+- `ENDING -> WAIT` after ending animation
+- `WAIT -> TOXIC` after inactivity timeout only if `ProjectConfig::Timing::kToxicTimeoutMs > 0` (and no `READY`)
+- `TOXIC -> WAIT` on `READY`
+- `MANUTENZIONE -> WAIT` on `READY`
+
+Important:
+- `ACTIVE` is accepted only in `WAIT`.
+- Some invalid-state commands are silently ignored (no serial response).
+- If `ProjectConfig::Timing::kToxicTimeoutMs = -1`, automatic `WAIT -> TOXIC` is disabled and `TOXIC` is entered only via serial command.
+
+## 5. Firmware Responses
+
+Possible lines emitted by firmware:
+
+- `OK ACTIVE`
+- `OK READY`
+- `OK TOXIC`
+- `OK MANUTENZIONE`
+- `ERR ACTIVE COLOR`
+- `ERR ACTIVE PARAMS`
+- `IGNORED ACTIVE`
+- `DONE`
+
+`DONE` is emitted when `ACTIVE` ends and transitions to `ENDING`.
+`OK READY` is emitted whenever firmware enters `WAIT` from another state (for example `ENDING -> WAIT`, `TOXIC -> WAIT`, `MANUTENZIONE -> WAIT`).
+
+## 6. Formatting and Parsing Rules
+
+- Commands `READY`, `TOXIC`, `MANUTENZIONE`:
+  - Compared as exact uppercase words after trimming leading/trailing spaces.
+  - Examples that work: `READY`, `  READY  `
+  - Example that does not work: `ready`
+
+- `ACTIVE`:
+  - First CSV token must be exactly `ACTIVE` (uppercase).
+  - Field separator is comma `,`.
+  - Color field key must be `BASE` or `COLOR` (uppercase).
+  - Pump segments can appear anywhere in the line and are scanned as `P<number>:<digits>`.
+
+- Buffer limit:
+  - RX line buffer is 256 bytes including terminator.
+  - Keep full command lines well under 255 characters.
+
+## 7. Host Implementation Recommendations
+
+- Open port at `115200`, set read timeout (for example 200-1000 ms).
+- After opening, optionally wait for the startup banner line.
+- Send exactly one command per line, always ending with `\n`.
+- Read one response line and match against known responses.
+- If no response arrives, treat as possible silent ignore due to invalid state.
+- On long-running operations, monitor for asynchronous `DONE`.
+
+## 8. Test Commands
+
+```text
+READY
+TOXIC
+MANUTENZIONE
+ACTIVE, BASE:ORANGE, P1:700, P3:1000
+ACTIVE, COLOR:warm-white, p2:500
+ACTIVE, BASE:BLUE, P2:0, P5:1200
+```
