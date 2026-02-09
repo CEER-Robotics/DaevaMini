@@ -1,42 +1,11 @@
 FlowRate:
-  MillisecondsPerMilliliter: 10
+  MillisecondsPerMilliliter: 100
 
 Modes:
   - Name: "Gin Mode"
     Color: "#559CAD"
     LiquidAssignments:
-      - "Gin"
-      - "Tonic"
+      - "Campari"
+      - "Vermouth"
       - "Lemon"
       - "Red-bull"
-    Cocktails:
-      - Name: "Gin Tonic"
-        Ingredients:
-          - Name: "Gin"
-            Milliliters: 50
-          - Name: "Tonic"
-            Milliliters: 150
-      - Name: "Gin Lemon"
-        Ingredients:
-          - Name: "Gin"
-            Milliliters: 50
-          - Name: "Lemon"
-            Milliliters: 150
-
-  - Name: "Vodka Mode"
-    Color: "#F5F749"
-    LiquidAssignments:
-      - "Vodka"
-      - "Lemon"
-      - "Red-bull"
-      - "Lemon"
-    Cocktails: []
-
-  - Name: "OG Mode"
-    Color: "#F46036"
-    LiquidAssignments:
-      - "Gin"
-      - "Vodka"
-      - "Tonic"
-      - "Lemon"
-    Cocktails: []

@@ -7,6 +7,12 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     </PropertyGroup>
+    <ItemGroup>
+        <Compile Remove="ImprovedInterface\**\*" />
+        <None Remove="ImprovedInterface\**\*" />
+        <AvaloniaResource Remove="ImprovedInterface\**\*" />
+        <AvaloniaXaml Remove="ImprovedInterface\**\*.axaml" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="11.3.8"/>
@@ -28,6 +34,18 @@
       <None Remove="Assets\logo-white.png" />
       <None Remove="Assets\logo_white.png" />
       <AvaloniaResource Include="Assets\logo_white.png" />
+      <AvaloniaResource Include="Assets\americano.png" />
+      <AvaloniaResource Include="Assets\bottle.png" />
+      <AvaloniaResource Include="Assets\Daeva.png" />
+      <AvaloniaResource Include="Assets\DaevaMax.png" />
+      <AvaloniaResource Include="Assets\ginlemon.png" />
+      <AvaloniaResource Include="Assets\gintonic.png" />
+      <AvaloniaResource Include="Assets\jerrycan.png" />
+      <AvaloniaResource Include="Assets\negroni.png" />
+      <AvaloniaResource Include="Assets\negronisbagliato.png" />
+      <AvaloniaResource Include="Assets\vodkalemon.png" />
+      <AvaloniaResource Include="Assets\vodkaredbull.png" />
+      <AvaloniaResource Include="Assets\vodkatonic.png" />
     </ItemGroup>
 
     <ItemGroup>
@@ -44,12 +62,16 @@
         <DependentUpon>SplashPage.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
-      <Compile Update="Views\CocktailsMenu.axaml.cs">
-        <DependentUpon>CocktailsMenu.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
       <Compile Update="Views\ContainerSetupPage.axaml.cs">
         <DependentUpon>ContainerSetupPage.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\CocktailMenu.axaml.cs">
+        <DependentUpon>CocktailMenu.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Controls\CocktailCard.axaml.cs">
+        <DependentUpon>CocktailCard.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
     </ItemGroup>

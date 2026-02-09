@@ -12,7 +12,7 @@ static const uint8_t ledPins[LED_COUNT] = {
 };
 
 // Mega: PWM is 0..255 and only on PWM pins (2–13, 44–46). Others act ON/OFF.
-static const uint8_t PWM_VALUE = 180;
+static const uint8_t PWM_VALUE = 130;
 
 // WS2812 strips
 static const uint8_t STRIP1_PIN = 2;

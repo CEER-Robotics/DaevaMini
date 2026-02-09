@@ -1,0 +1,79 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Close button (identical across all cards) -->
+    <Style Selector="Button.CloseBtn">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="FontSize" Value="38"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Padding" Value="10"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Margin" Value="20"/>
+    </Style>
+    <Style Selector="Button.CloseBtn:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="#20000000"/>
+    </Style>
+
+    <!-- Dale button – Burgundy (Negroni family) -->
+    <Style Selector="Button.DaleBtnBurgundy">
+        <Setter Property="Background" Value="#772823"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="FontSize" Value="32"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="CornerRadius" Value="15"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="20"/>
+        <Setter Property="Margin" Value="40, 20, 40, 40"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.DaleBtnBurgundy:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="#94342E"/>
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+    <Style Selector="Button.DaleBtnBurgundy:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="#521815"/>
+        <Setter Property="Foreground" Value="Black"/>
+    </Style>
+
+    <!-- Dale button – Teal (Gin family) -->
+    <Style Selector="Button.DaleBtnTeal">
+        <Setter Property="Background" Value="#D0F0F8"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="FontSize" Value="32"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="CornerRadius" Value="15"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="20"/>
+        <Setter Property="Margin" Value="40, 20, 40, 40"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.DaleBtnTeal:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="#FFFFFF"/>
+    </Style>
+
+    <!-- Dale button – Orange (Vodka family) -->
+    <Style Selector="Button.DaleBtnOrange">
+        <Setter Property="Background" Value="#F7940A"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="FontSize" Value="32"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="CornerRadius" Value="15"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="20"/>
+        <Setter Property="Margin" Value="40, 20, 40, 40"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.DaleBtnOrange:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="#C67608"/>
+    </Style>
+    <Style Selector="Button.DaleBtnOrange:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="#C67608"/>
+    </Style>
+</Styles>

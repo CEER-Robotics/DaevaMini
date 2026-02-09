@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -7,69 +7,80 @@
              x:Class="DaevaMini.Views.SplashPage"
              x:DataType="vm:ModesViewModel">
 
-    <!-- Single-page splash -->
-    <Grid Background="{StaticResource PrimaryBackgroundBrush}"
+    <!-- Single-page splash - ImprovedInterface start panel look -->
+    <Grid Background="#131818"
           RowDefinitions="Auto,*,Auto">
 
-        <!-- Top segmented control -->
-        <Grid Grid.Row="0" Margin="0,28,0,0">
+        <!-- Top: mode badge + settings -->
+        <!-- <Grid Grid.Row="0" Margin="0,28,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!-- Centered mode -->
-            <Border
-                Grid.Column="1"
-                Background="{Binding CurrentModeColor}"
-                CornerRadius="28"
-                Padding="22,10">
-                <TextBlock
-                    Text="{Binding CurrentModeName}"
-                    Foreground="#000000"
-                    FontSize="30"
-                    FontWeight="SemiBold"
-                    VerticalAlignment="Center"/>
-            </Border>
-
-            <!-- Settings button -->
-            <Button
-                Grid.Column="2"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Center"
-                Margin="0,0,16,0"
-                Content="⚙"
-                Background="Transparent"
-                FontSize="30"
-                Click="OnSettingsClick"/>
-        </Grid>
-
-        <!-- Center logo -->
-        <Grid Row="1" VerticalAlignment="Center">
-            <StackPanel HorizontalAlignment="Center" Spacing="10">
-                <Image Source="avares://DaevaMini/Assets/logo_white.png"
-                       Stretch="Uniform"
-                       HorizontalAlignment="Right"
-                       Width="650"/>
-            </StackPanel>
-        </Grid>
-
-        <Grid Row="2" Margin="0,0,0,0">
-            <Button HorizontalAlignment="Center"
+            <Border Grid.Column="1"
                     Background="{Binding CurrentModeColor}"
-                    Click="OnTouchToStart"
-                    Padding="50,32"
-                    Width="550"
-                    CornerRadius="26,26,0,0">
-                <TextBlock Text="Touch to start"
+                    CornerRadius="28"
+                    Padding="22,10">
+                <TextBlock Text="{Binding CurrentModeName}"
                            Foreground="#000000"
                            FontSize="30"
                            FontWeight="SemiBold"
-                           HorizontalAlignment="Center"
                            VerticalAlignment="Center"/>
+            </Border>
+
+            <Button Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Margin="0,0,16,0"
+                    Content="⚙"
+                    Background="Transparent"
+                    Foreground="White"
+                    FontSize="30"
+                    Click="OnSettingsClick"/>
+        </Grid> -->
+
+        <!-- Center: DaevaMax image (ImprovedInterface style) -->
+        <Border Grid.Row="1">
+            <Image Source="avares://DaevaMini/Assets/DaevaMax.png"
+                   Width="1494"
+                   Height="317"
+                   Stretch="Uniform"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Margin="0,0,-170,0"/>
+        </Border>
+
+        <!-- Touch to start - ImprovedInterface button style -->
+        <Border Grid.Row="2" Padding="0,0,0,-10">
+            <Button Name="TouchToStartButton"
+                    Content="Touch to start"
+                    Width="1010"
+                    Height="108"
+                    CornerRadius="15"
+                    Background="#539CA8"
+                    Foreground="#111111"
+                    FontSize="42"
+                    FontWeight="Medium"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Cursor="Hand"
+                    Click="OnTouchToStart">
+                <Button.Styles>
+                    <Style Selector="Button:pointerover /template/ ContentPresenter">
+                        <Setter Property="Background" Value="#427D86"/>
+                        <Setter Property="Foreground" Value="#111111"/>
+                    </Style>
+                    <Style Selector="Button:pressed /template/ ContentPresenter">
+                        <Setter Property="Background" Value="#36666E"/>
+                        <Setter Property="Foreground" Value="#111111"/>
+                    </Style>
+                </Button.Styles>
             </Button>
-        </Grid>
+        </Border>
     </Grid>
 </UserControl>
 

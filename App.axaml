@@ -8,6 +8,7 @@
     <Application.Resources>
         <!-- Converters -->
         <converters:InvertedBoolConverter x:Key="InvertedBoolConverter"/>
+        <converters:BitmapAssetConverter x:Key="BitmapAssetConverter"/>
         
         <!-- Color Resources -->
         <Color x:Key="PrimaryBackgroundColor">#131818</Color>
@@ -29,5 +30,6 @@
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://DaevaMini/Styles/AppStyles.axaml"/>
+        <StyleInclude Source="avares://DaevaMini/Styles/CocktailCardStyles.axaml"/>
     </Application.Styles>
 </Application>

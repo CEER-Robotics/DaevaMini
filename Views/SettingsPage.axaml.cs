@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Interactivity;
@@ -10,38 +10,24 @@ namespace DaevaMini.Views;
 public partial class SettingsPage : UserControl
 {
     private readonly ModesViewModel _modesViewModel;
-    private readonly ModesViewModel _localViewModel;
 
     public SettingsPage(ModesViewModel modesViewModel)
     {
         InitializeComponent();
         _modesViewModel = modesViewModel;
-        _localViewModel = new ModesViewModel
-        {
-            CurrentMode = _modesViewModel.CurrentMode
-        };
-
-        DataContext = _localViewModel;
-        _localViewModel.PropertyChanged += (s, e) =>
+        DataContext = _modesViewModel;
+        _modesViewModel.PropertyChanged += (s, e) =>
         {
             if (e.PropertyName == nameof(ModesViewModel.CurrentMode))
-            {
                 UpdateModeButtons();
-            }
         };
-        
-        // Update iniziale
-        Loaded += (s, e) => UpdateModeButtons();
+        Loaded += (_, _) => UpdateModeButtons();
     }
 
     private void ModeSelectorClick(object? sender, RoutedEventArgs e)
     {
-        if (sender is Button button && 
-            button.Tag is Mode mode && 
-            DataContext is ModesViewModel viewModel)
-        {
-            viewModel.CurrentMode = mode;
-        }
+        if (sender is Button button && button.Tag is Mode mode)
+            _modesViewModel.CurrentMode = mode;
     }
 
     private void UpdateModeButtons()
@@ -74,8 +60,6 @@ public partial class SettingsPage : UserControl
 
     private void OnSave(object? sender, RoutedEventArgs e)
     {
-        _modesViewModel.CurrentMode = _localViewModel.CurrentMode;
-
         if (VisualRoot is MainWindow mainWindow)
             mainWindow.ShowContainerSetupPage();
     }

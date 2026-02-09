@@ -7,7 +7,7 @@
              x:Class="DaevaMini.Views.ContainerSetupPage"
              x:DataType="vm:ModesViewModel">
 
-    <Grid Background="{StaticResource PrimaryBackgroundBrush}"
+    <Grid Background="#131818"
           ColumnDefinitions="Auto,*,Auto"
           Margin="20">
         
@@ -20,7 +20,7 @@
                     Click="OnBackArrow">
                 <TextBlock Text="←"
                            FontSize="40"
-                           Foreground="#FFB6C1" />
+                           Foreground="White" />
             </Button>
         </StackPanel>
 
@@ -44,7 +44,7 @@
                             Spacing="30">
                     <Border Width="150"
                             Height="150"
-                            Background="#87CEEB"
+                            Background="#D0F0F8"
                             CornerRadius="75">
                         <TextBlock Text="{Binding Position0Liquid}"
                                    Foreground="#000000"
@@ -58,7 +58,7 @@
                     
                     <Border Width="150"
                             Height="150"
-                            Background="#87CEEB"
+                            Background="#D0F0F8"
                             CornerRadius="75">
                         <TextBlock Text="{Binding Position1Liquid}"
                                    Foreground="#000000"
@@ -78,7 +78,7 @@
                             Spacing="20"
                             Margin="30,0">
                     <TextBlock Text="Insert the correct liquids"
-                               Foreground="{StaticResource TextPrimaryBrush}"
+                               Foreground="White"
                                FontSize="32"
                                FontWeight="SemiBold"
                                HorizontalAlignment="Center"
@@ -86,7 +86,7 @@
 
                     <Border Width="250"
                             Height="250"
-                            Background="#87CEEB"
+                            Background="#D0F0F8"
                             CornerRadius="20">
                         <TextBlock Text="DAĒVA"
                                    Foreground="#000000"
@@ -103,7 +103,7 @@
                             Spacing="30">
                     <Border Width="150"
                             Height="150"
-                            Background="#87CEEB"
+                            Background="#D0F0F8"
                             CornerRadius="75">
                         <TextBlock Text="{Binding Position2Liquid}"
                                    Foreground="#000000"
@@ -117,7 +117,7 @@
                     
                     <Border Width="150"
                             Height="150"
-                            Background="#87CEEB"
+                            Background="#D0F0F8"
                             CornerRadius="75">
                         <TextBlock Text="{Binding Position3Liquid}"
                                    Foreground="#000000"

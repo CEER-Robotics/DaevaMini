@@ -89,10 +89,28 @@ public sealed class ArduinoSerialManager : IDisposable
         return _serial.ReadLine();
     }
 
+    private const string ForcedPort = null; // set to null to use auto-detect
+
     private static string? FindArduinoPort()
     {
         try
         {
+            if (!string.IsNullOrEmpty(ForcedPort))
+            {
+                try
+                {
+                    using var testPort = new SerialPort(ForcedPort, 115200);
+                    testPort.Open();
+                    testPort.Close();
+                    Console.WriteLine($"[ArduinoManager] Using forced port: {ForcedPort}");
+                    return ForcedPort;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ArduinoManager] Forced port {ForcedPort} not available: {ex.Message}");
+                }
+            }
+
             var ports = SerialPort.GetPortNames();
             
             Console.WriteLine($"[ArduinoManager] Scanning for serial ports... Found {ports.Length} port(s): {string.Join(", ", ports)}");
@@ -107,6 +125,16 @@ public sealed class ArduinoSerialManager : IDisposable
                 p.Contains("ACM", StringComparison.OrdinalIgnoreCase) ||
                 p.StartsWith("COM", StringComparison.OrdinalIgnoreCase)
             ).ToList();
+
+            // On Windows, try lower COM numbers first (COM6 before COM11)
+            if (preferredPorts.Any() && preferredPorts[0].StartsWith("COM", StringComparison.OrdinalIgnoreCase))
+            {
+                preferredPorts = preferredPorts.OrderBy(p =>
+                {
+                    var s = p.Substring(3);
+                    return int.TryParse(s, out var n) ? n : int.MaxValue;
+                }).ToList();
+            }
 
             if (preferredPorts.Any())
             {

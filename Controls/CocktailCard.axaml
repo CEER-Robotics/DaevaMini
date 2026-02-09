@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:DaevaMini.Converters"
+             xmlns:models="clr-namespace:DaevaMini.Models"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+             x:Class="DaevaMini.Controls.CocktailCard"
+             x:DataType="models:Cocktail">
+
+    <UserControl.Styles>
+        <StyleInclude Source="avares://DaevaMini/Styles/CocktailCardStyles.axaml"/>
+    </UserControl.Styles>
+
+    <UserControl.Resources>
+        <converters:BitmapAssetConverter x:Key="BitmapAssetConverter"/>
+    </UserControl.Resources>
+
+    <Grid Background="#131818">
+
+        <Border Width="800" Height="90"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Center"
+                CornerRadius="0,0,45,45">
+            <Image Source="avares://DaevaMini/Assets/logo_white.png"
+                   Stretch="Uniform"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Margin="5"/>
+        </Border>
+
+        <Border Width="500"
+                Background="{Binding CardBackground}"
+                CornerRadius="30"
+                BoxShadow="0 10 40 10 #50000000"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+
+            <Grid>
+                <StackPanel Spacing="10">
+
+                    <Panel Height="40"/>
+
+                    <Image Source="{Binding ImageSource, Converter={StaticResource BitmapAssetConverter}}"
+                           Height="320"
+                           HorizontalAlignment="Center"/>
+
+                    <StackPanel HorizontalAlignment="Center" Spacing="5">
+                        <TextBlock Text="{Binding Title}"
+                                   FontFamily="Arial"
+                                   FontSize="50"
+                                   FontWeight="Bold"
+                                   Foreground="Black"
+                                   TextAlignment="Center"/>
+
+                        <TextBlock Text="{Binding Subtitle}"
+                                   FontSize="28"
+                                   FontWeight="Medium"
+                                   Foreground="Black"
+                                   TextAlignment="Center"
+                                   Opacity="1.0"/>
+                    </StackPanel>
+
+                    <Button Name="DaleButton" Content="Start"
+                            Classes.DaleBtnBurgundy="{Binding IsBurgundyTheme}"
+                            Classes.DaleBtnTeal="{Binding IsTealTheme}"
+                            Classes.DaleBtnOrange="{Binding IsOrangeTheme}"/>
+                </StackPanel>
+
+                <Button Classes="CloseBtn" Content="✕" Name="CloseButton"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

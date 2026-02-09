@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO.Ports;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,14 +37,15 @@ public class ArduinoSerial : IDisposable
                 }
                 _port?.Dispose();
 
-                // Create new connection
+                // Create new connection. DtrEnable/RtsEnable = false to avoid resetting
+                // the board when the port is opened (Serial Monitor doesn't hold DTR/RTS by default).
                 _port = new SerialPort(_portName, 115200)
                 {
                     NewLine = "\n",
-                    ReadTimeout = 1000,
-                    WriteTimeout = 1000,
-                    DtrEnable = true,
-                    RtsEnable = true
+                    ReadTimeout = 2000,
+                    WriteTimeout = 5000,
+                    DtrEnable = false,
+                    RtsEnable = false
                 };
 
                 _port.Open();
@@ -111,27 +112,27 @@ public class ArduinoSerial : IDisposable
                     }
                 }
             }
-            catch (TimeoutException)
+            catch (TimeoutException ex)
             {
-                // Port might be busy, try again
+                Console.WriteLine($"[ArduinoSerial] Send timeout (attempt {attempt + 1}): {ex.Message}");
                 if (attempt < MaxRetryAttempts - 1)
                 {
                     Thread.Sleep(RetryDelayMs);
                     continue;
                 }
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
-                // Port was closed, try to reconnect
+                Console.WriteLine($"[ArduinoSerial] Send invalid operation (attempt {attempt + 1}): {ex.Message}");
                 if (attempt < MaxRetryAttempts - 1)
                 {
                     Thread.Sleep(RetryDelayMs);
                     continue;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Other errors, try to reconnect
+                Console.WriteLine($"[ArduinoSerial] Send failed (attempt {attempt + 1}): {ex.GetType().Name} - {ex.Message}");
                 if (attempt < MaxRetryAttempts - 1)
                 {
                     Thread.Sleep(RetryDelayMs);
@@ -139,9 +140,9 @@ public class ArduinoSerial : IDisposable
                     {
                         Connect();
                     }
-                    catch
+                    catch (Exception rex)
                     {
-                        // Ignore reconnection errors, will retry
+                        Console.WriteLine($"[ArduinoSerial] Reconnect failed: {rex.Message}");
                     }
                     continue;
                 }
