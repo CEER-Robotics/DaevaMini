@@ -26,6 +26,10 @@ public sealed class ModeConfig
     [YamlMember(Alias = "Color")]
     public string Color { get; set; } = "#000000";
 
+    /// <summary>Preset name for ACTIVE BASE/COLOR (e.g. ORANGE, CYAN). Defaults to ORANGE if missing or invalid.</summary>
+    [YamlMember(Alias = "LedColor")]
+    public string LedColor { get; set; } = "ORANGE";
+
     [YamlMember(Alias = "LiquidAssignments")]
     public string[] LiquidAssignments { get; set; } = Array.Empty<string>();
 

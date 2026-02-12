@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using DaevaMini.Config;
 using DaevaMini.Controls;
 using DaevaMini.Models;
 using DaevaMini.Services;
@@ -129,14 +130,39 @@ public partial class MainWindow : Window
                 return;
             }
 
-            var commandParts = channelDurations.OrderBy(kvp => kvp.Key)
-                .Select(kvp => $"P{kvp.Key}:{kvp.Value}");
-            string command = string.Join(",", commandParts);
+            string ledColor = AppConfigService.Instance.Config.Modes
+                .FirstOrDefault(m => m.Name.Equals(_modesViewModel.CurrentModeName, StringComparison.OrdinalIgnoreCase))
+                ?.LedColor ?? "ORANGE";
+            string command = ArduinoProtocolHelper.BuildActiveCommand(ledColor, channelDurations);
             Console.WriteLine($"[MainWindow] Sending command: {command}");
 
             bool success = manager.Send(command);
             if (!success)
+            {
                 Console.WriteLine("[MainWindow] Failed to send command");
+                _cocktailsMenuViewModel.IsDispensing = false;
+                return;
+            }
+
+            string? responseLine = manager.ReadLine();
+            var response = ArduinoProtocolHelper.ParseActivateResponse(responseLine);
+            switch (response)
+            {
+                case ActivateResponse.Success:
+                    break;
+                case ActivateResponse.ErrColor:
+                    Console.WriteLine("[MainWindow] Arduino reported ERR ACTIVE COLOR (missing or invalid color)");
+                    break;
+                case ActivateResponse.ErrParams:
+                    Console.WriteLine("[MainWindow] Arduino reported ERR ACTIVE PARAMS (no valid pump duration)");
+                    break;
+                case ActivateResponse.Ignored:
+                    Console.WriteLine("[MainWindow] Arduino reported IGNORED ACTIVE (board not in WAIT state)");
+                    break;
+                case ActivateResponse.NoResponse:
+                    Console.WriteLine("[MainWindow] No response from Arduino (timeout or command ignored in current state)");
+                    break;
+            }
 
             _cocktailsMenuViewModel.IsDispensing = false;
         }

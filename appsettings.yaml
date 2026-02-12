@@ -4,6 +4,7 @@ FlowRate:
 Modes:
   - Name: "Gin Mode"
     Color: "#559CAD"
+    LedColor: "CYAN"
     LiquidAssignments:
       - "Campari"
       - "Vermouth"
