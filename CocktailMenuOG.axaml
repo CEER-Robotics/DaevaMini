@@ -1,0 +1,102 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+             x:Class="DaevaMini.CocktailMenuOG">
+
+    <UserControl.Styles>
+        <Style Selector="Button.CocktailCard">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="CornerRadius" Value="15"/>
+            <Setter Property="Background" Value="#253540"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1" />
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="Button.CocktailCard:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#324652"/>
+        </Style>
+
+        <Style Selector="Button.CocktailCard:pressed">
+            <Setter Property="RenderTransform" Value="scale(0.96)" />
+        </Style>
+        <Style Selector="Button.CocktailCard:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1A252D"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto, *" Background="#121212">
+
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Height="80">
+            
+            <Button Grid.Column="0"
+                    Width="40" Height="40"
+                    VerticalAlignment="Top"
+                    Margin="20,15,0,0" 
+                    Background="Transparent">
+                <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
+                          Foreground="White"
+                          Width="20" Height="20"/>
+            </Button>
+
+            <Border Grid.Column="1"
+                    Background="#C0ECFA"
+                    Width="450" Height="60"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Center"
+                    CornerRadius="0,0,30,30">
+                <Image Source="/Assets/Daeva.png" 
+                       Stretch="Uniform"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Margin="10"/> 
+            </Border>
+        </Grid>
+
+        <UniformGrid Grid.Row="1" Columns="2" Rows="2" Margin="30,10">
+
+            <Button Classes="CocktailCard">
+                <Grid RowDefinitions="*, Auto">
+                    <Image Grid.Row="0" Source="/Assets/negroni.png" Margin="15" Stretch="Uniform"/>
+                    <Border Grid.Row="1" Background="#FF6F61" Height="50" CornerRadius="0,0,15,15">
+                        <TextBlock Text="Negroni" Foreground="Black" FontWeight="Bold" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Button>
+
+            <Button Classes="CocktailCard">
+                <Grid RowDefinitions="*, Auto">
+                    <Image Grid.Row="0" Source="/Assets/negronisbagliato.png" Margin="15" Stretch="Uniform"/>
+                    <Border Grid.Row="1" Background="#FF6F61" Height="50" CornerRadius="0,0,15,15">
+                        <TextBlock Text="Negroni Sbagliato" Foreground="Black" FontWeight="Bold" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Button>
+
+            <Button Classes="CocktailCard">
+                <Grid RowDefinitions="*, Auto">
+                    <Image Grid.Row="0" Source="/Assets/americano.png" Margin="15" Stretch="Uniform"/>
+                    <Border Grid.Row="1" Background="#FF6F61" Height="50" CornerRadius="0,0,15,15">
+                        <TextBlock Text="Americano" Foreground="Black" FontWeight="Bold" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Button>
+
+            <Button Classes="CocktailCard">
+                <Grid RowDefinitions="*, Auto">
+                    <Border Grid.Row="1" Background="#FF6F61" Height="50" CornerRadius="0,0,15,15">
+                        <TextBlock Text="" Foreground="Black" FontWeight="Bold" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Button>
+
+        </UniformGrid>
+    </Grid>
+</UserControl>

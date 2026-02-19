@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.3.11"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.3.11"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.11"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.11"/>
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.11">
+            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <AvaloniaResource Include="Assets\vodkatonic.png" />
+      <None Remove="americano.png" />
+      <None Remove="bottle.png" />
+      <AvaloniaResource Include="Assets\americano.png" />
+      <None Remove="Daeva.png" />
+      <AvaloniaResource Include="Assets\bottle.png" />
+      <None Remove="DaevaMax.png" />
+      <AvaloniaResource Include="Assets\Daeva.png" />
+      <None Remove="ginlemon.png" />
+      <AvaloniaResource Include="Assets\DaevaMax.png" />
+      <None Remove="gintonic.png" />
+      <AvaloniaResource Include="Assets\ginlemon.png" />
+      <None Remove="jerrycan.png" />
+      <AvaloniaResource Include="Assets\gintonic.png" />
+      <None Remove="negroni.png" />
+      <AvaloniaResource Include="Assets\jerrycan.png" />
+      <None Remove="negronisbagliato.png" />
+      <AvaloniaResource Include="Assets\negroni.png" />
+      <None Remove="vodkalemon.png" />
+      <AvaloniaResource Include="Assets\negronisbagliato.png" />
+      <None Remove="vodkaredbull.png" />
+      <AvaloniaResource Include="Assets\vodkalemon.png" />
+      <None Remove="vodkatonic.png" />
+      <AvaloniaResource Include="Assets\vodkaredbull.png" />
+      <None Remove="Assets\DaevaMini.png" />
+      <AvaloniaResource Include="Assets\DaevaMini.png" />
+      <None Remove="Assets\DaevaFinal.png" />
+      <None Remove="Assets\DaevaMiniLogo.png" />
+      <AvaloniaResource Include="Assets\DaevaMiniLogo.png" />
+      <None Remove="Assets\DaevaDark.png" />
+      <AvaloniaResource Include="Assets\DaevaDark.png" />
+    </ItemGroup>
+</Project>

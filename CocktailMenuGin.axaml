@@ -1,0 +1,96 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+             x:Class="DaevaMini.CocktailMenuGin">
+
+    <UserControl.Styles>
+        <Style Selector="Button.DoneBtn">
+            <Setter Property="Background" Value="#F7940A"/> 
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="22"/> 
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="12"/> 
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="15"/> 
+            <Setter Property="Width" Value="280"/> 
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style Selector="Button.DoneBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#C67608"/> 
+        </Style>
+
+        <Style Selector="Button.DoneBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#A05D04"/> 
+        </Style>
+
+        <Style Selector="Button.BackBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="CornerRadius" Value="50"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        
+        <Style Selector="Button.BackBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#20FFFFFF"/> 
+        </Style>
+    </UserControl.Styles>
+
+    <Grid Background="#131818">
+
+        <Button Classes="BackBtn"
+                Margin="20,20,0,0"
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Top">
+            <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
+                      Foreground="White" 
+                      Width="28" Height="28"/>
+        </Button>
+
+        <Canvas Width="640" Height="330" HorizontalAlignment="Center" VerticalAlignment="Center">
+            
+            <TextBlock Canvas.Left="220" Canvas.Top="0" 
+                       Width="200" 
+                       Text="Insert the&#x0a;correct liquids" 
+                       TextAlignment="Center" 
+                       Foreground="White" 
+                       FontSize="26" 
+                       FontWeight="SemiBold"/>
+
+            <Border Canvas.Left="0" Canvas.Top="0" Background="#D0F0F8" CornerRadius="100" Width="150" Height="150">
+                <TextBlock Text="Vodka" Foreground="Black" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+
+            <Border Canvas.Left="490" Canvas.Top="0" Background="#D0F0F8" CornerRadius="100" Width="150" Height="150">
+                <TextBlock Text="Red-bull" Foreground="Black" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+
+            <Border Canvas.Left="0" Canvas.Top="180" Background="#D0F0F8" CornerRadius="100" Width="150" Height="150">
+                <TextBlock Text="Lemon" Foreground="Black" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+
+            <Border Canvas.Left="490" Canvas.Top="180" Background="#D0F0F8" CornerRadius="100" Width="150" Height="150">
+                <TextBlock Text="Lemon" Foreground="Black" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+
+            <Border Canvas.Left="220" Canvas.Top="110" Background="#D0F0F8" CornerRadius="20" Width="200" Height="200">
+                <Image Source="avares://DaevaMini/Assets/DaevaDark.png" 
+                       Width="180" 
+                       Margin="15,0,0,0"
+                       Stretch="Uniform" 
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Center"/>
+            </Border>
+
+        </Canvas>
+
+        <Button Content="Done" 
+                Classes="DoneBtn" 
+                VerticalAlignment="Bottom"
+                Margin="0,0,0,35"/>
+
+    </Grid>
+</UserControl>
