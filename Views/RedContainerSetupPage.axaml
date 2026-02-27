@@ -1,0 +1,152 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:DaevaMini.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+             x:Class="DaevaMini.Views.RedContainerSetupPage"
+             x:DataType="vm:ModesViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="ToggleButton.BottleBtn">
+            <Setter Property="Background" Value="#FF3B3B"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <StackPanel>
+                        <Border Width="145" Height="145" CornerRadius="100" Background="{TemplateBinding Background}">
+                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{TemplateBinding Tag}" Foreground="White" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,15,0,0"/>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="ToggleButton.JerryCanBtn">
+            <Setter Property="Background" Value="#FF3B3B"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <StackPanel>
+                        <Border Width="175" Height="175" CornerRadius="28" Background="{TemplateBinding Background}">
+                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{TemplateBinding Tag}" Foreground="White" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,15,0,0"/>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="ToggleButton.BottleBtn:checked, ToggleButton.JerryCanBtn:checked">
+            <Setter Property="Background" Value="#D0F0F8"/>
+        </Style>
+
+        <Style Selector="Button.DoneBtn">
+            <Setter Property="Background" Value="#F7940A"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="34"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Padding" Value="180,25"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.DoneBtn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#C67608"/>
+        </Style>
+        <Style Selector="Button.DoneBtn:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#A05A00"/>
+        </Style>
+        <Style Selector="Button.DoneBtn:pressed TextBlock">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="90, *, 220" Background="#121212">
+
+        <Grid Grid.Row="0" Margin="50,40,0,0">
+            <Button Background="Transparent" Click="OnBackArrow" HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="Hand">
+                <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" Foreground="White" Width="35" Height="35"/>
+            </Button>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto" HorizontalAlignment="Center" VerticalAlignment="Center">
+            
+            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="60" Margin="0,0,60,0">
+                <ToggleButton Classes="JerryCanBtn" Tag="Empty">
+                    <Image Source="avares://DaevaMini/Assets/jerrycan.png" Stretch="Uniform" Margin="40"/>
+                </ToggleButton>
+                <ToggleButton Classes="JerryCanBtn" Tag="Empty">
+                    <Image Source="avares://DaevaMini/Assets/jerrycan.png" Stretch="Uniform" Margin="40"/>
+                </ToggleButton>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="30">
+                
+                <StackPanel Orientation="Horizontal" Spacing="30" HorizontalAlignment="Center">
+                    <ToggleButton Classes="BottleBtn" Tag="Gin">
+                        <Image Source="avares://DaevaMini/Assets/bottle.png" Stretch="Uniform" Margin="35"/>
+                    </ToggleButton>
+                    <ToggleButton Classes="BottleBtn" Tag="Gin">
+                        <Image Source="avares://DaevaMini/Assets/bottle.png" Stretch="Uniform" Margin="35"/>
+                    </ToggleButton>
+                    <ToggleButton Classes="BottleBtn" Tag="Gin">
+                        <Image Source="avares://DaevaMini/Assets/bottle.png" Stretch="Uniform" Margin="35"/>
+                    </ToggleButton>
+                    <ToggleButton Classes="BottleBtn" Tag="Tonica">
+                        <Image Source="avares://DaevaMini/Assets/bottle.png" Stretch="Uniform" Margin="35"/>
+                    </ToggleButton>
+                </StackPanel>
+
+                <Grid ColumnDefinitions="Auto, 380, Auto" HorizontalAlignment="Center">
+                    
+                    <StackPanel Grid.Column="0" Spacing="30" VerticalAlignment="Top">
+                        <ToggleButton Classes="BottleBtn" Tag="Lemon">
+                            <Image Source="avares://DaevaMini/Assets/bottle.png" Stretch="Uniform" Margin="35"/>
+                        </ToggleButton>
+                        <ToggleButton Classes="BottleBtn" Tag="Gin">
+                            <Image Source="avares://DaevaMini/Assets/bottle.png" Stretch="Uniform" Margin="35"/>
+                        </ToggleButton>
+                        <ToggleButton Classes="BottleBtn" Tag="Lemon">
+                            <Image Source="avares://DaevaMini/Assets/bottle.png" Stretch="Uniform" Margin="35"/>
+                        </ToggleButton>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,30,0,0">
+                        <TextBlock Text="Change the empty container&#x0a;and then click its icon" 
+                                   Foreground="#D0F0F8" FontSize="26" FontWeight="Bold" 
+                                   HorizontalAlignment="Center" TextAlignment="Center" MaxWidth="380" TextWrapping="Wrap"/>
+                                   
+                        <Border Width="280" Height="280" Background="#D0F0F8" CornerRadius="20" Margin="0,30,0,0">
+                            <Image Source="avares://DaevaMini/Assets/Daeva.png" Stretch="Uniform" Margin="40"/>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Spacing="30" VerticalAlignment="Top">
+                        <ToggleButton Classes="BottleBtn" Tag="Tonica">
+                            <Image Source="avares://DaevaMini/Assets/bottle.png" Stretch="Uniform" Margin="35"/>
+                        </ToggleButton>
+                        <ToggleButton Classes="BottleBtn" Tag="Tonica">
+                            <Image Source="avares://DaevaMini/Assets/bottle.png" Stretch="Uniform" Margin="35"/>
+                        </ToggleButton>
+                        <ToggleButton Classes="BottleBtn" Tag="Tonica">
+                            <Image Source="avares://DaevaMini/Assets/bottle.png" Stretch="Uniform" Margin="35"/>
+                        </ToggleButton>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="60" Margin="60,0,0,0">
+                <ToggleButton Classes="JerryCanBtn" Tag="Empty">
+                    <Image Source="avares://DaevaMini/Assets/jerrycan.png" Stretch="Uniform" Margin="40"/>
+                </ToggleButton>
+                <ToggleButton Classes="JerryCanBtn" Tag="Empty">
+                    <Image Source="avares://DaevaMini/Assets/jerrycan.png" Stretch="Uniform" Margin="40"/>
+                </ToggleButton>
+            </StackPanel>
+        </Grid>
+
+        <Button Grid.Row="2" Content="Done" Classes="DoneBtn" Click="OnDone" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,70"/>
+
+    </Grid>
+</UserControl>
