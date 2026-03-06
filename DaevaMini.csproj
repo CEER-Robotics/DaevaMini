@@ -46,6 +46,9 @@
       <AvaloniaResource Include="Assets\vodkalemon.png" />
       <AvaloniaResource Include="Assets\vodkaredbull.png" />
       <AvaloniaResource Include="Assets\vodkatonic.png" />
+      <AvaloniaResource Include="Assets\DaevaMaxFinal.png" />
+      <AvaloniaResource Include="Assets\gear.svg" />
+      <AvaloniaResource Include="Assets\camparispritz.png" />
     </ItemGroup>
 
     <ItemGroup>

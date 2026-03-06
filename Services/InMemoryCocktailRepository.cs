@@ -23,34 +23,34 @@ public sealed class InMemoryCocktailRepository : ICocktailRepository
                 new CocktailIngredient("Tonic", 150)
             ]
         },
-        new Cocktail
-        {
-            Id = "vodkatonic",
-            Title = "Vodka Tonic",
-            Subtitle = "Vodka, tonic",
-            ImageSource = AssetsBase + "vodkatonic.png",
-            Theme = CocktailTheme.Orange,
-            LedRgb = (255, 255, 255),
-            Ingredients =
-            [
-                new CocktailIngredient("Vodka", 50),
-                new CocktailIngredient("Tonic", 150)
-            ]
-        },
-        new Cocktail
-        {
-            Id = "vodkaredbull",
-            Title = "Vodka Red Bull",
-            Subtitle = "Vodka, red bull",
-            ImageSource = AssetsBase + "vodkaredbull.png",
-            Theme = CocktailTheme.Orange,
-            LedRgb = (30, 255, 0),
-            Ingredients =
-            [
-                new CocktailIngredient("Vodka", 50),
-                new CocktailIngredient("Red-bull", 150)
-            ]
-        },
+        // new Cocktail
+        // {
+        //     Id = "vodkatonic",
+        //     Title = "Vodka Tonic",
+        //     Subtitle = "Vodka, tonic",
+        //     ImageSource = AssetsBase + "vodkatonic.png",
+        //     Theme = CocktailTheme.Orange,
+        //     LedRgb = (255, 255, 255),
+        //     Ingredients =
+        //     [
+        //         new CocktailIngredient("Vodka", 50),
+        //         new CocktailIngredient("Tonic", 150)
+        //     ]
+        // },
+        // new Cocktail
+        // {
+        //     Id = "vodkaredbull",
+        //     Title = "Vodka Red Bull",
+        //     Subtitle = "Vodka, red bull",
+        //     ImageSource = AssetsBase + "vodkaredbull.png",
+        //     Theme = CocktailTheme.Orange,
+        //     LedRgb = (30, 255, 0),
+        //     Ingredients =
+        //     [
+        //         new CocktailIngredient("Vodka", 50),
+        //         new CocktailIngredient("Red-bull", 150)
+        //     ]
+        // },
         new Cocktail
         {
             Id = "americano",
@@ -65,34 +65,34 @@ public sealed class InMemoryCocktailRepository : ICocktailRepository
                 new CocktailIngredient("Vermouth", 30)
             ]
         },
-        new Cocktail
-        {
-            Id = "ginlemon",
-            Title = "Gin Lemon",
-            Subtitle = "Gin, lemon",
-            ImageSource = AssetsBase + "ginlemon.png",
-            Theme = CocktailTheme.Teal,
-            LedRgb = (50, 255, 0),
-            Ingredients =
-            [
-                new CocktailIngredient("Gin", 50),
-                new CocktailIngredient("Lemon", 150)
-            ]
-        },
-        new Cocktail
-        {
-            Id = "vodkalemon",
-            Title = "Vodka Lemon",
-            Subtitle = "Vodka, lemon",
-            ImageSource = AssetsBase + "vodkalemon.png",
-            Theme = CocktailTheme.Orange,
-            LedRgb = (50, 255, 0),
-            Ingredients =
-            [
-                new CocktailIngredient("Vodka", 50),
-                new CocktailIngredient("Lemon", 150)
-            ]
-        },
+        // new Cocktail
+        // {
+        //     Id = "ginlemon",
+        //     Title = "Gin Lemon",
+        //     Subtitle = "Gin, lemon",
+        //     ImageSource = AssetsBase + "ginlemon.png",
+        //     Theme = CocktailTheme.Teal,
+        //     LedRgb = (50, 255, 0),
+        //     Ingredients =
+        //     [
+        //         new CocktailIngredient("Gin", 50),
+        //         new CocktailIngredient("Lemon", 150)
+        //     ]
+        // },
+        // new Cocktail
+        // {
+        //     Id = "vodkalemon",
+        //     Title = "Vodka Lemon",
+        //     Subtitle = "Vodka, lemon",
+        //     ImageSource = AssetsBase + "vodkalemon.png",
+        //     Theme = CocktailTheme.Orange,
+        //     LedRgb = (50, 255, 0),
+        //     Ingredients =
+        //     [
+        //         new CocktailIngredient("Vodka", 50),
+        //         new CocktailIngredient("Lemon", 150)
+        //     ]
+        // },
         new Cocktail
         {
             Id = "negroni",
@@ -122,6 +122,16 @@ public sealed class InMemoryCocktailRepository : ICocktailRepository
                 new CocktailIngredient("Vermouth", 80),
                 new CocktailIngredient("Prosecco", 80)
             ]
+        },
+        new Cocktail
+        {
+            Id = "camparispritz",
+            Title = "Campari Spritz",
+            Subtitle = "Campari, Prosecco",
+            ImageSource = AssetsBase + "camparispritz.png",
+            Theme = CocktailTheme.Burgundy,
+            LedRgb = (10, 255, 0),
+            Ingredients = [ new CocktailIngredient("Campari", 50), new CocktailIngredient("Prosecco", 80) ]
         }
     ];
 
