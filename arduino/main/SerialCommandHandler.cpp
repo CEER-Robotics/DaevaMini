@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "LedAnimations.h"
@@ -38,14 +39,40 @@ static bool isExactCommand(const char* line, const char* cmd) {
   return strcmp(t, cmd) == 0;
 }
 
-static bool extractActiveColorName(const char* line,
-                                   char* outName,
-                                   size_t outNameLen) {
-  if (line == nullptr || outName == nullptr || outNameLen == 0) {
+// Parses a 0-255 byte value; returns true and sets *out if valid.
+static bool parseByte(const char* s, uint8_t* out) {
+  if (s == nullptr || out == nullptr) {
+    return false;
+  }
+  char* end = nullptr;
+  long n = strtol(s, &end, 10);
+  if (end == s || *end != '\0') {
+    return false;
+  }
+  if (n < 0 || n > 255) {
+    return false;
+  }
+  *out = (uint8_t)n;
+  return true;
+}
+
+// Extracts active color: either BASE/COLOR:<name> or RGB:r,g,b.
+// For RGB, the value after the colon is r; the next two comma-separated tokens are g and b.
+static bool extractActiveColor(const char* line,
+                               char* outName,
+                               size_t outNameLen,
+                               uint8_t* outR,
+                               uint8_t* outG,
+                               uint8_t* outB,
+                               bool* outIsRgb) {
+  if (line == nullptr || outName == nullptr || outNameLen == 0 ||
+      outR == nullptr || outG == nullptr || outB == nullptr ||
+      outIsRgb == nullptr) {
     return false;
   }
 
   outName[0] = '\0';
+  *outIsRgb = false;
 
   char buf[sizeof(rxLine)];
   strncpy(buf, line, sizeof(buf) - 1);
@@ -72,12 +99,33 @@ static bool extractActiveColorName(const char* line,
     char* key = trimInPlace(field);
     char* val = trimInPlace(sep + 1);
 
+    if (strcmp(key, "RGB") == 0) {
+      uint8_t r = 0, g = 0, b = 0;
+      if (!parseByte(val, &r)) {
+        return false;
+      }
+      char* tokG = strtok(nullptr, ",");
+      char* tokB = strtok(nullptr, ",");
+      if (tokG == nullptr || tokB == nullptr) {
+        return false;
+      }
+      if (!parseByte(trimInPlace(tokG), &g) || !parseByte(trimInPlace(tokB), &b)) {
+        return false;
+      }
+      *outR = r;
+      *outG = g;
+      *outB = b;
+      *outIsRgb = true;
+      return true;
+    }
+
     if (strcmp(key, "BASE") == 0 || strcmp(key, "COLOR") == 0) {
       if (*val == '\0') {
         return false;
       }
       strncpy(outName, val, outNameLen - 1);
       outName[outNameLen - 1] = '\0';
+      *outIsRgb = false;
       return true;
     }
   }
@@ -136,7 +184,10 @@ static void handleSerialLine(const char* line) {
   }
 
   char colorName[32];
-  if (!extractActiveColorName(line, colorName, sizeof(colorName))) {
+  uint8_t rgbR = 0, rgbG = 0, rgbB = 0;
+  bool isRgb = false;
+  if (!extractActiveColor(line, colorName, sizeof(colorName),
+                          &rgbR, &rgbG, &rgbB, &isRgb)) {
     SerialUSB.println("ERR ACTIVE COLOR");
     return;
   }
@@ -147,7 +198,9 @@ static void handleSerialLine(const char* line) {
   }
 
   uint32_t selectedColor = 0;
-  if (!LedAnimations::parsePresetColor(colorName, selectedColor)) {
+  if (isRgb) {
+    selectedColor = ((uint32_t)rgbR << 16) | ((uint32_t)rgbG << 8) | (uint32_t)rgbB;
+  } else if (!LedAnimations::parsePresetColor(colorName, selectedColor)) {
     SerialUSB.println("ERR ACTIVE COLOR");
     return;
   }

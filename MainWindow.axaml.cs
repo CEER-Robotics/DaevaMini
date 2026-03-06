@@ -130,10 +130,13 @@ public partial class MainWindow : Window
                 return;
             }
 
-            string ledColor = AppConfigService.Instance.Config.Modes
-                .FirstOrDefault(m => m.Name.Equals(_modesViewModel.CurrentModeName, StringComparison.OrdinalIgnoreCase))
-                ?.LedColor ?? "ORANGE";
-            string command = ArduinoProtocolHelper.BuildActiveCommand(ledColor, channelDurations);
+            string command = cocktail.LedRgb is { } rgb
+                ? ArduinoProtocolHelper.BuildActiveCommand(rgb, channelDurations)
+                : ArduinoProtocolHelper.BuildActiveCommand(
+                    AppConfigService.Instance.Config.Modes
+                        .FirstOrDefault(m => m.Name.Equals(_modesViewModel.CurrentModeName, StringComparison.OrdinalIgnoreCase))
+                        ?.LedColor ?? "ORANGE",
+                    channelDurations);
             Console.WriteLine($"[MainWindow] Sending command: {command}");
 
             bool success = manager.Send(command);

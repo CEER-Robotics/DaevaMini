@@ -139,7 +139,7 @@ constexpr Rgb kMaintenanceOrange = {255, 120, 0};
 
 // Named colors accepted by ACTIVE, BASE:<name> (or COLOR:<name>).
 constexpr std::array<NamedColor, 10> kPresetColors = {{
-    {"ORANGE", {255, 120, 0}},
+    {"ORANGE", {120, 255, 0}},
     {"RED", {255, 0, 0}},
     {"GREEN", {0, 255, 0}},
     {"BLUE", {0, 0, 255}},

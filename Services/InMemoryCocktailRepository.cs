@@ -16,6 +16,7 @@ public sealed class InMemoryCocktailRepository : ICocktailRepository
             Subtitle = "Gin, tonica",
             ImageSource = AssetsBase + "gintonic.png",
             Theme = CocktailTheme.Teal,
+            LedRgb = (255, 255, 255),
             Ingredients =
             [
                 new CocktailIngredient("Gin", 50),
@@ -29,6 +30,7 @@ public sealed class InMemoryCocktailRepository : ICocktailRepository
             Subtitle = "Vodka, tonic",
             ImageSource = AssetsBase + "vodkatonic.png",
             Theme = CocktailTheme.Orange,
+            LedRgb = (255, 255, 255),
             Ingredients =
             [
                 new CocktailIngredient("Vodka", 50),
@@ -42,6 +44,7 @@ public sealed class InMemoryCocktailRepository : ICocktailRepository
             Subtitle = "Vodka, red bull",
             ImageSource = AssetsBase + "vodkaredbull.png",
             Theme = CocktailTheme.Orange,
+            LedRgb = (30, 255, 0),
             Ingredients =
             [
                 new CocktailIngredient("Vodka", 50),
@@ -55,6 +58,7 @@ public sealed class InMemoryCocktailRepository : ICocktailRepository
             Subtitle = "Campari, Vermouth",
             ImageSource = AssetsBase + "americano.png",
             Theme = CocktailTheme.Burgundy,
+            LedRgb = (0, 255, 0),
             Ingredients =
             [
                 new CocktailIngredient("Campari", 30),
@@ -68,6 +72,7 @@ public sealed class InMemoryCocktailRepository : ICocktailRepository
             Subtitle = "Gin, lemon",
             ImageSource = AssetsBase + "ginlemon.png",
             Theme = CocktailTheme.Teal,
+            LedRgb = (50, 255, 0),
             Ingredients =
             [
                 new CocktailIngredient("Gin", 50),
@@ -81,6 +86,7 @@ public sealed class InMemoryCocktailRepository : ICocktailRepository
             Subtitle = "Vodka, lemon",
             ImageSource = AssetsBase + "vodkalemon.png",
             Theme = CocktailTheme.Orange,
+            LedRgb = (50, 255, 0),
             Ingredients =
             [
                 new CocktailIngredient("Vodka", 50),
@@ -94,6 +100,7 @@ public sealed class InMemoryCocktailRepository : ICocktailRepository
             Subtitle = "Campari, Vermouth, Gin",
             ImageSource = AssetsBase + "negroni.png",
             Theme = CocktailTheme.Burgundy,
+            LedRgb = (0, 255, 0),
             Ingredients =
             [
                 new CocktailIngredient("Gin", 30),
@@ -108,6 +115,7 @@ public sealed class InMemoryCocktailRepository : ICocktailRepository
             Subtitle = "Campari, Vermouth, Prosecco",
             ImageSource = AssetsBase + "negronisbagliato.png",
             Theme = CocktailTheme.Burgundy,
+            LedRgb = (10, 255, 0),
             Ingredients =
             [
                 new CocktailIngredient("Campari", 50),

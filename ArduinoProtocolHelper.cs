@@ -35,7 +35,21 @@ public static class ArduinoProtocolHelper
     }
 
     /// <summary>
-    /// Builds the ACTIVE command line: ACTIVE, BASE:&lt;color&gt;, P1:&lt;ms&gt;, P2:&lt;ms&gt;, ...
+    /// Builds the ACTIVE command line with RGB: ACTIVE, RGB:&lt;r&gt;,&lt;g&gt;,&lt;b&gt;, P1:&lt;ms&gt;, ...
+    /// Pump segments are ordered by pump ID. At least one pump must have duration &gt; 0 (caller responsibility).
+    /// </summary>
+    public static string BuildActiveCommand((byte R, byte G, byte B) ledRgb, IReadOnlyDictionary<int, int> channelDurations)
+    {
+        var pumpParts = channelDurations
+            .Where(kvp => kvp.Value > 0)
+            .OrderBy(kvp => kvp.Key)
+            .Select(kvp => $"P{kvp.Key}:{kvp.Value}");
+        string pumpSegment = string.Join(", ", pumpParts);
+        return $"ACTIVE, RGB:{ledRgb.R},{ledRgb.G},{ledRgb.B}, {pumpSegment}";
+    }
+
+    /// <summary>
+    /// Builds the ACTIVE command line with a preset color name: ACTIVE, BASE:&lt;color&gt;, P1:&lt;ms&gt;, P2:&lt;ms&gt;, ...
     /// Pump segments are ordered by pump ID. At least one pump must have duration &gt; 0 (caller responsibility).
     /// </summary>
     public static string BuildActiveCommand(string ledColor, IReadOnlyDictionary<int, int> channelDurations)

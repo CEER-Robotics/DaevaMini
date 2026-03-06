@@ -81,13 +81,15 @@ General format:
 ACTIVE, BASE:<COLOR_NAME>, P1:<ms>, P2:<ms>, ...
 ```
 
-`COLOR` can be used instead of `BASE`:
+`COLOR` can be used instead of `BASE`. You can also pass an RGB triple instead of a color name:
 
 ```text
-ACTIVE, COLOR:<COLOR_NAME>, P1:<ms>
+ACTIVE, RGB:<r>,<g>,<b>, P1:<ms>, ...
 ```
 
-Valid color names:
+Example: `ACTIVE, RGB:255,128,0, P1:1000` (orange). Each of `r`, `g`, `b` must be 0–255.
+
+Valid color names (when using `BASE:` or `COLOR:`):
 - `ORANGE`
 - `RED`
 - `GREEN`
