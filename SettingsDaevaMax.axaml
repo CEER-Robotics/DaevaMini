@@ -1,0 +1,112 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+             x:Class="DaevaMini.SettingsDaevaMax">
+
+    <UserControl.Styles>
+        
+        <Style Selector="Button.DoneBtn">
+            <Setter Property="Background" Value="#F7940A"/> 
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="40"/> 
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="22"/> 
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Width" Value="525"/> 
+            <Setter Property="Height" Value="100"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.DoneBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#C67608"/> 
+        </Style>
+        <Style Selector="Button.DoneBtn:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#A05A00"/>
+        </Style>
+        <Style Selector="Button.DoneBtn:pressed TextBlock">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+
+        <Style Selector="Button.BackBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="18"/>
+            <Setter Property="CornerRadius" Value="50"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.BackBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#20FFFFFF"/> 
+        </Style>
+
+        <Style Selector="Button.StartBlueBtn">
+            <Setter Property="Background" Value="#0084FF"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="40"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="22"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="90"/>
+            <Setter Property="Width" Value="338"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.StartBlueBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#005BBB"/> 
+        </Style>
+        <Style Selector="Button.StartBlueBtn:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#004185"/> 
+        </Style>
+
+        <Style Selector="Button.StartRedBtn">
+            <Setter Property="Background" Value="#FF3B3B"/>
+            <Setter Property="Foreground" Value="Black"/> 
+            <Setter Property="FontSize" Value="40"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="22"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="90"/>
+            <Setter Property="Width" Value="338"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.StartRedBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#FF5C5C"/> 
+        </Style>
+        <Style Selector="Button.StartRedBtn:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#CC2E2E"/> 
+        </Style>
+        <Style Selector="Button.StartRedBtn:pressed TextBlock">
+            <Setter Property="Foreground" Value="Black"/> 
+        </Style>
+
+    </UserControl.Styles>
+
+    <Grid Background="#131818" RowDefinitions="Auto, *, Auto">
+
+        <Grid Grid.Row="0" Margin="38,36,38,0">
+            <Button Classes="BackBtn" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
+                          Foreground="White" Width="50" Height="50"/>
+            </Button>
+            <TextBlock Text="Settings" Foreground="White" FontSize="68" FontWeight="Bold" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Grid>
+
+        <StackPanel Grid.Row="1" Width="1031" Spacing="63" VerticalAlignment="Center" HorizontalAlignment="Center">
+            
+            <StackPanel Spacing="27" HorizontalAlignment="Left">
+                <TextBlock Text="Filling:" Foreground="White" FontSize="40" FontWeight="Bold"/>
+                <Button Classes="StartRedBtn" Content="Start"/>
+            </StackPanel>
+
+            <StackPanel Spacing="27" HorizontalAlignment="Left">
+                <TextBlock Text="Cleaning:" Foreground="White" FontSize="40" FontWeight="Bold"/>
+                <Button Classes="StartBlueBtn" Content="Start"/>
+            </StackPanel>
+
+        </StackPanel>
+
+    </Grid>
+</UserControl>
