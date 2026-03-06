@@ -70,7 +70,8 @@
             </Button>
         </Grid>
 
-        <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto" HorizontalAlignment="Center" VerticalAlignment="Center"
+              Margin="0,-50,0,0">
             
             <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="60" Margin="0,0,60,0">
                 <ToggleButton Classes="JerryCanBtn" Tag="Empty">
@@ -83,7 +84,7 @@
 
             <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="30">
                 
-                <StackPanel Orientation="Horizontal" Spacing="30" HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="50" HorizontalAlignment="Center">
                     <ToggleButton Classes="BottleBtn" Tag="Gin">
                         <Image Source="avares://DaevaMini/Assets/bottle.png" Stretch="Uniform" Margin="35"/>
                     </ToggleButton>
@@ -98,7 +99,7 @@
                     </ToggleButton>
                 </StackPanel>
 
-                <Grid ColumnDefinitions="Auto, 380, Auto" HorizontalAlignment="Center">
+                <Grid ColumnDefinitions="Auto, 450, Auto" HorizontalAlignment="Center">
                     
                     <StackPanel Grid.Column="0" Spacing="30" VerticalAlignment="Top">
                         <ToggleButton Classes="BottleBtn" Tag="Lemon">
