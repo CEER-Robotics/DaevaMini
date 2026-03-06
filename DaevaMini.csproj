@@ -12,6 +12,8 @@
         <None Remove="ImprovedInterface\**\*" />
         <AvaloniaResource Remove="ImprovedInterface\**\*" />
         <AvaloniaXaml Remove="ImprovedInterface\**\*.axaml" />
+        <None Remove="Assets\DaevaMaxFinal.png" />
+        <AvaloniaResource Include="Assets\DaevaMaxFinal.png" />
     </ItemGroup>
 
     <ItemGroup>

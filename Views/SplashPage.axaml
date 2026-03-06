@@ -43,7 +43,7 @@
 
         <!-- Center: DaevaMax image (ImprovedInterface style) -->
         <Border Grid.Row="1">
-            <Image Source="avares://DaevaMini/Assets/DaevaMax.png"
+            <Image Source="avares://DaevaMini/Assets/DaevaMaxFinal.png"
                    Width="1494"
                    Height="317"
                    Stretch="Uniform"
