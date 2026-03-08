@@ -53,7 +53,9 @@ public sealed class ModesViewModel : INotifyPropertyChanged
         );
     }
 
-    private Mode _currentMode = Modes[0];
+    private static readonly Mode FallbackMode = new("Default", "#559CAD", Array.Empty<string>());
+
+    private Mode _currentMode = Modes.Count > 0 ? Modes[0] : FallbackMode;
     public Mode CurrentMode
     {
         get

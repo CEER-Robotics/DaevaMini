@@ -86,7 +86,7 @@
     <Grid Background="#131818" RowDefinitions="Auto, *, Auto">
 
         <Grid Grid.Row="0" Margin="38,36,38,0">
-            <Button Classes="BackBtn" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <Button Classes="BackBtn" HorizontalAlignment="Left" VerticalAlignment="Center" Click="OnBackClick">
                 <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
                           Foreground="White" Width="50" Height="50"/>
             </Button>
@@ -98,12 +98,12 @@
             
             <StackPanel Spacing="27" HorizontalAlignment="Left">
                 <TextBlock Text="Filling:" Foreground="White" FontSize="40" FontWeight="Bold"/>
-                <Button Classes="StartRedBtn" Content="Start"/>
+                <Button Classes="StartRedBtn" Content="Start" Click="OnFillingClick"/>
             </StackPanel>
 
             <StackPanel Spacing="27" HorizontalAlignment="Left">
                 <TextBlock Text="Cleaning:" Foreground="White" FontSize="40" FontWeight="Bold"/>
-                <Button Classes="StartBlueBtn" Content="Start"/>
+                <Button Classes="StartBlueBtn" Content="Start" Click="OnCleaningClick"/>
             </StackPanel>
 
         </StackPanel>

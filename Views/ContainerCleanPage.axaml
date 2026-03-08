@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:DaevaMini.ViewModels"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
-             x:Class="DaevaMini.Views.ContainerFillPage"
+             x:Class="DaevaMini.Views.ContainerCleanPage"
              x:DataType="vm:ModesViewModel">
 
     <UserControl.Styles>
@@ -38,7 +38,7 @@
             </Setter>
         </Style>
 
-        <Style Selector="ToggleButton.BottleBtn.Filled">
+        <Style Selector="ToggleButton.BottleBtn.Cleaned">
             <Setter Property="Background" Value="#7BBFCF"/>
         </Style>
 
@@ -51,8 +51,8 @@
             <Setter Property="Cursor" Value="Arrow"/>
         </Style>
 
-        <Style Selector="Button.DoneBtn">
-            <Setter Property="Background" Value="#F7940A"/>
+        <Style Selector="Button.CleanBtn">
+            <Setter Property="Background" Value="#0084FF"/>
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="FontSize" Value="34"/>
             <Setter Property="FontWeight" Value="Bold"/>
@@ -60,19 +60,19 @@
             <Setter Property="Padding" Value="180,25"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
-        <Style Selector="Button.DoneBtn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="#C67608"/>
+        <Style Selector="Button.CleanBtn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#005BBB"/>
         </Style>
-        <Style Selector="Button.DoneBtn:pressed /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="#A05A00"/>
+        <Style Selector="Button.CleanBtn:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#004185"/>
         </Style>
-        <Style Selector="Button.DoneBtn:pressed TextBlock">
+        <Style Selector="Button.CleanBtn:pressed TextBlock">
             <Setter Property="Foreground" Value="Black"/>
         </Style>
-        <Style Selector="Button.DoneBtn:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Style Selector="Button.CleanBtn:disabled /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="#7F7F7F"/>
         </Style>
-        <Style Selector="Button.DoneBtn:disabled">
+        <Style Selector="Button.CleanBtn:disabled">
             <Setter Property="Foreground" Value="#444444"/>
             <Setter Property="Cursor" Value="Arrow"/>
             <Setter Property="Opacity" Value="0.6"/>
@@ -131,7 +131,7 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,30,0,0">
-                        <TextBlock Text="Insert the containers in the correct spot, and start the filling of the machine." 
+                        <TextBlock Text="Select the containers to clean, then press Clean to start." 
                                    Foreground="#D0F0F8" FontSize="26" FontWeight="Bold" 
                                    HorizontalAlignment="Center" TextAlignment="Center" MaxWidth="380" TextWrapping="Wrap"/>
                                    
@@ -164,7 +164,7 @@
             </StackPanel>
         </Grid>
 
-        <Button x:Name="FillBtn" Grid.Row="2" Content="Fill" Classes="DoneBtn" Click="OnFill" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,70"/>
+        <Button x:Name="CleanBtn" Grid.Row="2" Content="Clean" Classes="CleanBtn" Click="OnClean" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,70"/>
 
     </Grid>
 </UserControl>

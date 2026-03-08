@@ -10,12 +10,12 @@ using DaevaMini.ViewModels;
 
 namespace DaevaMini.Views;
 
-public partial class ContainerFillPage : UserControl
+public partial class ContainerCleanPage : UserControl
 {
     private readonly ModesViewModel _modesViewModel;
     private readonly ToggleButton?[] _bottles;
 
-    public ContainerFillPage(ModesViewModel modesViewModel)
+    public ContainerCleanPage(ModesViewModel modesViewModel)
     {
         InitializeComponent();
         _modesViewModel = modesViewModel;
@@ -47,7 +47,7 @@ public partial class ContainerFillPage : UserControl
             mainWindow.ShowSettingsPage();
     }
 
-    private async void OnFill(object? sender, RoutedEventArgs e)
+    private async void OnClean(object? sender, RoutedEventArgs e)
     {
         var selectedChannels = new List<int>();
         for (int i = 0; i < _bottles.Length; i++)
@@ -58,59 +58,59 @@ public partial class ContainerFillPage : UserControl
 
         if (selectedChannels.Count == 0)
         {
-            Console.WriteLine("[ContainerFillPage] No containers selected");
+            Console.WriteLine("[ContainerCleanPage] No containers selected");
             return;
         }
 
         var config = AppConfigService.Instance.Config;
-        int fillMs = config.FillDurationMs;
-        var channelDurations = selectedChannels.ToDictionary(ch => ch, _ => fillMs);
+        int cleanMs = config.CleanDurationMs;
+        var channelDurations = selectedChannels.ToDictionary(ch => ch, _ => cleanMs);
 
-        FillBtn.IsEnabled = false;
+        CleanBtn.IsEnabled = false;
 
-        Console.WriteLine($"[ContainerFillPage] Filling channels: {string.Join(", ", selectedChannels)} for {fillMs}ms each");
+        Console.WriteLine($"[ContainerCleanPage] Cleaning channels: {string.Join(", ", selectedChannels)} for {cleanMs}ms each");
 
         var manager = ArduinoSerialManager.Instance;
         if (!manager.IsConnected)
         {
-            Console.WriteLine("[ContainerFillPage] Arduino not connected");
-            await FinishFill(fillMs, selectedChannels);
+            Console.WriteLine("[ContainerCleanPage] Arduino not connected");
+            await FinishClean(cleanMs, selectedChannels);
             return;
         }
 
         string command = ArduinoProtocolHelper.BuildActiveCommand(
-            "ORANGE",
+            "BLUE",
             channelDurations);
-        Console.WriteLine($"[ContainerFillPage] Sending: {command}");
+        Console.WriteLine($"[ContainerCleanPage] Sending: {command}");
 
         bool sent = manager.Send(command);
         if (!sent)
         {
-            Console.WriteLine("[ContainerFillPage] Failed to send command");
-            await FinishFill(fillMs, selectedChannels);
+            Console.WriteLine("[ContainerCleanPage] Failed to send command");
+            await FinishClean(cleanMs, selectedChannels);
             return;
         }
 
         string? responseLine = manager.ReadLine();
         var response = ArduinoProtocolHelper.ParseActivateResponse(responseLine);
-        Console.WriteLine($"[ContainerFillPage] Response: {response}");
+        Console.WriteLine($"[ContainerCleanPage] Response: {response}");
 
-        await FinishFill(fillMs, selectedChannels);
+        await FinishClean(cleanMs, selectedChannels);
     }
 
-    private async Task FinishFill(int delayMs, List<int> filledChannels)
+    private async Task FinishClean(int delayMs, List<int> cleanedChannels)
     {
         await Task.Delay(delayMs);
-        foreach (int ch in filledChannels)
+        foreach (int ch in cleanedChannels)
         {
             int idx = ch - 1;
             if (idx >= 0 && idx < _bottles.Length && _bottles[idx] != null)
             {
                 _bottles[idx]!.IsChecked = false;
-                if (!_bottles[idx]!.Classes.Contains("Filled"))
-                    _bottles[idx]!.Classes.Add("Filled");
+                if (!_bottles[idx]!.Classes.Contains("Cleaned"))
+                    _bottles[idx]!.Classes.Add("Cleaned");
             }
         }
-        FillBtn.IsEnabled = true;
+        CleanBtn.IsEnabled = true;
     }
 }

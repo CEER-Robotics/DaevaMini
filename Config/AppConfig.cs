@@ -8,6 +8,15 @@ public sealed class AppConfig
     [YamlMember(Alias = "FlowRate")]
     public FlowRateConfig FlowRate { get; set; } = new();
 
+    [YamlMember(Alias = "FillDurationMs")]
+    public int FillDurationMs { get; set; } = 5000;
+
+    [YamlMember(Alias = "CleanDurationMs")]
+    public int CleanDurationMs { get; set; } = 10000;
+
+    [YamlMember(Alias = "LiquidAssignments")]
+    public string[] LiquidAssignments { get; set; } = Array.Empty<string>();
+
     [YamlMember(Alias = "Modes")]
     public ModeConfig[] Modes { get; set; } = Array.Empty<ModeConfig>();
 }

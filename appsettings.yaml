@@ -1,12 +1,27 @@
 FlowRate:
   MillisecondsPerMilliliter: 100
 
-Modes:
-  - Name: "Gin Mode"
-    Color: "#559CAD"
-    LedColor: "CYAN"
-    LiquidAssignments:
-      - "Campari"
-      - "Vermouth"
-      - "Lemon"
-      - "Red-bull"
+FillDurationMs: 3000
+CleanDurationMs: 10000
+
+LiquidAssignments:
+  - "Campari"
+  - "Vermouth"
+  - "Lemon"
+  - "Red-bull"
+  - ""
+  - ""
+  - ""
+  - ""
+  - ""
+  - ""
+
+# Modes:
+#   - Name: "Gin Mode"
+#     Color: "#559CAD"
+#     LedColor: "CYAN"
+#     LiquidAssignments:
+#       - "Campari"
+#       - "Vermouth"
+#       - "Lemon"
+#       - "Red-bull"

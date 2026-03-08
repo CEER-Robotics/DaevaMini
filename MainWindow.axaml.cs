@@ -180,7 +180,7 @@ public partial class MainWindow : Window
     {
         if (_pageContainer != null)
         {
-            _pageContainer.Content = new SettingsPage(_modesViewModel);
+            _pageContainer.Content = new SettingsDaevaMax(_modesViewModel);
         }
     }
 
@@ -189,6 +189,22 @@ public partial class MainWindow : Window
         if (_pageContainer != null)
         {
             _pageContainer.Content = new ContainerSetupPage(_modesViewModel);
+        }
+    }
+
+    public void ShowContainerFillPage()
+    {
+        if (_pageContainer != null)
+        {
+            _pageContainer.Content = new ContainerFillPage(_modesViewModel);
+        }
+    }
+
+    public void ShowContainerCleanPage()
+    {
+        if (_pageContainer != null)
+        {
+            _pageContainer.Content = new ContainerCleanPage(_modesViewModel);
         }
     }
 }
