@@ -6,23 +6,22 @@
              x:Class="DaevaMini.ChangeBottle">
 
     <UserControl.Styles>
+        
         <Style Selector="Button.DoneBtn">
             <Setter Property="Background" Value="#F7940A"/> 
             <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="FontSize" Value="22"/> 
+            <Setter Property="FontSize" Value="24"/> 
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="CornerRadius" Value="12"/> 
+            <Setter Property="CornerRadius" Value="15"/> 
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="15"/> 
-            <Setter Property="Width" Value="280"/> 
+            <Setter Property="Width" Value="320"/> 
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
-
         <Style Selector="Button.DoneBtn:pointerover /template/ ContentPresenter">
             <Setter Property="Background" Value="#C67608"/> 
         </Style>
-
         <Style Selector="Button.DoneBtn:pressed /template/ ContentPresenter">
             <Setter Property="Background" Value="#A05D04"/> 
         </Style>
@@ -33,67 +32,71 @@
             <Setter Property="CornerRadius" Value="50"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
-        
         <Style Selector="Button.BackBtn:pointerover /template/ ContentPresenter">
             <Setter Property="Background" Value="#20FFFFFF"/> 
         </Style>
+
+        <Style Selector="ToggleButton.BottleToggle">
+            <Setter Property="Background" Value="#2A2A2A"/> <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <StackPanel>
+                        <Border Width="150" Height="150" CornerRadius="100" Background="{TemplateBinding Background}">
+                            <Image Source="avares://DaevaMini/Assets/bottle.png" Stretch="Uniform" Margin="40"/>
+                        </Border>
+                        <TextBlock Text="{TemplateBinding Tag}" Foreground="White" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,15,0,0"/>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        
+        <Style Selector="ToggleButton.BottleToggle:checked /template/ Border">
+            <Setter Property="Background" Value="#D0F0F8"/>
+        </Style>
+
     </UserControl.Styles>
 
-    <Grid Background="#131818">
+    <Grid RowDefinitions="Auto, *, Auto" Background="#121212">
 
-        <Button Classes="BackBtn"
-                Margin="20,20,0,0"
-                HorizontalAlignment="Left" 
-                VerticalAlignment="Top">
-            <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
-                      Foreground="White" 
-                      Width="28" Height="28"/>
-        </Button>
+        <Grid Grid.Row="0" Margin="20,20,0,0">
+            <Button Classes="BackBtn" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
+                          Foreground="White" Width="28" Height="28"/>
+            </Button>
+        </Grid>
 
-        <Canvas Width="640" Height="330" 
-                HorizontalAlignment="Center" 
-                VerticalAlignment="Center"
-                Margin="0,0,0,60">
-            
-            <TextBlock Canvas.Left="220" Canvas.Top="0" 
-                       Width="200" 
+        <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-30,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="50"/> <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="50"/> <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="20"/> <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ToggleButton Grid.Row="0" Grid.Column="0" Classes="BottleToggle" Tag="Gin" IsChecked="True"/>
+            <ToggleButton Grid.Row="2" Grid.Column="0" Classes="BottleToggle" Tag="Lemon" IsChecked="True"/>
+
+            <TextBlock Grid.Row="0" Grid.Column="2" 
                        Text="Insert the&#x0a;correct liquids" 
-                       TextAlignment="Center" 
-                       Foreground="White" 
-                       FontSize="26" 
-                       FontWeight="SemiBold"/>
+                       TextAlignment="Center" Foreground="White" 
+                       FontSize="28" FontWeight="SemiBold" 
+                       VerticalAlignment="Center" Margin="0,0,0,20"/>
 
-            <Border Canvas.Left="0" Canvas.Top="0" Background="#D0F0F8" CornerRadius="100" Width="150" Height="150">
-                <TextBlock Text="Vodka" Foreground="Black" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
-
-            <Border Canvas.Left="490" Canvas.Top="0" Background="#D0F0F8" CornerRadius="100" Width="150" Height="150">
-                <TextBlock Text="Red-bull" Foreground="Black" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
-
-            <Border Canvas.Left="0" Canvas.Top="180" Background="#D0F0F8" CornerRadius="100" Width="150" Height="150">
-                <TextBlock Text="Lemon" Foreground="Black" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
-
-            <Border Canvas.Left="490" Canvas.Top="180" Background="#D0F0F8" CornerRadius="100" Width="150" Height="150">
-                <TextBlock Text="Lemon" Foreground="Black" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
-
-            <Border Canvas.Left="220" Canvas.Top="110" Background="#D0F0F8" CornerRadius="20" Width="200" Height="200">
+            <Border Grid.Row="2" Grid.Column="2" Background="#D0F0F8" CornerRadius="20" Width="200" Height="200" VerticalAlignment="Center" Margin="0,-90,0,0">
                 <Image Source="avares://DaevaMini/Assets/DaevaDark.png" 
-                       Width="180" 
-                       Margin="25,0,0,0"
-                       Stretch="Uniform" 
-                       HorizontalAlignment="Center" 
-                       VerticalAlignment="Center"/>
+                       Width="180" Stretch="Uniform" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center" 
+                       Margin="25,0,0,0"/>
             </Border>
 
-        </Canvas>
+            <ToggleButton Grid.Row="0" Grid.Column="4" Classes="BottleToggle" Tag="Tonica" IsChecked="True"/>
+            <ToggleButton Grid.Row="2" Grid.Column="4" Classes="BottleToggle" Tag="Tonica" IsChecked="True"/>
+        </Grid>
 
-        <Button Content="Done" 
-                Classes="DoneBtn" 
-                VerticalAlignment="Bottom"
-                Margin="0,0,0,35"/>
+        <Button Grid.Row="2" Content="Done" Classes="DoneBtn" Margin="0,0,0,30"/>
 
     </Grid>
 </UserControl>
