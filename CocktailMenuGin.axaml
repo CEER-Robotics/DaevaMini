@@ -6,91 +6,89 @@
              x:Class="DaevaMini.CocktailMenuGin">
 
     <UserControl.Styles>
-        <Style Selector="Button.DoneBtn">
-            <Setter Property="Background" Value="#F7940A"/> 
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="FontSize" Value="22"/> 
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="CornerRadius" Value="12"/> 
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="15"/> 
-            <Setter Property="Width" Value="280"/> 
-            <Setter Property="Cursor" Value="Hand"/>
+        <Style Selector="Button.CocktailCard">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="CornerRadius" Value="15"/>
+            <Setter Property="Background" Value="#253540"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1" />
+                </Transitions>
+            </Setter>
         </Style>
 
-        <Style Selector="Button.DoneBtn:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#C67608"/> 
+        <Style Selector="Button.CocktailCard:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#324652"/> 
         </Style>
 
-        <Style Selector="Button.DoneBtn:pressed /template/ ContentPresenter">
-            <Setter Property="Background" Value="#A05D04"/> 
+        <Style Selector="Button.CocktailCard:pressed">
+            <Setter Property="RenderTransform" Value="scale(0.96)" /> 
         </Style>
-
-        <Style Selector="Button.BackBtn">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Padding" Value="10"/>
-            <Setter Property="CornerRadius" Value="50"/>
-            <Setter Property="Cursor" Value="Hand"/>
-        </Style>
-        
-        <Style Selector="Button.BackBtn:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#20FFFFFF"/> 
+        <Style Selector="Button.CocktailCard:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1A252D"/> 
         </Style>
     </UserControl.Styles>
 
-    <Grid Background="#131818">
+    <Grid RowDefinitions="Auto, *" Background="#121212">
 
-        <Button Classes="BackBtn"
-                Margin="20,20,0,0"
-                HorizontalAlignment="Left" 
-                VerticalAlignment="Top">
-            <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
-                      Foreground="White" 
-                      Width="28" Height="28"/>
-        </Button>
-
-        <Canvas Width="640" Height="330" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Grid Grid.Row="0" Height="80">
             
-            <TextBlock Canvas.Left="220" Canvas.Top="0" 
-                       Width="200" 
-                       Text="Insert the&#x0a;correct liquids" 
-                       TextAlignment="Center" 
-                       Foreground="White" 
-                       FontSize="26" 
-                       FontWeight="SemiBold"/>
+            <Button HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Width="40" Height="40"
+                    Margin="20,15,0,0" 
+                    Background="Transparent">
+                <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
+                          Foreground="White"
+                          Width="20" Height="20"/>
+            </Button>
 
-            <Border Canvas.Left="0" Canvas.Top="0" Background="#D0F0F8" CornerRadius="100" Width="150" Height="150">
-                <TextBlock Text="Vodka" Foreground="Black" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
+            <Image Source="/Assets/DaevaWhite.png" 
+                   Stretch="Uniform"
+                   Height="40"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+        </Grid>
 
-            <Border Canvas.Left="490" Canvas.Top="0" Background="#D0F0F8" CornerRadius="100" Width="150" Height="150">
-                <TextBlock Text="Red-bull" Foreground="Black" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
+        <UniformGrid Grid.Row="1" Columns="2" Rows="2" Margin="30,10">
 
-            <Border Canvas.Left="0" Canvas.Top="180" Background="#D0F0F8" CornerRadius="100" Width="150" Height="150">
-                <TextBlock Text="Lemon" Foreground="Black" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
+            <Button Classes="CocktailCard">
+                <Grid RowDefinitions="*, Auto">
+                    <Image Grid.Row="0" Source="/Assets/gintonic.png" Margin="15" Stretch="Uniform"/>
+                    <Border Grid.Row="1" Background="#539CA8" Height="50" CornerRadius="0,0,15,15">
+                        <TextBlock Text="Gin Tonic" Foreground="Black" FontWeight="Bold" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Button>
 
-            <Border Canvas.Left="490" Canvas.Top="180" Background="#D0F0F8" CornerRadius="100" Width="150" Height="150">
-                <TextBlock Text="Lemon" Foreground="Black" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            </Border>
+            <Button Classes="CocktailCard">
+                <Grid RowDefinitions="*, Auto">
+                    <Image Grid.Row="0" Source="/Assets/ginlemon.png" Margin="15" Stretch="Uniform"/>
+                    <Border Grid.Row="1" Background="#539CA8" Height="50" CornerRadius="0,0,15,15">
+                        <TextBlock Text="Gin Lemon" Foreground="Black" FontWeight="Bold" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Button>
 
-            <Border Canvas.Left="220" Canvas.Top="110" Background="#D0F0F8" CornerRadius="20" Width="200" Height="200">
-                <Image Source="avares://DaevaMini/Assets/DaevaDark.png" 
-                       Width="180" 
-                       Margin="15,0,0,0"
-                       Stretch="Uniform" 
-                       HorizontalAlignment="Center" 
-                       VerticalAlignment="Center"/>
-            </Border>
+            <Button Classes="CocktailCard">
+                <Grid RowDefinitions="*, Auto">
+                    <Border Grid.Row="1" Background="#539CA8" Height="50" CornerRadius="0,0,15,15">
+                        <TextBlock Text="" Foreground="Black" FontWeight="Bold" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Button>
 
-        </Canvas>
+            <Button Classes="CocktailCard">
+                <Grid RowDefinitions="*, Auto">
+                    <Border Grid.Row="1" Background="#539CA8" Height="50" CornerRadius="0,0,15,15">
+                        <TextBlock Text="" Foreground="Black" FontWeight="Bold" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Button>
 
-        <Button Content="Done" 
-                Classes="DoneBtn" 
-                VerticalAlignment="Bottom"
-                Margin="0,0,0,35"/>
-
+        </UniformGrid>
     </Grid>
 </UserControl>

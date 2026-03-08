@@ -34,11 +34,11 @@
 
     <Grid RowDefinitions="Auto, *" Background="#121212">
 
-        <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Height="80">
+        <Grid Grid.Row="0" Height="80">
             
-            <Button Grid.Column="0"
-                    Width="40" Height="40"
+            <Button HorizontalAlignment="Left"
                     VerticalAlignment="Top"
+                    Width="40" Height="40"
                     Margin="20,15,0,0" 
                     Background="Transparent">
                 <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
@@ -46,18 +46,11 @@
                           Width="20" Height="20"/>
             </Button>
 
-            <Border Grid.Column="1"
-                    Background="#C0ECFA"
-                    Width="450" Height="60"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Center"
-                    CornerRadius="0,0,30,30">
-                <Image Source="/Assets/Daeva.png" 
-                       Stretch="Uniform"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       Margin="10"/> 
-            </Border>
+            <Image Source="/Assets/DaevaWhite.png" 
+                   Stretch="Uniform"
+                   Height="40"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
         </Grid>
 
         <UniformGrid Grid.Row="1" Columns="2" Rows="2" Margin="30,10">

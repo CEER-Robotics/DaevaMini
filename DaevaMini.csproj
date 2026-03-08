@@ -51,5 +51,7 @@
       <AvaloniaResource Include="Assets\DaevaMiniLogo.png" />
       <None Remove="Assets\DaevaDark.png" />
       <AvaloniaResource Include="Assets\DaevaDark.png" />
+      <None Remove="Assets\DaevaWhite.png" />
+      <AvaloniaResource Include="Assets\DaevaWhite.png" />
     </ItemGroup>
 </Project>
