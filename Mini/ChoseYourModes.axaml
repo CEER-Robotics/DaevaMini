@@ -1,0 +1,116 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+             x:Class="DaevaMini.ChoseYourModes">
+
+    <UserControl.Styles>
+        <Style Selector="Button.DoneBtn">
+            <Setter Property="Background" Value="#F7940A"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="15"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Width" Value="320"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style Selector="Button.DoneBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#C67608"/>
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+
+        <Style Selector="Button.DoneBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#A05D04"/>
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+
+        <Style Selector="Button.BackBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="CornerRadius" Value="50"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.BackBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#20FFFFFF"/>
+        </Style>
+
+        <Style Selector="CheckBox.ModeItem">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="0,0,0,2"/>
+            <Setter Property="Padding" Value="20,15"/>
+            <Setter Property="Background" Value="#3D3D3D"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="Container" 
+                            Background="{TemplateBinding Background}" 
+                            BorderBrush="#555555" 
+                            BorderThickness="0,0,0,1"
+                            Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <TextBlock Text="{TemplateBinding Content}" 
+                                       Foreground="White" 
+                                       FontSize="22" 
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center"/>
+                            <PathIcon Name="CheckMark" 
+                                      Data="M9,16.17L4.83,12L3.41,13.41L9,19L21,7L19.59,5.59L9,16.17Z"
+                                      Foreground="White" 
+                                      Width="24" Height="24"
+                                      HorizontalAlignment="Right"
+                                      IsVisible="False"/>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="CheckBox.ModeItem:checked /template/ PathIcon#CheckMark">
+            <Setter Property="IsVisible" Value="True"/>
+        </Style>
+        <Style Selector="CheckBox.ModeItem:pointerover /template/ Border#Container">
+            <Setter Property="Background" Value="#505050"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid Background="#131818" RowDefinitions="Auto, *, Auto">
+        
+        <Grid Grid.Row="0" Margin="20,20,20,0">
+            <Button Classes="BackBtn" HorizontalAlignment="Left">
+                <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" Foreground="White"/>
+            </Button>
+            <TextBlock Text="Choose your modes" Foreground="White" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center"/>
+        </Grid>
+
+        <Border Grid.Row="1" 
+                Background="#3D3D3D" 
+                CornerRadius="20" 
+                Margin="60,30" 
+                ClipToBounds="True" 
+                VerticalAlignment="Top">
+            <StackPanel>
+                <CheckBox Classes="ModeItem" Content="Gin mode" IsChecked="True"/>
+                <CheckBox Classes="ModeItem" Content="Vodka mode" IsChecked="True"/>
+                <CheckBox Classes="ModeItem" Content="Og mode" IsChecked="True"/>
+                <CheckBox Classes="ModeItem" Content="Spritz mode"/>
+                <CheckBox Classes="ModeItem" Content="Party mode"/>
+                
+                <Border Background="#3D3D3D" Padding="20,15">
+                    <Grid>
+                        <TextBlock Text="Custom mode" Foreground="#AAAAAA" FontSize="22" FontWeight="Medium"/>
+                        <PathIcon Data="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M9,6A3,3 0 0,1 12,3A3,3 0 0,1 15,6V8H9V6M18,20H6V10H18V20M12,17A2,2 0 1,0 12,13A2,2 0 0,0 12,17Z" 
+                                  Foreground="#AAAAAA" Width="24" Height="24" HorizontalAlignment="Right"/>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <Button Grid.Row="2" Content="Done" Classes="DoneBtn" Margin="0,0,0,35"/>
+        
+    </Grid>
+</UserControl>
