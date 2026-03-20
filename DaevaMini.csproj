@@ -8,17 +8,6 @@
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Remove="ImprovedInterface\**\*" />
-        <None Remove="ImprovedInterface\**\*" />
-        <AvaloniaResource Remove="ImprovedInterface\**\*" />
-        <AvaloniaXaml Remove="ImprovedInterface\**\*.axaml" />
-        <None Remove="Assets\DaevaMaxFinal.png" />
-        <AvaloniaResource Include="Assets\DaevaMaxFinal.png" />
-        <None Remove="Assets\camparispritz.png" />
-        <AvaloniaResource Include="Assets\camparispritz.png" />
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="Avalonia" Version="11.3.8"/>
         <PackageReference Include="Avalonia.Desktop" Version="11.3.8"/>
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.8"/>
@@ -33,18 +22,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Assets\logo.png" />
-      <AvaloniaResource Include="Assets\logo.png" />
-      <None Remove="Assets\logo-white.png" />
-      <None Remove="Assets\logo_white.png" />
       <AvaloniaResource Include="Assets\logo_white.png" />
       <AvaloniaResource Include="Assets\americano.png" />
-      <AvaloniaResource Include="Assets\bottle.png" />
-      <AvaloniaResource Include="Assets\Daeva.png" />
-      <AvaloniaResource Include="Assets\DaevaMax.png" />
       <AvaloniaResource Include="Assets\ginlemon.png" />
       <AvaloniaResource Include="Assets\gintonic.png" />
-      <AvaloniaResource Include="Assets\jerrycan.png" />
       <AvaloniaResource Include="Assets\negroni.png" />
       <AvaloniaResource Include="Assets\negronisbagliato.png" />
       <AvaloniaResource Include="Assets\vodkalemon.png" />
@@ -52,7 +33,10 @@
       <AvaloniaResource Include="Assets\vodkatonic.png" />
       <AvaloniaResource Include="Assets\DaevaMaxFinal.png" />
       <AvaloniaResource Include="Assets\gear.svg" />
+      <AvaloniaResource Include="Assets\DaevaDark.png" />
       <AvaloniaResource Include="Assets\camparispritz.png" />
+      <AvaloniaResource Include="Assets\DaevaMiniLogo.png" />
+      <AvaloniaResource Include="Assets\DaevaWhite.png" />
     </ItemGroup>
 
     <ItemGroup>
@@ -65,15 +49,15 @@
       <Compile Update="ProductsPage.axaml.cs">
         <DependentUpon>ProductsPage.axaml</DependentUpon>
       </Compile>
-      <Compile Update="Views\SplashPage.axaml.cs">
+      <Compile Update="Views\Max\SplashPage.axaml.cs">
         <DependentUpon>SplashPage.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
-      <Compile Update="Views\ContainerSetupPage.axaml.cs">
+      <Compile Update="Views\Max\ContainerSetupPage.axaml.cs">
         <DependentUpon>ContainerSetupPage.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
-      <Compile Update="Views\CocktailMenu.axaml.cs">
+      <Compile Update="Views\Max\CocktailMenu.axaml.cs">
         <DependentUpon>CocktailMenu.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>

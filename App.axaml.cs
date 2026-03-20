@@ -1,7 +1,11 @@
+using System;
+using System.Linq;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using DaevaMini.Config;
+using DaevaMini.Views.Mini;
 
 namespace DaevaMini;
 
@@ -14,14 +18,17 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // Load configuration first
         AppConfigService.Instance.LoadConfig();
         
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow();
-            
-            // Initialize Arduino connection when app starts
+            var args = desktop.Args ?? Array.Empty<string>();
+            bool isMini = args.Contains("--Mini", StringComparer.OrdinalIgnoreCase);
+
+            desktop.MainWindow = isMini
+                ? new MiniMainWindow()
+                : new MainWindow();
+
             desktop.Exit += OnExit;
             ArduinoSerialManager.Instance.Initialize();
         }
@@ -31,7 +38,6 @@ public partial class App : Application
 
     private void OnExit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
     {
-        // Clean up Arduino connection when app exits
         ArduinoSerialManager.Instance.Dispose();
     }
 }

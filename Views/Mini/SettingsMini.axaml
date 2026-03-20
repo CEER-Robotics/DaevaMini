@@ -1,0 +1,182 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+             x:Class="DaevaMini.Views.Mini.SettingsMini">
+
+    <UserControl.Styles>
+        
+        <Style Selector="Button.BackBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="CornerRadius" Value="50"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.BackBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#20FFFFFF"/> 
+        </Style>
+
+        <Style Selector="Button.EditBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#0084FF"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="5"/>
+        </Style>
+        <Style Selector="Button.EditBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Foreground" Value="#005BBB"/> 
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="Button.StartBtn">
+            <Setter Property="Background" Value="#0084FF"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Width" Value="180"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.StartBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#005BBB"/> 
+        </Style>
+
+        <Style Selector="Button.StartRedBtn">
+            <Setter Property="Background" Value="#FF3B3B"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Width" Value="180"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.StartRedBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#CC2E2E"/> 
+        </Style>
+
+        <Style Selector="RadioButton.ModeTab">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border x:Name="RootBorder" Background="Transparent" CornerRadius="25" 
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <TextBlock x:Name="Txt" Text="{TemplateBinding Content}" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                   Foreground="#111111" FontWeight="Bold" FontSize="20"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="RadioButton.GinTab:checked /template/ Border#RootBorder">
+            <Setter Property="Background" Value="#539CA8"/>
+        </Style>
+        <Style Selector="RadioButton.VodkaTab:checked /template/ Border#RootBorder">
+            <Setter Property="Background" Value="#F7940A"/> 
+        </Style>
+        <Style Selector="RadioButton.OGTab:checked /template/ Border#RootBorder">
+            <Setter Property="Background" Value="#F46036"/>
+        </Style>
+
+        <Style Selector="RadioButton.LedColor">
+            <Setter Property="Width" Value="55"/>
+            <Setter Property="Height" Value="55"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="White"/> 
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border CornerRadius="22" Background="{TemplateBinding Background}">
+                        <PathIcon x:Name="CheckIcon" Data="M9,16.17L4.83,12L3.41,13.41L9,19L21,7L19.59,5.59L9,16.17Z" 
+                                  Foreground="{TemplateBinding Foreground}" Width="30" Height="30" IsVisible="False"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="RadioButton.LedColor:checked /template/ PathIcon#CheckIcon">
+            <Setter Property="IsVisible" Value="True"/>
+        </Style>
+
+        <Style Selector="Button.EditColorBtn">
+            <Setter Property="Width" Value="55"/>
+            <Setter Property="Height" Value="55"/>
+            <Setter Property="Background" Value="#444444"/>
+            <Setter Property="CornerRadius" Value="22"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.EditColorBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#555555"/>
+        </Style>
+
+    </UserControl.Styles>
+
+    <Grid Background="#131818" RowDefinitions="Auto, *">
+
+        <Grid Grid.Row="0" Margin="20,20,20,0">
+            <Button x:Name="BackBtn" Classes="BackBtn" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
+                          Foreground="White" Width="28" Height="28"/>
+            </Button>
+            <TextBlock Text="Settings" Foreground="White" FontSize="38" FontWeight="Bold" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Grid>
+
+        <StackPanel Grid.Row="1" Width="600" Spacing="35" VerticalAlignment="Center">
+            
+            <StackPanel Spacing="15">
+                <Grid>
+                    <TextBlock Text="Mode:" Foreground="White" FontSize="22" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <Button x:Name="EditModesBtn" Classes="EditBtn" Content="Edit" HorizontalAlignment="Right"/>
+                </Grid>
+                <Border Background="#404040" CornerRadius="25" Height="55">
+                    <UniformGrid Columns="3">
+                        <RadioButton x:Name="GinModeTab" Classes="ModeTab GinTab" Content="Gin Mode" IsChecked="True"/>
+                        <RadioButton x:Name="VodkaModeTab" Classes="ModeTab VodkaTab" Content="Vodka Mode"/>
+                        <RadioButton x:Name="OGModeTab" Classes="ModeTab OGTab" Content="OG Mode"/>
+                    </UniformGrid>
+                </Border>
+            </StackPanel>
+
+            <StackPanel Spacing="15">
+                <TextBlock Text="Led colors:" Foreground="White" FontSize="22" FontWeight="Bold"/>
+                
+                <StackPanel Orientation="Horizontal" Spacing="25">
+                    <RadioButton Classes="LedColor" Background="#FF0D0D" IsChecked="True"/> 
+                    <RadioButton Classes="LedColor" Background="#539CA8"/> 
+                    <RadioButton Classes="LedColor" Background="#FFFF4D" Foreground="#111111"/> 
+                    <RadioButton Classes="LedColor" Background="#6D4C7D"/> 
+                    <RadioButton Classes="LedColor" Background="#F0A1D8" Foreground="#111111"/> 
+                    <Button Classes="EditColorBtn">
+                        <PathIcon Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" 
+                                  Foreground="White" Width="24" Height="24"/>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="80" HorizontalAlignment="Left">
+                
+                <StackPanel Spacing="15">
+                    <TextBlock Text="Filling:" Foreground="White" FontSize="22" FontWeight="Bold"/>
+                    <Button x:Name="FillStartBtn" Classes="StartRedBtn" Content="Start"/>
+                </StackPanel>
+
+                <StackPanel Spacing="15">
+                    <TextBlock Text="Cleaning:" Foreground="White" FontSize="22" FontWeight="Bold"/>
+                    <Button x:Name="CleanStartBtn" Classes="StartBtn" Content="Start"/>
+                </StackPanel>
+
+            </StackPanel>
+
+        </StackPanel>
+
+    </Grid>
+</UserControl>

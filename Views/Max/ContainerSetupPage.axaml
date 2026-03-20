@@ -1,0 +1,151 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+             x:Class="DaevaMini.Views.Max.ContainerSetupPage">
+
+    <Grid Background="#131818"
+          ColumnDefinitions="Auto,*,Auto"
+          Margin="20">
+        
+        <!-- Left column: back button -->
+        <StackPanel Grid.Column="0"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Left"
+                    Margin="10,0,0,0">
+            <Button Background="Transparent"
+                    Click="OnBackArrow">
+                <TextBlock Text="←"
+                           FontSize="40"
+                           Foreground="White" />
+            </Button>
+        </StackPanel>
+
+        <!-- Center column: main content -->
+        <Grid Grid.Column="1"
+              RowDefinitions="*,Auto"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center"
+              Margin="10">
+            
+            <!-- Top: instruction + layout -->
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="Auto,Auto,Auto"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Margin="0,0,0,30">
+                
+                <!-- Left containers -->
+                <StackPanel Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Spacing="30">
+                    <Border Width="150"
+                            Height="150"
+                            Background="#D0F0F8"
+                            CornerRadius="75">
+                        <TextBlock x:Name="Slot0"
+                                   Foreground="#000000"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"/>
+                    </Border>
+                    
+                    <Border Width="150"
+                            Height="150"
+                            Background="#D0F0F8"
+                            CornerRadius="75">
+                        <TextBlock x:Name="Slot1"
+                                   Foreground="#000000"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- Center text + square -->
+                <StackPanel Grid.Column="1"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="20"
+                            Margin="30,0">
+                    <TextBlock Text="Insert the correct liquids"
+                               Foreground="White"
+                               FontSize="32"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"/>
+
+                    <Border Width="250"
+                            Height="250"
+                            Background="#D0F0F8"
+                            CornerRadius="20">
+                        <TextBlock Text="DAĒVA"
+                                   Foreground="#000000"
+                                   FontSize="48"
+                                   FontWeight="Bold"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- Right containers -->
+                <StackPanel Grid.Column="2"
+                            VerticalAlignment="Center"
+                            Spacing="30">
+                    <Border Width="150"
+                            Height="150"
+                            Background="#D0F0F8"
+                            CornerRadius="75">
+                        <TextBlock x:Name="Slot2"
+                                   Foreground="#000000"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"/>
+                    </Border>
+                    
+                    <Border Width="150"
+                            Height="150"
+                            Background="#D0F0F8"
+                            CornerRadius="75">
+                        <TextBlock x:Name="Slot3"
+                                   Foreground="#000000"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"/>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- Bottom: Done button -->
+            <Button Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Bottom"
+                    Padding="80,20"
+                    CornerRadius="20"
+                    Background="#539CA8"
+                    Click="OnDone">
+                <TextBlock Text="Done"
+                           Foreground="#000000"
+                           FontSize="28"
+                           FontWeight="SemiBold"/>
+            </Button>
+        </Grid>
+
+        <!-- Right column: spacer for centering -->
+        <Grid Grid.Column="2"/>
+    </Grid>
+</UserControl>
+

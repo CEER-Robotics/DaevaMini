@@ -16,12 +16,28 @@ LiquidAssignments:
   - ""
   - ""
 
-# Modes:
-#   - Name: "Gin Mode"
-#     Color: "#559CAD"
-#     LedColor: "CYAN"
-#     LiquidAssignments:
-#       - "Campari"
-#       - "Vermouth"
-#       - "Lemon"
-#       - "Red-bull"
+Modes:
+  - Name: "Gin Mode"
+    Color: "#559CAD"
+    LedColor: "CYAN"
+    LiquidAssignments:
+      - "Gin"
+      - "Tonic"
+      - "Lemon"
+      - ""
+  - Name: "Vodka Mode"
+    Color: "#F7940A"
+    LedColor: "CYAN"
+    LiquidAssignments:
+      - "Vodka"
+      - "Tonic"
+      - "Lemon"
+      - ""
+  - Name: "OG Mode"
+    Color: "#F46036"
+    LedColor: "RED"
+    LiquidAssignments:
+      - "Campari"
+      - "Vermouth"
+      - "Gin"
+      - ""

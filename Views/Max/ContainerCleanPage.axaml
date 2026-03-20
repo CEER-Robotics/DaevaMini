@@ -1,0 +1,168 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+             x:Class="DaevaMini.Views.Max.ContainerCleanPage">
+
+    <UserControl.Styles>
+        <Style Selector="ToggleButton.BottleBtn">
+            <Setter Property="Background" Value="#253540"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <StackPanel>
+                        <Border Width="145" Height="145" CornerRadius="100" Background="{TemplateBinding Background}">
+                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{TemplateBinding Tag}" Foreground="White" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,15,0,0"/>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="ToggleButton.JerryCanBtn">
+            <Setter Property="Background" Value="#253540"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <StackPanel>
+                        <Border Width="175" Height="175" CornerRadius="28" Background="{TemplateBinding Background}">
+                            <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{TemplateBinding Tag}" Foreground="White" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,15,0,0"/>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="ToggleButton.BottleBtn.Cleaned">
+            <Setter Property="Background" Value="#7BBFCF"/>
+        </Style>
+
+        <Style Selector="ToggleButton.BottleBtn:checked, ToggleButton.JerryCanBtn:checked">
+            <Setter Property="Background" Value="#D0F0F8"/>
+        </Style>
+
+        <Style Selector="ToggleButton.BottleBtn:disabled, ToggleButton.JerryCanBtn:disabled">
+            <Setter Property="Opacity" Value="0.3"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
+        <Style Selector="Button.CleanBtn">
+            <Setter Property="Background" Value="#0084FF"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="34"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Padding" Value="180,25"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.CleanBtn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#005BBB"/>
+        </Style>
+        <Style Selector="Button.CleanBtn:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#004185"/>
+        </Style>
+        <Style Selector="Button.CleanBtn:pressed TextBlock">
+            <Setter Property="Foreground" Value="Black"/>
+        </Style>
+        <Style Selector="Button.CleanBtn:disabled /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#7F7F7F"/>
+        </Style>
+        <Style Selector="Button.CleanBtn:disabled">
+            <Setter Property="Foreground" Value="#444444"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+            <Setter Property="Opacity" Value="0.6"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="90, *, 220" Background="#121212">
+
+        <Grid Grid.Row="0" Margin="50,40,0,0">
+            <Button Background="Transparent" Click="OnBackArrow" HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="Hand">
+                <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" Foreground="White" Width="35" Height="35"/>
+            </Button>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto" HorizontalAlignment="Center" VerticalAlignment="Center"
+              Margin="0,-50,0,0">
+            
+            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="60" Margin="0,0,60,0">
+                <ToggleButton Classes="JerryCanBtn" Tag="Empty" IsEnabled="False">
+                    <PathIcon Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z" Foreground="White" Width="60" Height="60"/>
+                </ToggleButton>
+                <ToggleButton Classes="JerryCanBtn" Tag="Empty" IsEnabled="False">
+                    <PathIcon Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z" Foreground="White" Width="60" Height="60"/>
+                </ToggleButton>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="30">
+                
+                <StackPanel Orientation="Horizontal" Spacing="50" HorizontalAlignment="Center">
+                    <ToggleButton x:Name="Bottle4" Classes="BottleBtn" Tag="4">
+                        <PathIcon Data="M272 32L368 32C385.7 32 400 46.3 400 64C400 81.7 385.7 96 368 96L272 96C254.3 96 240 81.7 240 64C240 46.3 254.3 32 272 32zM176 208C176 172.7 204.7 144 240 144L400 144C435.3 144 464 172.7 464 208C464 232.1 450.7 253.1 431 264C450.7 274.9 464 295.9 464 320C464 344.1 450.7 365.1 431 376C450.7 386.9 464 407.9 464 432C464 456.1 450.7 477.1 431 488C450.7 498.9 464 519.9 464 544C464 579.3 435.3 608 400 608L240 608C204.7 608 176 579.3 176 544C176 519.9 189.3 498.9 209 488C189.3 477.1 176 456.1 176 432C176 407.9 189.3 386.9 209 376C189.3 365.1 176 344.1 176 320C176 295.9 189.3 274.9 209 264C189.3 253.1 176 232.1 176 208z" Foreground="White" Width="60" Height="60"/>
+                    </ToggleButton>
+                    <ToggleButton x:Name="Bottle5" Classes="BottleBtn" Tag="5">
+                        <PathIcon Data="M272 32L368 32C385.7 32 400 46.3 400 64C400 81.7 385.7 96 368 96L272 96C254.3 96 240 81.7 240 64C240 46.3 254.3 32 272 32zM176 208C176 172.7 204.7 144 240 144L400 144C435.3 144 464 172.7 464 208C464 232.1 450.7 253.1 431 264C450.7 274.9 464 295.9 464 320C464 344.1 450.7 365.1 431 376C450.7 386.9 464 407.9 464 432C464 456.1 450.7 477.1 431 488C450.7 498.9 464 519.9 464 544C464 579.3 435.3 608 400 608L240 608C204.7 608 176 579.3 176 544C176 519.9 189.3 498.9 209 488C189.3 477.1 176 456.1 176 432C176 407.9 189.3 386.9 209 376C189.3 365.1 176 344.1 176 320C176 295.9 189.3 274.9 209 264C189.3 253.1 176 232.1 176 208z" Foreground="White" Width="60" Height="60"/>
+                    </ToggleButton>
+                    <ToggleButton x:Name="Bottle6" Classes="BottleBtn" Tag="6">
+                        <PathIcon Data="M272 32L368 32C385.7 32 400 46.3 400 64C400 81.7 385.7 96 368 96L272 96C254.3 96 240 81.7 240 64C240 46.3 254.3 32 272 32zM176 208C176 172.7 204.7 144 240 144L400 144C435.3 144 464 172.7 464 208C464 232.1 450.7 253.1 431 264C450.7 274.9 464 295.9 464 320C464 344.1 450.7 365.1 431 376C450.7 386.9 464 407.9 464 432C464 456.1 450.7 477.1 431 488C450.7 498.9 464 519.9 464 544C464 579.3 435.3 608 400 608L240 608C204.7 608 176 579.3 176 544C176 519.9 189.3 498.9 209 488C189.3 477.1 176 456.1 176 432C176 407.9 189.3 386.9 209 376C189.3 365.1 176 344.1 176 320C176 295.9 189.3 274.9 209 264C189.3 253.1 176 232.1 176 208z" Foreground="White" Width="60" Height="60"/>
+                    </ToggleButton>
+                    <ToggleButton x:Name="Bottle7" Classes="BottleBtn" Tag="7">
+                        <PathIcon Data="M272 32L368 32C385.7 32 400 46.3 400 64C400 81.7 385.7 96 368 96L272 96C254.3 96 240 81.7 240 64C240 46.3 254.3 32 272 32zM176 208C176 172.7 204.7 144 240 144L400 144C435.3 144 464 172.7 464 208C464 232.1 450.7 253.1 431 264C450.7 274.9 464 295.9 464 320C464 344.1 450.7 365.1 431 376C450.7 386.9 464 407.9 464 432C464 456.1 450.7 477.1 431 488C450.7 498.9 464 519.9 464 544C464 579.3 435.3 608 400 608L240 608C204.7 608 176 579.3 176 544C176 519.9 189.3 498.9 209 488C189.3 477.1 176 456.1 176 432C176 407.9 189.3 386.9 209 376C189.3 365.1 176 344.1 176 320C176 295.9 189.3 274.9 209 264C189.3 253.1 176 232.1 176 208z" Foreground="White" Width="60" Height="60"/>
+                    </ToggleButton>
+                </StackPanel>
+
+                <Grid ColumnDefinitions="Auto, 450, Auto" HorizontalAlignment="Center">
+                    
+                    <StackPanel Grid.Column="0" Spacing="30" VerticalAlignment="Top">
+                        <ToggleButton x:Name="Bottle3" Classes="BottleBtn" Tag="3">
+                            <PathIcon Data="M272 32L368 32C385.7 32 400 46.3 400 64C400 81.7 385.7 96 368 96L272 96C254.3 96 240 81.7 240 64C240 46.3 254.3 32 272 32zM176 208C176 172.7 204.7 144 240 144L400 144C435.3 144 464 172.7 464 208C464 232.1 450.7 253.1 431 264C450.7 274.9 464 295.9 464 320C464 344.1 450.7 365.1 431 376C450.7 386.9 464 407.9 464 432C464 456.1 450.7 477.1 431 488C450.7 498.9 464 519.9 464 544C464 579.3 435.3 608 400 608L240 608C204.7 608 176 579.3 176 544C176 519.9 189.3 498.9 209 488C189.3 477.1 176 456.1 176 432C176 407.9 189.3 386.9 209 376C189.3 365.1 176 344.1 176 320C176 295.9 189.3 274.9 209 264C189.3 253.1 176 232.1 176 208z" Foreground="White" Width="60" Height="60"/>
+                        </ToggleButton>
+                        <ToggleButton x:Name="Bottle2" Classes="BottleBtn" Tag="2">
+                            <PathIcon Data="M272 32L368 32C385.7 32 400 46.3 400 64C400 81.7 385.7 96 368 96L272 96C254.3 96 240 81.7 240 64C240 46.3 254.3 32 272 32zM176 208C176 172.7 204.7 144 240 144L400 144C435.3 144 464 172.7 464 208C464 232.1 450.7 253.1 431 264C450.7 274.9 464 295.9 464 320C464 344.1 450.7 365.1 431 376C450.7 386.9 464 407.9 464 432C464 456.1 450.7 477.1 431 488C450.7 498.9 464 519.9 464 544C464 579.3 435.3 608 400 608L240 608C204.7 608 176 579.3 176 544C176 519.9 189.3 498.9 209 488C189.3 477.1 176 456.1 176 432C176 407.9 189.3 386.9 209 376C189.3 365.1 176 344.1 176 320C176 295.9 189.3 274.9 209 264C189.3 253.1 176 232.1 176 208z" Foreground="White" Width="60" Height="60"/>
+                        </ToggleButton>
+                        <ToggleButton x:Name="Bottle1" Classes="BottleBtn" Tag="1">
+                            <PathIcon Data="M272 32L368 32C385.7 32 400 46.3 400 64C400 81.7 385.7 96 368 96L272 96C254.3 96 240 81.7 240 64C240 46.3 254.3 32 272 32zM176 208C176 172.7 204.7 144 240 144L400 144C435.3 144 464 172.7 464 208C464 232.1 450.7 253.1 431 264C450.7 274.9 464 295.9 464 320C464 344.1 450.7 365.1 431 376C450.7 386.9 464 407.9 464 432C464 456.1 450.7 477.1 431 488C450.7 498.9 464 519.9 464 544C464 579.3 435.3 608 400 608L240 608C204.7 608 176 579.3 176 544C176 519.9 189.3 498.9 209 488C189.3 477.1 176 456.1 176 432C176 407.9 189.3 386.9 209 376C189.3 365.1 176 344.1 176 320C176 295.9 189.3 274.9 209 264C189.3 253.1 176 232.1 176 208z" Foreground="White" Width="60" Height="60"/>
+                        </ToggleButton>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,30,0,0">
+                        <TextBlock Text="Select the containers to clean, then press Clean to start." 
+                                   Foreground="#D0F0F8" FontSize="26" FontWeight="Bold" 
+                                   HorizontalAlignment="Center" TextAlignment="Center" MaxWidth="380" TextWrapping="Wrap"/>
+                                   
+                        <Border Width="280" Height="280" Background="#D0F0F8" CornerRadius="20" Margin="0,30,0,0">
+                            <Image Source="avares://DaevaMini/Assets/DaevaDark.png" Stretch="Uniform" Margin="40"/>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Spacing="30" VerticalAlignment="Top">
+                        <ToggleButton x:Name="Bottle8" Classes="BottleBtn" Tag="8">
+                            <PathIcon Data="M272 32L368 32C385.7 32 400 46.3 400 64C400 81.7 385.7 96 368 96L272 96C254.3 96 240 81.7 240 64C240 46.3 254.3 32 272 32zM176 208C176 172.7 204.7 144 240 144L400 144C435.3 144 464 172.7 464 208C464 232.1 450.7 253.1 431 264C450.7 274.9 464 295.9 464 320C464 344.1 450.7 365.1 431 376C450.7 386.9 464 407.9 464 432C464 456.1 450.7 477.1 431 488C450.7 498.9 464 519.9 464 544C464 579.3 435.3 608 400 608L240 608C204.7 608 176 579.3 176 544C176 519.9 189.3 498.9 209 488C189.3 477.1 176 456.1 176 432C176 407.9 189.3 386.9 209 376C189.3 365.1 176 344.1 176 320C176 295.9 189.3 274.9 209 264C189.3 253.1 176 232.1 176 208z" Foreground="White" Width="60" Height="60"/>
+                        </ToggleButton>
+                        <ToggleButton x:Name="Bottle9" Classes="BottleBtn" Tag="9">
+                            <PathIcon Data="M272 32L368 32C385.7 32 400 46.3 400 64C400 81.7 385.7 96 368 96L272 96C254.3 96 240 81.7 240 64C240 46.3 254.3 32 272 32zM176 208C176 172.7 204.7 144 240 144L400 144C435.3 144 464 172.7 464 208C464 232.1 450.7 253.1 431 264C450.7 274.9 464 295.9 464 320C464 344.1 450.7 365.1 431 376C450.7 386.9 464 407.9 464 432C464 456.1 450.7 477.1 431 488C450.7 498.9 464 519.9 464 544C464 579.3 435.3 608 400 608L240 608C204.7 608 176 579.3 176 544C176 519.9 189.3 498.9 209 488C189.3 477.1 176 456.1 176 432C176 407.9 189.3 386.9 209 376C189.3 365.1 176 344.1 176 320C176 295.9 189.3 274.9 209 264C189.3 253.1 176 232.1 176 208z" Foreground="White" Width="60" Height="60"/>
+                        </ToggleButton>
+                        <ToggleButton x:Name="Bottle10" Classes="BottleBtn" Tag="10">
+                            <PathIcon Data="M272 32L368 32C385.7 32 400 46.3 400 64C400 81.7 385.7 96 368 96L272 96C254.3 96 240 81.7 240 64C240 46.3 254.3 32 272 32zM176 208C176 172.7 204.7 144 240 144L400 144C435.3 144 464 172.7 464 208C464 232.1 450.7 253.1 431 264C450.7 274.9 464 295.9 464 320C464 344.1 450.7 365.1 431 376C450.7 386.9 464 407.9 464 432C464 456.1 450.7 477.1 431 488C450.7 498.9 464 519.9 464 544C464 579.3 435.3 608 400 608L240 608C204.7 608 176 579.3 176 544C176 519.9 189.3 498.9 209 488C189.3 477.1 176 456.1 176 432C176 407.9 189.3 386.9 209 376C189.3 365.1 176 344.1 176 320C176 295.9 189.3 274.9 209 264C189.3 253.1 176 232.1 176 208z" Foreground="White" Width="60" Height="60"/>
+                        </ToggleButton>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="60" Margin="60,0,0,0">
+                <ToggleButton Classes="JerryCanBtn" Tag="Empty" IsEnabled="False">
+                    <PathIcon Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z" Foreground="White" Width="60" Height="60"/>
+                </ToggleButton>
+                <ToggleButton Classes="JerryCanBtn" Tag="Empty" IsEnabled="False">
+                    <PathIcon Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z" Foreground="White" Width="60" Height="60"/>
+                </ToggleButton>
+            </StackPanel>
+        </Grid>
+
+        <Button x:Name="CleanBtn" Grid.Row="2" Content="Clean" Classes="CleanBtn" Click="OnClean" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,70"/>
+
+    </Grid>
+</UserControl>

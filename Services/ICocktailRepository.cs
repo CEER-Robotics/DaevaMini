@@ -6,4 +6,5 @@ namespace DaevaMini.Services;
 public interface ICocktailRepository
 {
     IReadOnlyList<Cocktail> GetAll();
+    IReadOnlyList<Cocktail> GetByMode(string modeName);
 }

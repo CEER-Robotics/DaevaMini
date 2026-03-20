@@ -1,0 +1,121 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+             x:Class="DaevaMini.Views.Mini.MiniCleanPage">
+
+    <UserControl.Styles>
+
+        <Style Selector="Button.BackBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="CornerRadius" Value="50"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.BackBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#20FFFFFF"/>
+        </Style>
+
+        <Style Selector="ToggleButton.BottleToggle">
+            <Setter Property="Background" Value="#2A2A2A"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <StackPanel>
+                        <Border Width="120" Height="120" CornerRadius="60" Background="{TemplateBinding Background}">
+                            <PathIcon Data="M272 32L368 32C385.7 32 400 46.3 400 64C400 81.7 385.7 96 368 96L272 96C254.3 96 240 81.7 240 64C240 46.3 254.3 32 272 32zM176 208C176 172.7 204.7 144 240 144L400 144C435.3 144 464 172.7 464 208C464 232.1 450.7 253.1 431 264C450.7 274.9 464 295.9 464 320C464 344.1 450.7 365.1 431 376C450.7 386.9 464 407.9 464 432C464 456.1 450.7 477.1 431 488C450.7 498.9 464 519.9 464 544C464 579.3 435.3 608 400 608L240 608C204.7 608 176 579.3 176 544C176 519.9 189.3 498.9 209 488C189.3 477.1 176 456.1 176 432C176 407.9 189.3 386.9 209 376C189.3 365.1 176 344.1 176 320C176 295.9 189.3 274.9 209 264C189.3 253.1 176 232.1 176 208z"
+                                      Foreground="White" Width="45" Height="45"/>
+                        </Border>
+                        <TextBlock Text="{TemplateBinding Tag}" Foreground="White" FontSize="20" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="ToggleButton.BottleToggle:checked /template/ Border">
+            <Setter Property="Background" Value="#D0F0F8"/>
+        </Style>
+        <Style Selector="ToggleButton.BottleToggle.Cleaned /template/ Border">
+            <Setter Property="Background" Value="#7BBFCF"/>
+        </Style>
+        <Style Selector="ToggleButton.BottleToggle:disabled">
+            <Setter Property="Opacity" Value="0.3"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
+        <Style Selector="Button.CleanBtn">
+            <Setter Property="Background" Value="#0084FF"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="15"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Width" Value="320"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.CleanBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#005BBB"/>
+        </Style>
+        <Style Selector="Button.CleanBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#004185"/>
+        </Style>
+        <Style Selector="Button.CleanBtn:disabled">
+            <Setter Property="Opacity" Value="0.5"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto, *, Auto" Background="#121212">
+
+        <Grid Grid.Row="0" Margin="20,20,0,0">
+            <Button x:Name="BackBtn" Classes="BackBtn" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
+                          Foreground="White" Width="28" Height="28"/>
+            </Button>
+            <TextBlock Text="Cleaning" Foreground="White" FontSize="32" FontWeight="Bold"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Grid>
+
+        <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ToggleButton x:Name="Bottle1" Grid.Row="0" Grid.Column="0" Classes="BottleToggle" Tag="1"/>
+            <ToggleButton x:Name="Bottle3" Grid.Row="2" Grid.Column="0" Classes="BottleToggle" Tag="3"/>
+
+            <TextBlock Grid.Row="0" Grid.Column="2"
+                       Text="Select containers&#x0a;to clean"
+                       TextAlignment="Center" Foreground="#D0F0F8"
+                       FontSize="24" FontWeight="SemiBold"
+                       VerticalAlignment="Center" Margin="0,0,0,15"/>
+
+            <Border Grid.Row="2" Grid.Column="2" Background="#D0F0F8" CornerRadius="20"
+                    Width="160" Height="160" VerticalAlignment="Center" Margin="0,-60,0,0">
+                <Image Source="avares://DaevaMini/Assets/DaevaDark.png"
+                       Width="140" Stretch="Uniform"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Margin="20,0,0,0"/>
+            </Border>
+
+            <ToggleButton x:Name="Bottle2" Grid.Row="0" Grid.Column="4" Classes="BottleToggle" Tag="2"/>
+            <ToggleButton x:Name="Bottle4" Grid.Row="2" Grid.Column="4" Classes="BottleToggle" Tag="4"/>
+        </Grid>
+
+        <Button x:Name="CleanBtn" Grid.Row="2" Content="Clean" Classes="CleanBtn" Margin="0,0,0,25"/>
+
+    </Grid>
+</UserControl>

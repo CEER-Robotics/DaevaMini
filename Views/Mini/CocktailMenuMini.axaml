@@ -1,0 +1,103 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="clr-namespace:DaevaMini.Converters"
+             xmlns:models="clr-namespace:DaevaMini.Models"
+             xmlns:vm="clr-namespace:DaevaMini.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+             x:Class="DaevaMini.Views.Mini.CocktailMenuMini"
+             x:Name="MenuHost"
+             x:DataType="vm:CocktailMenuViewModel">
+
+    <UserControl.Resources>
+        <converters:BitmapAssetConverter x:Key="BitmapAssetConverter"/>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="Button.CocktailCard">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="CornerRadius" Value="15"/>
+            <Setter Property="Background" Value="#253540"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1" />
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="Button.CocktailCard:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#324652"/>
+        </Style>
+
+        <Style Selector="Button.CocktailCard:pressed">
+            <Setter Property="RenderTransform" Value="scale(0.96)" />
+        </Style>
+        <Style Selector="Button.CocktailCard:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1A252D"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto, *" Background="#121212">
+
+        <Grid Grid.Row="0" Height="80">
+            <Button Name="BackButton"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Width="40" Height="40"
+                    Margin="20,15,0,0"
+                    Background="Transparent">
+                <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
+                          Foreground="White"
+                          Width="20" Height="20"/>
+            </Button>
+
+            <Image Source="/Assets/DaevaWhite.png"
+                   Stretch="Uniform"
+                   Height="40"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+
+            <Button Name="SettingsButton"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Width="40" Height="40"
+                    Margin="0,15,20,0"
+                    Background="Transparent"
+                    Cursor="Hand">
+                <PathIcon Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.04 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.04 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"
+                          Foreground="#888888" Width="20" Height="20"/>
+            </Button>
+        </Grid>
+
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding Cocktails}" Margin="30,10">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="2" Rows="2"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="models:Cocktail">
+                    <Button Classes="CocktailCard"
+                            Command="{Binding DataContext.SelectCocktailCommand, ElementName=MenuHost}"
+                            CommandParameter="{Binding}">
+                        <Grid RowDefinitions="*, Auto">
+                            <Image Grid.Row="0"
+                                   Source="{Binding ImageSource, Converter={StaticResource BitmapAssetConverter}}"
+                                   Margin="15" Stretch="Uniform"/>
+                            <Border Grid.Row="1" Background="{Binding CardBackground}"
+                                    Height="50" CornerRadius="0,0,15,15">
+                                <TextBlock Text="{Binding Title}" Foreground="Black"
+                                           FontWeight="Bold" FontSize="24"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>

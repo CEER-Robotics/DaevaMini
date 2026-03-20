@@ -1,34 +1,25 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using DaevaMini.Models;
 using DaevaMini.Services;
 
-namespace DaevaMini.ViewModels;
+namespace DaevaMini.ViewModels.Max;
 
 /// <summary>
-/// ViewModel for the new CocktailMenu (ImprovedInterface style). Uses repository for display list.
+/// ViewModel for the Max cocktail menu. Loads all cocktails from the repository
+/// without mode filtering — the Max has no concept of modes.
 /// </summary>
-public sealed class CocktailMenuViewModel : INotifyPropertyChanged
+public sealed class MaxCocktailMenuViewModel : INotifyPropertyChanged
 {
     private readonly ICocktailRepository _repository;
-    private readonly ModesViewModel _modesViewModel;
     private ObservableCollection<Cocktail> _cocktails = new();
 
-    public CocktailMenuViewModel(ICocktailRepository repository, ModesViewModel modesViewModel)
+    public MaxCocktailMenuViewModel(ICocktailRepository repository)
     {
         _repository = repository;
-        _modesViewModel = modesViewModel;
-        RefreshCocktails();
-        _modesViewModel.PropertyChanged += (s, e) =>
-        {
-            if (e.PropertyName == nameof(ModesViewModel.CurrentMode))
-                RefreshCocktails();
-        };
+        Cocktails = new ObservableCollection<Cocktail>(_repository.GetAll());
     }
 
     public ObservableCollection<Cocktail> Cocktails
@@ -44,13 +35,6 @@ public sealed class CocktailMenuViewModel : INotifyPropertyChanged
 
     /// <summary>Set by the host (e.g. MainWindow) to handle cocktail selection.</summary>
     public ICommand? SelectCocktailCommand { get; set; }
-
-    private void RefreshCocktails()
-    {
-        if (_modesViewModel.CurrentMode == null) return;
-        var list = _repository.GetByMode(_modesViewModel.CurrentMode.Name);
-        Cocktails = new ObservableCollection<Cocktail>(list);
-    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged([CallerMemberName] string? name = null)

@@ -48,14 +48,20 @@ public sealed class ModesViewModel : INotifyPropertyChanged
     private static void LoadModesFromConfig()
     {
         var config = AppConfigService.Instance.Config;
-        _modes = new ObservableCollection<Mode>(
-            config.Modes.Select(m => new Mode(m.Name, m.Color, m.LiquidAssignments))
-        );
+        if (config.Modes.Length > 0)
+        {
+            _modes = new ObservableCollection<Mode>(
+                config.Modes.Select(m => new Mode(m.Name, m.Color, m.LiquidAssignments))
+            );
+        }
+        else
+        {
+            // error out
+            throw new InvalidOperationException("No modes found in config");
+        }
     }
 
-    private static readonly Mode FallbackMode = new("Default", "#559CAD", Array.Empty<string>());
-
-    private Mode _currentMode = Modes.Count > 0 ? Modes[0] : FallbackMode;
+    private Mode _currentMode = Modes[0];
     public Mode CurrentMode
     {
         get
