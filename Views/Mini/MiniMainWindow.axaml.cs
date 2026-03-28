@@ -1,5 +1,5 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -15,8 +15,8 @@ public partial class MiniMainWindow : Window
 {
     private ContentControl? _pageContainer;
     private readonly ModesViewModel _modesViewModel = new();
-    private readonly CocktailsMenuViewModel _cocktailsMenuViewModel;
     private UserControl? _cocktailMenuView;
+    private bool _isDispensing;
 
     public MiniMainWindow()
     {
@@ -31,7 +31,6 @@ public partial class MiniMainWindow : Window
         ExtendClientAreaToDecorationsHint = true;
 #endif
         _pageContainer = this.FindControl<ContentControl>("PageContainer");
-        _cocktailsMenuViewModel = new CocktailsMenuViewModel(_modesViewModel);
         ShowLockScreen();
     }
 
@@ -131,61 +130,45 @@ public partial class MiniMainWindow : Window
     {
         if (sender is not CocktailCard card || card.DataContext is not Cocktail cocktail)
             return;
-        if (_cocktailsMenuViewModel.IsDispensing) return;
+        if (_isDispensing) return;
 
-        CocktailVm? cocktailVm = null;
-        if (cocktail.Ingredients.Count > 0)
+        if (cocktail.Ingredients.Count == 0)
         {
-            var ingredients = cocktail.Ingredients
-                .Select(i => new Ingredient(i.Name, i.Milliliters))
-                .ToArray();
-            cocktailVm = new CocktailVm(cocktail.Title, ingredients);
-        }
-        else
-        {
-            cocktailVm = _cocktailsMenuViewModel.Cocktails
-                .FirstOrDefault(c => c.Name.Equals(cocktail.Title, StringComparison.OrdinalIgnoreCase));
-        }
-
-        if (cocktailVm == null)
-        {
-            Console.WriteLine($"[MiniMainWindow] No matching cocktail config for: {cocktail.Title}");
+            Console.WriteLine($"[MiniMainWindow] No ingredients defined for: {cocktail.Title}");
             return;
         }
 
-        _cocktailsMenuViewModel.IsDispensing = true;
+        _isDispensing = true;
         try
         {
             var manager = ArduinoSerialManager.Instance;
             if (!manager.IsConnected)
             {
                 Console.WriteLine("[MiniMainWindow] Arduino not connected");
-                _cocktailsMenuViewModel.IsDispensing = false;
+                _isDispensing = false;
                 return;
             }
 
-            var channelDurations = _cocktailsMenuViewModel.MapIngredientsToChannels(cocktailVm);
+            var mode = _modesViewModel.CurrentMode;
+            int msPerMl = AppConfigService.Instance.Config.FlowRate.MillisecondsPerMilliliter;
+            var channelDurations = MapIngredientsToChannels(cocktail.Ingredients, mode.LiquidAssignments, msPerMl);
             if (channelDurations.Count == 0)
             {
                 Console.WriteLine($"[MiniMainWindow] No matching ingredients for {cocktail.Title}");
-                _cocktailsMenuViewModel.IsDispensing = false;
+                _isDispensing = false;
                 return;
             }
 
             string command = cocktail.LedRgb is { } rgb
                 ? ArduinoProtocolHelper.BuildActiveCommand(rgb, channelDurations)
-                : ArduinoProtocolHelper.BuildActiveCommand(
-                    AppConfigService.Instance.Config.Modes
-                        .FirstOrDefault(m => m.Name.Equals(_modesViewModel.CurrentModeName, StringComparison.OrdinalIgnoreCase))
-                        ?.LedColor ?? "ORANGE",
-                    channelDurations);
+                : ArduinoProtocolHelper.BuildActiveCommand(mode.LedColor, channelDurations);
             Console.WriteLine($"[MiniMainWindow] Sending command: {command}");
 
             bool success = manager.Send(command);
             if (!success)
             {
                 Console.WriteLine("[MiniMainWindow] Failed to send command");
-                _cocktailsMenuViewModel.IsDispensing = false;
+                _isDispensing = false;
                 return;
             }
 
@@ -209,12 +192,35 @@ public partial class MiniMainWindow : Window
                     break;
             }
 
-            _cocktailsMenuViewModel.IsDispensing = false;
+            _isDispensing = false;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"[MiniMainWindow] Dispense error: {ex.Message}");
-            _cocktailsMenuViewModel.IsDispensing = false;
+            _isDispensing = false;
         }
+    }
+
+    private static Dictionary<int, int> MapIngredientsToChannels(
+        IReadOnlyList<CocktailIngredient> ingredients, string[] assignments, int msPerMl)
+    {
+        var channelDurations = new Dictionary<int, int>();
+        foreach (var ingredient in ingredients)
+        {
+            for (int position = 0; position < assignments.Length; position++)
+            {
+                if (assignments[position].Equals(ingredient.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    int channel = position + 1;
+                    int durationMs = ingredient.Milliliters * msPerMl;
+                    if (channelDurations.ContainsKey(channel))
+                        channelDurations[channel] += durationMs;
+                    else
+                        channelDurations[channel] = durationMs;
+                    break;
+                }
+            }
+        }
+        return channelDurations;
     }
 }

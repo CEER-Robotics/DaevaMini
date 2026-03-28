@@ -12,12 +12,14 @@ public sealed class Mode
 {
     public string Name { get; }
     public IBrush Color { get; }
+    public string LedColor { get; }
     public string[] LiquidAssignments { get; }
 
-    public Mode(string name, string color, string[] liquidAssignments)
+    public Mode(string name, string color, string ledColor, string[] liquidAssignments)
     {
         Name = name;
         Color = Brush.Parse(color);
+        LedColor = ledColor;
         LiquidAssignments = liquidAssignments;
     }
     
@@ -51,7 +53,7 @@ public sealed class ModesViewModel : INotifyPropertyChanged
         if (config.Modes.Length > 0)
         {
             _modes = new ObservableCollection<Mode>(
-                config.Modes.Select(m => new Mode(m.Name, m.Color, m.LiquidAssignments))
+                config.Modes.Select(m => new Mode(m.Name, m.Color, m.LedColor, m.LiquidAssignments))
             );
         }
         else

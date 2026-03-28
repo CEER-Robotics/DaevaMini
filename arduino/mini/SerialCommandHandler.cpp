@@ -5,20 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "LedAnimations.h"
 #include "ProjectConfig.h"
 #include "PumpControl.h"
 
 namespace {
-
-enum State : uint8_t {
-  ST_WAIT,
-  ST_ACTIVE,
-  ST_TOXIC,
-  ST_MANUTENZIONE,
-};
-
-static State state = ST_WAIT;
-static uint32_t activeEndMs = 0;
 
 static char rxLine[ProjectConfig::Serial::kRxBufferSize];
 static size_t rxLen = 0;
@@ -39,6 +30,7 @@ static bool isExactCommand(const char* line, const char* cmd) {
   if (line == nullptr || cmd == nullptr) {
     return false;
   }
+
   char buf[sizeof(rxLine)];
   strncpy(buf, line, sizeof(buf) - 1);
   buf[sizeof(buf) - 1] = '\0';
@@ -46,10 +38,105 @@ static bool isExactCommand(const char* line, const char* cmd) {
   return strcmp(t, cmd) == 0;
 }
 
+// Parses a 0-255 byte value; returns true and sets *out if valid.
+static bool parseByte(const char* s, uint8_t* out) {
+  if (s == nullptr || out == nullptr) {
+    return false;
+  }
+  char* end = nullptr;
+  long n = strtol(s, &end, 10);
+  if (end == s || *end != '\0') {
+    return false;
+  }
+  if (n < 0 || n > 255) {
+    return false;
+  }
+  *out = (uint8_t)n;
+  return true;
+}
+
+// Extracts active color: either BASE/COLOR:<name> or RGB:r,g,b.
+// For RGB, the value after the colon is r; the next two comma-separated tokens are g and b.
+static bool extractActiveColor(const char* line,
+                               char* outName,
+                               size_t outNameLen,
+                               uint8_t* outR,
+                               uint8_t* outG,
+                               uint8_t* outB,
+                               bool* outIsRgb) {
+  if (line == nullptr || outName == nullptr || outNameLen == 0 ||
+      outR == nullptr || outG == nullptr || outB == nullptr ||
+      outIsRgb == nullptr) {
+    return false;
+  }
+
+  outName[0] = '\0';
+  *outIsRgb = false;
+
+  char buf[sizeof(rxLine)];
+  strncpy(buf, line, sizeof(buf) - 1);
+  buf[sizeof(buf) - 1] = '\0';
+
+  char* tok = strtok(buf, ",");
+  if (tok == nullptr) {
+    return false;
+  }
+
+  tok = trimInPlace(tok);
+  if (strcmp(tok, "ACTIVE") != 0) {
+    return false;
+  }
+
+  while ((tok = strtok(nullptr, ",")) != nullptr) {
+    char* field = trimInPlace(tok);
+    char* sep = strchr(field, ':');
+    if (sep == nullptr) {
+      continue;
+    }
+
+    *sep = '\0';
+    char* key = trimInPlace(field);
+    char* val = trimInPlace(sep + 1);
+
+    if (strcmp(key, "RGB") == 0) {
+      uint8_t r = 0, g = 0, b = 0;
+      if (!parseByte(val, &r)) {
+        return false;
+      }
+      char* tokG = strtok(nullptr, ",");
+      char* tokB = strtok(nullptr, ",");
+      if (tokG == nullptr || tokB == nullptr) {
+        return false;
+      }
+      if (!parseByte(trimInPlace(tokG), &g) || !parseByte(trimInPlace(tokB), &b)) {
+        return false;
+      }
+      *outR = r;
+      *outG = g;
+      *outB = b;
+      *outIsRgb = true;
+      return true;
+    }
+
+    if (strcmp(key, "BASE") == 0 || strcmp(key, "COLOR") == 0) {
+      if (*val == '\0') {
+        return false;
+      }
+      strncpy(outName, val, outNameLen - 1);
+      outName[outNameLen - 1] = '\0';
+      *outIsRgb = false;
+      return true;
+    }
+  }
+
+  return false;
+}
+
 static bool isActiveCommand(const char* line) {
   if (line == nullptr) {
     return false;
   }
+
   char buf[sizeof(rxLine)];
   strncpy(buf, line, sizeof(buf) - 1);
   buf[sizeof(buf) - 1] = '\0';
@@ -62,32 +149,41 @@ static bool isActiveCommand(const char* line) {
   return strcmp(tok, "ACTIVE") == 0;
 }
 
+static bool hasActiveColorField(const char* line) {
+  if (line == nullptr) {
+    return false;
+  }
+
+  return strstr(line, "BASE:") != nullptr || strstr(line, "COLOR:") != nullptr ||
+         strstr(line, "RGB:") != nullptr;
+}
+
 static void handleSerialLine(const char* line) {
   if (line == nullptr || line[0] == '\0') {
     return;
   }
 
   if (isExactCommand(line, "MANUTENZIONE")) {
-    PumpControl::allOff();
-    state = ST_MANUTENZIONE;
-    activeEndMs = 0;
-    Serial.println("OK MANUTENZIONE");
+    if (LedAnimations::handleMaintenanceCommand()) {
+      PumpControl::allOff();
+      Serial.println("OK MANUTENZIONE");
+    }
     return;
   }
 
   if (isExactCommand(line, "READY")) {
-    if (state == ST_TOXIC || state == ST_MANUTENZIONE) {
-      state = ST_WAIT;
+    const bool wasWaiting = LedAnimations::isWaitingForCommand();
+    if (LedAnimations::handleReadyCommand() && wasWaiting) {
       Serial.println("OK READY");
     }
     return;
   }
 
   if (isExactCommand(line, "TOXIC")) {
-    PumpControl::allOff();
-    state = ST_TOXIC;
-    activeEndMs = 0;
-    Serial.println("OK TOXIC");
+    if (LedAnimations::handleToxicCommand()) {
+      PumpControl::allOff();
+      Serial.println("OK TOXIC");
+    }
     return;
   }
 
@@ -95,8 +191,7 @@ static void handleSerialLine(const char* line) {
     return;
   }
 
-  // ACTIVE command — accepted only in WAIT.
-  if (state != ST_WAIT) {
+  if (!LedAnimations::isWaitingForCommand()) {
     Serial.println("IGNORED ACTIVE");
     return;
   }
@@ -108,9 +203,34 @@ static void handleSerialLine(const char* line) {
     return;
   }
 
-  state = ST_ACTIVE;
-  activeEndMs = maxEnd;
-  Serial.println("OK ACTIVE");
+  bool started = false;
+  if (hasActiveColorField(line)) {
+    char colorName[32];
+    uint8_t rgbR = 0, rgbG = 0, rgbB = 0;
+    bool isRgb = false;
+    if (!extractActiveColor(line, colorName, sizeof(colorName),
+                            &rgbR, &rgbG, &rgbB, &isRgb)) {
+      Serial.println("ERR ACTIVE COLOR");
+      return;
+    }
+
+    uint32_t selectedColor = 0;
+    if (isRgb) {
+      selectedColor = ((uint32_t)rgbR << 16) | ((uint32_t)rgbG << 8) | (uint32_t)rgbB;
+    } else if (!LedAnimations::parsePresetColor(colorName, selectedColor)) {
+      Serial.println("ERR ACTIVE COLOR");
+      return;
+    }
+
+    started = LedAnimations::startActiveWithColor(maxEnd, selectedColor);
+  } else {
+    LedAnimations::startActive(maxEnd);
+    started = true;
+  }
+
+  if (started) {
+    Serial.println("OK ACTIVE");
+  }
 }
 
 }  // namespace
@@ -120,19 +240,9 @@ namespace SerialCommandHandler {
 void begin() {
   rxLen = 0;
   rxLine[0] = '\0';
-  state = ST_WAIT;
-  activeEndMs = 0;
 }
 
 void update() {
-  // Check if ACTIVE period has elapsed.
-  if (state == ST_ACTIVE && activeEndMs != 0 &&
-      (int32_t)(millis() - activeEndMs) >= 0) {
-    state = ST_WAIT;
-    activeEndMs = 0;
-    Serial.println("DONE");
-  }
-
   while (Serial.available() > 0) {
     char c = (char)Serial.read();
     if (c == '\r') {

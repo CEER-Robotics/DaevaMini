@@ -7,7 +7,7 @@ namespace DaevaMini.Services;
 
 public sealed class MiniCocktailRepository : ICocktailRepository
 {
-    private const string AssetsBase = "avares://DaevaMini/Assets/";
+    private const string AssetsBase = "avares://Daeva/Assets/";
 
     private static readonly IReadOnlyList<Cocktail> Cocktails =
     [

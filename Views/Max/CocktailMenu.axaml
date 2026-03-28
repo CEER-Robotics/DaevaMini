@@ -21,7 +21,7 @@
                     VerticalAlignment="Top"
                     HorizontalAlignment="Center"
                     CornerRadius="0,0,45,45">
-                <Image Source="avares://DaevaMini/Assets/logo_white.png"
+                <Image Source="avares://Daeva/Assets/logo_white.png"
                        Stretch="Uniform"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"

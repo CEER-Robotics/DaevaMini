@@ -18,7 +18,7 @@ public class Cocktail
     public string Title { get; init; } = string.Empty;
     public string Subtitle { get; init; } = string.Empty;
     public string ModeName { get; init; } = string.Empty;
-    /// <summary>Avares path, e.g. avares://DaevaMini/Assets/negroni.png</summary>
+    /// <summary>Avares path, e.g. avares://Daeva/Assets/negroni.png</summary>
     public string ImageSource { get; init; } = string.Empty;
     public CocktailTheme Theme { get; init; }
 

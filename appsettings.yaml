@@ -1,16 +1,16 @@
 FlowRate:
-  MillisecondsPerMilliliter: 100
+  MillisecondsPerMilliliter: 117
 
 FillDurationMs: 3000
 CleanDurationMs: 10000
 
 LiquidAssignments:
-  - "Campari"
-  - "Vermouth"
-  - "Lemon"
-  - "Red-bull"
+  - "Aperol"
+  - "Prosecco"
   - ""
   - ""
+  - "Gin"
+  - "Tonic"
   - ""
   - ""
   - ""

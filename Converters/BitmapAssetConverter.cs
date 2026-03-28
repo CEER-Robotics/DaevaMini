@@ -20,7 +20,7 @@ public sealed class BitmapAssetConverter : IValueConverter
         {
             var uri = path.StartsWith("avares://", StringComparison.Ordinal)
                 ? new Uri(path)
-                : new Uri($"avares://DaevaMini/Assets/{path.TrimStart('/')}");
+                : new Uri($"avares://Daeva/Assets/{path.TrimStart('/')}");
             using var stream = AssetLoader.Open(uri);
             return new Bitmap(stream);
         }

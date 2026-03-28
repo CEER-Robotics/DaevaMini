@@ -29,7 +29,7 @@
 
     <Application.Styles>
         <FluentTheme />
-        <StyleInclude Source="avares://DaevaMini/Styles/AppStyles.axaml"/>
-        <StyleInclude Source="avares://DaevaMini/Styles/CocktailCardStyles.axaml"/>
+        <StyleInclude Source="avares://Daeva/Styles/AppStyles.axaml"/>
+        <StyleInclude Source="avares://Daeva/Styles/CocktailCardStyles.axaml"/>
     </Application.Styles>
 </Application>

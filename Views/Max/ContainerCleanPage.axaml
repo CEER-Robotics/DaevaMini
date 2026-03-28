@@ -134,7 +134,7 @@
                                    HorizontalAlignment="Center" TextAlignment="Center" MaxWidth="380" TextWrapping="Wrap"/>
                                    
                         <Border Width="280" Height="280" Background="#D0F0F8" CornerRadius="20" Margin="0,30,0,0">
-                            <Image Source="avares://DaevaMini/Assets/DaevaDark.png" Stretch="Uniform" Margin="40"/>
+                            <Image Source="avares://Daeva/Assets/DaevaDark.png" Stretch="Uniform" Margin="40"/>
                         </Border>
                     </StackPanel>
 
