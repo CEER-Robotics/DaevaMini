@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using DaevaMini.Config;
@@ -47,7 +45,7 @@ public partial class MainWindow : Window
         if (_pageContainer == null) return;
 
         var repository = new MaxCocktailRepository();
-        var menuViewModel = new ViewModels.Max.MaxCocktailMenuViewModel(repository)
+        var menuViewModel = new CocktailMenuViewModel(repository)
         {
             SelectCocktailCommand = new RelayCommand(OnCocktailSelected)
         };
@@ -92,7 +90,7 @@ public partial class MainWindow : Window
             _pageContainer.Content = _cocktailMenuView;
     }
 
-    private void OnCardDaleClicked(object? sender, RoutedEventArgs e)
+    private async void OnCardDaleClicked(object? sender, RoutedEventArgs e)
     {
         if (sender is not CocktailCard card || card.DataContext is not Cocktail cocktail)
             return;
@@ -111,15 +109,15 @@ public partial class MainWindow : Window
             if (!manager.IsConnected)
             {
                 Console.WriteLine("[MainWindow] Arduino not connected");
-                _isDispensing = false;
                 return;
             }
 
-            var channelDurations = MapIngredientsToChannels(cocktail.Ingredients);
+            var config = AppConfigService.Instance.Config;
+            var channelDurations = ArduinoProtocolHelper.MapIngredientsToChannels(
+                cocktail.Ingredients, config.LiquidAssignments, config.FlowRate.MillisecondsPerMilliliter);
             if (channelDurations.Count == 0)
             {
                 Console.WriteLine($"[MainWindow] No matching ingredients for {cocktail.Title}");
-                _isDispensing = false;
                 return;
             }
 
@@ -128,74 +126,43 @@ public partial class MainWindow : Window
                 : ArduinoProtocolHelper.BuildActiveCommand("ORANGE", channelDurations);
             Console.WriteLine($"[MainWindow] Sending command: {command}");
 
-            bool success = manager.Send(command);
-            if (!success)
+            if (!manager.Send(command))
             {
                 Console.WriteLine("[MainWindow] Failed to send command");
-                _isDispensing = false;
                 return;
             }
 
-            string? responseLine = manager.ReadLine();
-            var response = ArduinoProtocolHelper.ParseActivateResponse(responseLine);
+            var response = ArduinoProtocolHelper.ParseActivateResponse(manager.ReadLine());
             switch (response)
             {
                 case ActivateResponse.Success:
+                    int totalDuration = 0;
+                    foreach (var ms in channelDurations.Values)
+                        if (ms > totalDuration) totalDuration = ms;
+                    await card.StartDispensing(totalDuration);
                     break;
                 case ActivateResponse.ErrColor:
-                    Console.WriteLine("[MainWindow] Arduino reported ERR ACTIVE COLOR (missing or invalid color)");
+                    Console.WriteLine("[MainWindow] Arduino reported ERR ACTIVE COLOR");
                     break;
                 case ActivateResponse.ErrParams:
-                    Console.WriteLine("[MainWindow] Arduino reported ERR ACTIVE PARAMS (no valid pump duration)");
+                    Console.WriteLine("[MainWindow] Arduino reported ERR ACTIVE PARAMS");
                     break;
                 case ActivateResponse.Ignored:
-                    Console.WriteLine("[MainWindow] Arduino reported IGNORED ACTIVE (board not in WAIT state)");
+                    Console.WriteLine("[MainWindow] Arduino reported IGNORED ACTIVE");
                     break;
                 case ActivateResponse.NoResponse:
-                    Console.WriteLine("[MainWindow] No response from Arduino (timeout or command ignored in current state)");
+                    Console.WriteLine("[MainWindow] No response from Arduino");
                     break;
             }
-
-            _isDispensing = false;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"[MainWindow] Dispense error: {ex.Message}");
+        }
+        finally
+        {
             _isDispensing = false;
         }
-    }
-
-    /// <summary>
-    /// Maps cocktail ingredients to pump channels using the global LiquidAssignments config.
-    /// Returns a dictionary mapping channel number (1-based) to duration in milliseconds.
-    /// </summary>
-    private static Dictionary<int, int> MapIngredientsToChannels(IReadOnlyList<CocktailIngredient> ingredients)
-    {
-        var config = AppConfigService.Instance.Config;
-        var assignments = config.LiquidAssignments;
-        int msPerMl = config.FlowRate.MillisecondsPerMilliliter;
-        var channelDurations = new Dictionary<int, int>();
-
-        foreach (var ingredient in ingredients)
-        {
-            for (int position = 0; position < assignments.Length; position++)
-            {
-                if (assignments[position].Equals(ingredient.Name, StringComparison.OrdinalIgnoreCase))
-                {
-                    int channel = position + 1;
-                    int durationMs = ingredient.Milliliters * msPerMl;
-
-                    if (channelDurations.ContainsKey(channel))
-                        channelDurations[channel] += durationMs;
-                    else
-                        channelDurations[channel] = durationMs;
-
-                    break;
-                }
-            }
-        }
-
-        return channelDurations;
     }
 
     public void ShowSettingsPage()

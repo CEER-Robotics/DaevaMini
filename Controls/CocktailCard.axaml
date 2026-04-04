@@ -65,6 +65,12 @@
                             Classes.DaleBtnBurgundy="{Binding IsBurgundyTheme}"
                             Classes.DaleBtnTeal="{Binding IsTealTheme}"
                             Classes.DaleBtnOrange="{Binding IsOrangeTheme}"/>
+                    <ProgressBar Name="DispenseProgress"
+                                 Minimum="0" Maximum="100" Value="0"
+                                 Foreground="#CC000000"
+                                 Background="#4DFFFFFF"
+                                 IsVisible="False"
+                                 Height="72" Margin="40,20,40,40" CornerRadius="15"/>
                 </StackPanel>
 
                 <Button Classes="CloseBtn" Content="✕" Name="CloseButton"/>

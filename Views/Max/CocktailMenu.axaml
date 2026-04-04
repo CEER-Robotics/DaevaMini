@@ -4,11 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:converters="clr-namespace:DaevaMini.Converters"
              xmlns:models="clr-namespace:DaevaMini.Models"
-             xmlns:vm="clr-namespace:DaevaMini.ViewModels.Max"
+             xmlns:vm="clr-namespace:DaevaMini.ViewModels"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
              x:Class="DaevaMini.Views.Max.CocktailMenu"
              x:Name="MenuHost"
-             x:DataType="vm:MaxCocktailMenuViewModel">
+             x:DataType="vm:CocktailMenuViewModel">
 
     <UserControl.Resources>
         <converters:BitmapAssetConverter x:Key="BitmapAssetConverter"/>
@@ -51,8 +51,15 @@
                 <DataTemplate x:DataType="models:Cocktail">
                     <Button Margin="15" Padding="0" CornerRadius="15" Background="#253540"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                            IsEnabled="{Binding IsActive}"
                             Command="{Binding DataContext.SelectCocktailCommand, ElementName=MenuHost}"
                             CommandParameter="{Binding}">
+                        <Button.Styles>
+                            <!-- Suppress Avalonia's default disabled opacity — we handle it via overlay -->
+                            <Style Selector="Button:disabled">
+                                <Setter Property="Opacity" Value="1"/>
+                            </Style>
+                        </Button.Styles>
                         <Grid RowDefinitions="*, Auto">
                             <Image Grid.Row="0" Source="{Binding ImageSource, Converter={StaticResource BitmapAssetConverter}}"
                                    Margin="20" Stretch="Uniform"/>
@@ -62,6 +69,9 @@
                                            FontSize="30" HorizontalAlignment="Center"
                                            VerticalAlignment="Center"/>
                             </Border>
+                            <!-- Inactive overlay — rendered on top, covers both rows -->
+                            <Border Grid.RowSpan="2" Background="#BB121212" CornerRadius="15"
+                                    IsVisible="{Binding IsInactive}"/>
                         </Grid>
                     </Button>
                 </DataTemplate>

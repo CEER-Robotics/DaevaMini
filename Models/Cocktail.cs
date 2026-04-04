@@ -40,6 +40,10 @@ public class Cocktail
     /// <summary>Style class for the Dale button (e.g. DaleBtnBurgundy).</summary>
     public string DaleBtnClass => CocktailThemeHelper.GetDaleBtnClass(Theme);
 
+    /// <summary>When false the card is greyed out and non-selectable in the menu.</summary>
+    public bool IsActive { get; init; } = true;
+    public bool IsInactive => !IsActive;
+
     public bool IsBurgundyTheme => Theme == CocktailTheme.Burgundy;
     public bool IsTealTheme => Theme == CocktailTheme.Teal;
     public bool IsOrangeTheme => Theme == CocktailTheme.Orange;

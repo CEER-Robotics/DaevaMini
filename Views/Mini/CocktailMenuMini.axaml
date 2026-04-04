@@ -82,8 +82,14 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="models:Cocktail">
                     <Button Classes="CocktailCard"
+                            IsEnabled="{Binding IsActive}"
                             Command="{Binding DataContext.SelectCocktailCommand, ElementName=MenuHost}"
                             CommandParameter="{Binding}">
+                        <Button.Styles>
+                            <Style Selector="Button:disabled">
+                                <Setter Property="Opacity" Value="1"/>
+                            </Style>
+                        </Button.Styles>
                         <Grid RowDefinitions="*, Auto">
                             <Image Grid.Row="0"
                                    Source="{Binding ImageSource, Converter={StaticResource BitmapAssetConverter}}"
@@ -94,6 +100,9 @@
                                            FontWeight="Bold" FontSize="24"
                                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
+                            <!-- Inactive overlay -->
+                            <Border Grid.RowSpan="2" Background="#BB121212" CornerRadius="15"
+                                    IsVisible="{Binding IsInactive}"/>
                         </Grid>
                     </Button>
                 </DataTemplate>

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -126,7 +125,7 @@ public partial class MiniMainWindow : Window
             _pageContainer.Content = _cocktailMenuView;
     }
 
-    private void OnCardDaleClicked(object? sender, RoutedEventArgs e)
+    private async void OnCardDaleClicked(object? sender, RoutedEventArgs e)
     {
         if (sender is not CocktailCard card || card.DataContext is not Cocktail cocktail)
             return;
@@ -145,17 +144,15 @@ public partial class MiniMainWindow : Window
             if (!manager.IsConnected)
             {
                 Console.WriteLine("[MiniMainWindow] Arduino not connected");
-                _isDispensing = false;
                 return;
             }
 
             var mode = _modesViewModel.CurrentMode;
             int msPerMl = AppConfigService.Instance.Config.FlowRate.MillisecondsPerMilliliter;
-            var channelDurations = MapIngredientsToChannels(cocktail.Ingredients, mode.LiquidAssignments, msPerMl);
+            var channelDurations = ArduinoProtocolHelper.MapIngredientsToChannels(cocktail.Ingredients, mode.LiquidAssignments, msPerMl);
             if (channelDurations.Count == 0)
             {
                 Console.WriteLine($"[MiniMainWindow] No matching ingredients for {cocktail.Title}");
-                _isDispensing = false;
                 return;
             }
 
@@ -164,19 +161,20 @@ public partial class MiniMainWindow : Window
                 : ArduinoProtocolHelper.BuildActiveCommand(mode.LedColor, channelDurations);
             Console.WriteLine($"[MiniMainWindow] Sending command: {command}");
 
-            bool success = manager.Send(command);
-            if (!success)
+            if (!manager.Send(command))
             {
                 Console.WriteLine("[MiniMainWindow] Failed to send command");
-                _isDispensing = false;
                 return;
             }
 
-            string? responseLine = manager.ReadLine();
-            var response = ArduinoProtocolHelper.ParseActivateResponse(responseLine);
+            var response = ArduinoProtocolHelper.ParseActivateResponse(manager.ReadLine());
             switch (response)
             {
                 case ActivateResponse.Success:
+                    int totalDuration = 0;
+                    foreach (var ms in channelDurations.Values)
+                        if (ms > totalDuration) totalDuration = ms;
+                    await card.StartDispensing(totalDuration);
                     break;
                 case ActivateResponse.ErrColor:
                     Console.WriteLine("[MiniMainWindow] Arduino reported ERR ACTIVE COLOR");
@@ -191,36 +189,15 @@ public partial class MiniMainWindow : Window
                     Console.WriteLine("[MiniMainWindow] No response from Arduino");
                     break;
             }
-
-            _isDispensing = false;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"[MiniMainWindow] Dispense error: {ex.Message}");
+        }
+        finally
+        {
             _isDispensing = false;
         }
     }
 
-    private static Dictionary<int, int> MapIngredientsToChannels(
-        IReadOnlyList<CocktailIngredient> ingredients, string[] assignments, int msPerMl)
-    {
-        var channelDurations = new Dictionary<int, int>();
-        foreach (var ingredient in ingredients)
-        {
-            for (int position = 0; position < assignments.Length; position++)
-            {
-                if (assignments[position].Equals(ingredient.Name, StringComparison.OrdinalIgnoreCase))
-                {
-                    int channel = position + 1;
-                    int durationMs = ingredient.Milliliters * msPerMl;
-                    if (channelDurations.ContainsKey(channel))
-                        channelDurations[channel] += durationMs;
-                    else
-                        channelDurations[channel] = durationMs;
-                    break;
-                }
-            }
-        }
-        return channelDurations;
-    }
 }

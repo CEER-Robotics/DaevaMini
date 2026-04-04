@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DaevaMini.Models;
 
 namespace DaevaMini;
 
@@ -82,6 +83,34 @@ public static class ArduinoProtocolHelper
             return ActivateResponse.Ignored;
 
         return ActivateResponse.NoResponse;
+    }
+
+    /// <summary>
+    /// Maps cocktail ingredients to pump channels.
+    /// Returns a dictionary of channel number (1-based) to duration in milliseconds.
+    /// Ingredients with no matching assignment are silently skipped.
+    /// </summary>
+    public static Dictionary<int, int> MapIngredientsToChannels(
+        IReadOnlyList<CocktailIngredient> ingredients, string[] assignments, int msPerMl)
+    {
+        var channelDurations = new Dictionary<int, int>();
+        foreach (var ingredient in ingredients)
+        {
+            for (int position = 0; position < assignments.Length; position++)
+            {
+                if (assignments[position].Equals(ingredient.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    int channel = position + 1;
+                    int durationMs = ingredient.Milliliters * msPerMl;
+                    if (channelDurations.ContainsKey(channel))
+                        channelDurations[channel] += durationMs;
+                    else
+                        channelDurations[channel] = durationMs;
+                    break;
+                }
+            }
+        }
+        return channelDurations;
     }
 }
 

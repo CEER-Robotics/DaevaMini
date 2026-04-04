@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using DaevaMini.Models;
@@ -11,24 +8,29 @@ using DaevaMini.Services;
 namespace DaevaMini.ViewModels;
 
 /// <summary>
-/// ViewModel for the new CocktailMenu (ImprovedInterface style). Uses repository for display list.
+/// ViewModel for cocktail menu screens. When modesViewModel is provided, filters by current mode
+/// and refreshes on mode change (Mini). When null, loads all cocktails (Max).
 /// </summary>
 public sealed class CocktailMenuViewModel : INotifyPropertyChanged
 {
     private readonly ICocktailRepository _repository;
-    private readonly ModesViewModel _modesViewModel;
+    private readonly ModesViewModel? _modesViewModel;
     private ObservableCollection<Cocktail> _cocktails = new();
 
-    public CocktailMenuViewModel(ICocktailRepository repository, ModesViewModel modesViewModel)
+    public CocktailMenuViewModel(ICocktailRepository repository, ModesViewModel? modesViewModel = null)
     {
         _repository = repository;
         _modesViewModel = modesViewModel;
         RefreshCocktails();
-        _modesViewModel.PropertyChanged += (s, e) =>
+
+        if (_modesViewModel != null)
         {
-            if (e.PropertyName == nameof(ModesViewModel.CurrentMode))
-                RefreshCocktails();
-        };
+            _modesViewModel.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(ModesViewModel.CurrentMode))
+                    RefreshCocktails();
+            };
+        }
     }
 
     public ObservableCollection<Cocktail> Cocktails
@@ -42,13 +44,14 @@ public sealed class CocktailMenuViewModel : INotifyPropertyChanged
         }
     }
 
-    /// <summary>Set by the host (e.g. MainWindow) to handle cocktail selection.</summary>
+    /// <summary>Set by the host window to handle cocktail selection.</summary>
     public ICommand? SelectCocktailCommand { get; set; }
 
     private void RefreshCocktails()
     {
-        if (_modesViewModel.CurrentMode == null) return;
-        var list = _repository.GetByMode(_modesViewModel.CurrentMode.Name);
+        var list = _modesViewModel?.CurrentMode != null
+            ? _repository.GetByMode(_modesViewModel.CurrentMode.Name)
+            : _repository.GetAll();
         Cocktails = new ObservableCollection<Cocktail>(list);
     }
 

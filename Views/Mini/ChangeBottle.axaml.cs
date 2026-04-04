@@ -35,7 +35,7 @@ public partial class ChangeBottle : UserControl
 
     private void ApplyLiquidAssignments()
     {
-        var assignments = AppConfigService.Instance.Config.LiquidAssignments;
+        var assignments = _modesViewModel.CurrentMode.LiquidAssignments;
         for (int i = 0; i < _bottles.Length; i++)
         {
             if (_bottles[i] == null) continue;

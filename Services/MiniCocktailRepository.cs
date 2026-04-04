@@ -14,6 +14,7 @@ public sealed class MiniCocktailRepository : ICocktailRepository
         new Cocktail
         {
             Id = "gintonic",
+            IsActive = false,
             Title = "Gin Tonic",
             Subtitle = "Gin, tonica",
             ImageSource = AssetsBase + "gintonic.png",
@@ -29,6 +30,7 @@ public sealed class MiniCocktailRepository : ICocktailRepository
         new Cocktail
         {
             Id = "ginlemon",
+            IsActive = false,
             Title = "Gin Lemon",
             Subtitle = "Gin, lemon",
             ImageSource = AssetsBase + "ginlemon.png",
@@ -46,6 +48,7 @@ public sealed class MiniCocktailRepository : ICocktailRepository
         new Cocktail
         {
             Id = "vodkalemon",
+            IsActive = false,
             Title = "Vodka Lemon",
             Subtitle = "Vodka, lemon",
             ImageSource = AssetsBase + "vodkalemon.png",
@@ -61,6 +64,7 @@ public sealed class MiniCocktailRepository : ICocktailRepository
         new Cocktail
         {
             Id = "vodkaredbull",
+            IsActive = false,
             Title = "Vodka Red Bull",
             Subtitle = "Vodka, red bull",
             ImageSource = AssetsBase + "vodkaredbull.png",
@@ -76,6 +80,7 @@ public sealed class MiniCocktailRepository : ICocktailRepository
         new Cocktail
         {
             Id = "vodkatonic",
+            IsActive = false,
             Title = "Vodka Tonic",
             Subtitle = "Vodka, tonic",
             ImageSource = AssetsBase + "vodkatonic.png",
@@ -109,6 +114,7 @@ public sealed class MiniCocktailRepository : ICocktailRepository
         new Cocktail
         {
             Id = "negronisbagliato",
+            IsActive = false,
             Title = "Negroni Sbagliato",
             Subtitle = "Campari, Vermouth, Prosecco",
             ImageSource = AssetsBase + "negronisbagliato.png",
@@ -125,6 +131,7 @@ public sealed class MiniCocktailRepository : ICocktailRepository
         new Cocktail
         {
             Id = "americano",
+            IsActive = false,
             Title = "Americano",
             Subtitle = "Campari, Vermouth",
             ImageSource = AssetsBase + "americano.png",
@@ -140,6 +147,7 @@ public sealed class MiniCocktailRepository : ICocktailRepository
         new Cocktail
         {
             Id = "camparispritz",
+            IsActive = false,
             Title = "Campari Spritz",
             Subtitle = "Campari, Prosecco",
             ImageSource = AssetsBase + "camparispritz.png",
