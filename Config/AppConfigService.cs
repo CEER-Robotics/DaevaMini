@@ -10,6 +10,7 @@ public sealed class AppConfigService
     private static AppConfigService? _instance;
     private static readonly object _lockObject = new();
     private AppConfig? _config;
+    private string _configFileName = "appsettings.yaml";
 
     public static AppConfigService Instance
     {
@@ -45,11 +46,12 @@ public sealed class AppConfigService
         }
     }
 
-    public void LoadConfig()
+    public void LoadConfig(string fileName = "appsettings.yaml")
     {
+        _configFileName = fileName;
         try
         {
-            string configPath = Path.Combine(AppContext.BaseDirectory, "appsettings.yaml");
+            string configPath = Path.Combine(AppContext.BaseDirectory, fileName);
             
             if (!File.Exists(configPath))
             {
@@ -80,6 +82,26 @@ public sealed class AppConfigService
         {
             Console.WriteLine($"[AppConfigService] Error loading config: {ex.Message}, using defaults");
             _config = new AppConfig();
+        }
+    }
+
+    public void SaveConfig()
+    {
+        if (_config == null) return;
+        try
+        {
+            string configPath = Path.Combine(AppContext.BaseDirectory, _configFileName);
+            var serializer = new SerializerBuilder()
+                .WithNamingConvention(NullNamingConvention.Instance)
+                .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitNull)
+                .Build();
+            string yaml = serializer.Serialize(_config);
+            File.WriteAllText(configPath, yaml);
+            Console.WriteLine("[AppConfigService] Configuration saved successfully");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[AppConfigService] Error saving config: {ex.Message}");
         }
     }
 

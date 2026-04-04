@@ -1,0 +1,165 @@
+FlowRate:
+  MillisecondsPerMilliliter: 117
+
+FillDurationMs: 3000
+CleanDurationMs: 10000
+
+LiquidAssignments:
+  - "Aperol"
+  - "Prosecco"
+  - ""
+  - ""
+  - "Gin"
+  - "Tonic"
+  - ""
+  - ""
+  - ""
+  - ""
+
+Cocktails:
+  - Id: "gintonic"
+    Name: "Gin Tonic"
+    Subtitle: "Gin, tonica"
+    Image: "gintonic"
+    Theme: "Teal"
+    IsActive: true
+    LedR: 255
+    LedG: 255
+    LedB: 255
+    Ingredients:
+      - Name: "Gin"
+        Milliliters: 40
+      - Name: "Tonic"
+        Milliliters: 120
+  - Id: "aperolspritz"
+    Name: "Aperol Spritz"
+    Subtitle: "Aperol, Prosecco"
+    Image: "camparispritz"
+    Theme: "Burgundy"
+    IsActive: true
+    LedR: 40
+    LedG: 255
+    LedB: 0
+    Ingredients:
+      - Name: "Tonic"
+        Milliliters: 20
+      - Name: "Aperol"
+        Milliliters: 60
+      - Name: "Prosecco"
+        Milliliters: 90
+  - Id: "ginlemon"
+    Name: "Gin Lemon"
+    Subtitle: "Gin, lemon"
+    Image: "ginlemon"
+    Theme: "Teal"
+    IsActive: false
+    LedR: 50
+    LedG: 255
+    LedB: 0
+    Ingredients:
+      - Name: "Gin"
+        Milliliters: 50
+      - Name: "Lemon"
+        Milliliters: 150
+  - Id: "vodkalemon"
+    Name: "Vodka Lemon"
+    Subtitle: "Vodka, lemon"
+    Image: "vodkalemon"
+    Theme: "Orange"
+    IsActive: false
+    LedR: 50
+    LedG: 255
+    LedB: 0
+    Ingredients:
+      - Name: "Vodka"
+        Milliliters: 50
+      - Name: "Lemon"
+        Milliliters: 150
+  - Id: "vodkaredbull"
+    Name: "Vodka Red Bull"
+    Subtitle: "Vodka, red bull"
+    Image: "vodkaredbull"
+    Theme: "Orange"
+    IsActive: false
+    LedR: 30
+    LedG: 255
+    LedB: 0
+    Ingredients:
+      - Name: "Vodka"
+        Milliliters: 50
+      - Name: "Red-bull"
+        Milliliters: 150
+  - Id: "vodkatonic"
+    Name: "Vodka Tonic"
+    Subtitle: "Vodka, tonic"
+    Image: "vodkatonic"
+    Theme: "Orange"
+    IsActive: false
+    LedR: 255
+    LedG: 255
+    LedB: 255
+    Ingredients:
+      - Name: "Vodka"
+        Milliliters: 50
+      - Name: "Tonic"
+        Milliliters: 150
+  - Id: "negroni"
+    Name: "Negroni"
+    Subtitle: "Campari, Vermouth, Gin"
+    Image: "negroni"
+    Theme: "Burgundy"
+    IsActive: false
+    LedR: 0
+    LedG: 255
+    LedB: 0
+    Ingredients:
+      - Name: "Gin"
+        Milliliters: 30
+      - Name: "Campari"
+        Milliliters: 30
+      - Name: "Vermouth"
+        Milliliters: 30
+  - Id: "negronisbagliato"
+    Name: "Negroni Sbagliato"
+    Subtitle: "Campari, Vermouth, Prosecco"
+    Image: "negronisbagliato"
+    Theme: "Burgundy"
+    IsActive: false
+    LedR: 10
+    LedG: 255
+    LedB: 0
+    Ingredients:
+      - Name: "Campari"
+        Milliliters: 50
+      - Name: "Vermouth"
+        Milliliters: 80
+      - Name: "Prosecco"
+        Milliliters: 80
+  - Id: "americano"
+    Name: "Americano"
+    Subtitle: "Campari, Vermouth"
+    Image: "americano"
+    Theme: "Burgundy"
+    IsActive: false
+    LedR: 0
+    LedG: 255
+    LedB: 0
+    Ingredients:
+      - Name: "Campari"
+        Milliliters: 30
+      - Name: "Vermouth"
+        Milliliters: 30
+  - Id: "camparispritz"
+    Name: "Campari Spritz"
+    Subtitle: "Campari, Prosecco"
+    Image: "camparispritz"
+    Theme: "Burgundy"
+    IsActive: false
+    LedR: 10
+    LedG: 255
+    LedB: 0
+    Ingredients:
+      - Name: "Campari"
+        Milliliters: 50
+      - Name: "Prosecco"
+        Milliliters: 80

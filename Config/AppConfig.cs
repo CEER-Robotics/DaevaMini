@@ -19,6 +19,10 @@ public sealed class AppConfig
 
     [YamlMember(Alias = "Modes")]
     public ModeConfig[] Modes { get; set; } = Array.Empty<ModeConfig>();
+
+    /// <summary>Max-only: flat cocktail list (no modes).</summary>
+    [YamlMember(Alias = "Cocktails")]
+    public CocktailConfig[] Cocktails { get; set; } = Array.Empty<CocktailConfig>();
 }
 
 public sealed class FlowRateConfig
@@ -48,8 +52,34 @@ public sealed class ModeConfig
 
 public sealed class CocktailConfig
 {
+    [YamlMember(Alias = "Id")]
+    public string Id { get; set; } = string.Empty;
+
     [YamlMember(Alias = "Name")]
     public string Name { get; set; } = string.Empty;
+
+    [YamlMember(Alias = "Subtitle")]
+    public string Subtitle { get; set; } = string.Empty;
+
+    /// <summary>Image filename without extension, e.g. "negroni" → avares://Daeva/Assets/negroni.png</summary>
+    [YamlMember(Alias = "Image")]
+    public string Image { get; set; } = string.Empty;
+
+    /// <summary>One of: Burgundy, Teal, Orange</summary>
+    [YamlMember(Alias = "Theme")]
+    public string Theme { get; set; } = "Burgundy";
+
+    [YamlMember(Alias = "IsActive")]
+    public bool IsActive { get; set; } = true;
+
+    [YamlMember(Alias = "LedR")]
+    public int? LedR { get; set; }
+
+    [YamlMember(Alias = "LedG")]
+    public int? LedG { get; set; }
+
+    [YamlMember(Alias = "LedB")]
+    public int? LedB { get; set; }
 
     [YamlMember(Alias = "Ingredients")]
     public IngredientConfig[] Ingredients { get; set; } = Array.Empty<IngredientConfig>();

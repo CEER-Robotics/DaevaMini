@@ -40,7 +40,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="appsettings.yaml">
+      <Content Include="appsettings.mini.yaml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="appsettings.max.yaml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>

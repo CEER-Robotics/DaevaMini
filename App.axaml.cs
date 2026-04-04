@@ -18,12 +18,12 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        AppConfigService.Instance.LoadConfig();
-        
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var args = desktop.Args ?? Array.Empty<string>();
             bool isMini = args.Contains("--Mini", StringComparer.OrdinalIgnoreCase);
+
+            AppConfigService.Instance.LoadConfig(isMini ? "appsettings.mini.yaml" : "appsettings.max.yaml");
 
             desktop.MainWindow = isMini
                 ? new MiniMainWindow()

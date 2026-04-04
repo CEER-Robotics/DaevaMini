@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DaevaMini.Config;
 using DaevaMini.Models;
 
 namespace DaevaMini.Services;
@@ -9,176 +10,33 @@ public sealed class MaxCocktailRepository : ICocktailRepository
 {
     private const string AssetsBase = "avares://Daeva/Assets/";
 
-    private static readonly IReadOnlyList<Cocktail> Cocktails =
-    [
-        // Gin Mode
-        new Cocktail
-        {
-            Id = "gintonic",
-            Title = "Gin Tonic",
-            Subtitle = "Gin, tonica",
-            ImageSource = AssetsBase + "gintonic.png",
-            Theme = CocktailTheme.Teal,
-            ModeName = "Gin Mode",
-            LedRgb = (255, 255, 255),
-            Ingredients =
-            [
-                new CocktailIngredient("Gin", 40),
-                new CocktailIngredient("Tonic", 120)
-            ]
-        },
-        new Cocktail
-        {
-            Id = "aperolspritz",
-            Title = "Aperol Spritz",
-            Subtitle = "Aperol, Prosecco",
-            ImageSource = AssetsBase + "camparispritz.png",
-            Theme = CocktailTheme.Burgundy,
-            ModeName = "OG Mode",
-            LedRgb = (40, 255, 0),
-            Ingredients =
-            [
-                new CocktailIngredient("Tonic", 20),
-                new CocktailIngredient("Aperol", 60),
-                new CocktailIngredient("Prosecco", 90)
-            ]
-        },
-        new Cocktail
-        {
-            Id = "ginlemon",
-            Title = "Gin Lemon",
-            Subtitle = "Gin, lemon",
-            ImageSource = AssetsBase + "ginlemon.png",
-            Theme = CocktailTheme.Teal,
-            ModeName = "Gin Mode",
-            LedRgb = (50, 255, 0),
-            IsActive = false,
-            Ingredients =
-            [
-                new CocktailIngredient("Gin", 50),
-                new CocktailIngredient("Lemon", 150)
-            ]
-        },
+    private readonly IReadOnlyList<Cocktail> _cocktails;
 
-        // Vodka Mode
-        new Cocktail
-        {
-            Id = "vodkalemon",
-            Title = "Vodka Lemon",
-            Subtitle = "Vodka, lemon",
-            ImageSource = AssetsBase + "vodkalemon.png",
-            Theme = CocktailTheme.Orange,
-            ModeName = "Vodka Mode",
-            LedRgb = (50, 255, 0),
-            IsActive = false,
-            Ingredients =
-            [
-                new CocktailIngredient("Vodka", 50),
-                new CocktailIngredient("Lemon", 150)
-            ]
-        },
-        new Cocktail
-        {
-            Id = "vodkaredbull",
-            Title = "Vodka Red Bull",
-            Subtitle = "Vodka, red bull",
-            ImageSource = AssetsBase + "vodkaredbull.png",
-            Theme = CocktailTheme.Orange,
-            ModeName = "Vodka Mode",
-            LedRgb = (30, 255, 0),
-            IsActive = false,
-            Ingredients =
-            [
-                new CocktailIngredient("Vodka", 50),
-                new CocktailIngredient("Red-bull", 150)
-            ]
-        },
-        new Cocktail
-        {
-            Id = "vodkatonic",
-            Title = "Vodka Tonic",
-            Subtitle = "Vodka, tonic",
-            ImageSource = AssetsBase + "vodkatonic.png",
-            Theme = CocktailTheme.Orange,
-            ModeName = "Vodka Mode",
-            LedRgb = (255, 255, 255),
-            IsActive = false,
-            Ingredients =
-            [
-                new CocktailIngredient("Vodka", 50),
-                new CocktailIngredient("Tonic", 150)
-            ]
-        },
-        new Cocktail
-        {
-            Id = "negroni",
-            Title = "Negroni",
-            Subtitle = "Campari, Vermouth, Gin",
-            ImageSource = AssetsBase + "negroni.png",
-            Theme = CocktailTheme.Burgundy,
-            ModeName = "OG Mode",
-            LedRgb = (0, 255, 0),
-            IsActive = false,
-            Ingredients =
-            [
-                new CocktailIngredient("Gin", 30),
-                new CocktailIngredient("Campari", 30),
-                new CocktailIngredient("Vermouth", 30)
-            ]
-        },
-        new Cocktail
-        {
-            Id = "negronisbagliato",
-            Title = "Negroni Sbagliato",
-            Subtitle = "Campari, Vermouth, Prosecco",
-            ImageSource = AssetsBase + "negronisbagliato.png",
-            Theme = CocktailTheme.Burgundy,
-            ModeName = "OG Mode",
-            LedRgb = (10, 255, 0),
-            IsActive = false,
-            Ingredients =
-            [
-                new CocktailIngredient("Campari", 50),
-                new CocktailIngredient("Vermouth", 80),
-                new CocktailIngredient("Prosecco", 80)
-            ]
-        },
-        new Cocktail
-        {
-            Id = "americano",
-            Title = "Americano",
-            Subtitle = "Campari, Vermouth",
-            ImageSource = AssetsBase + "americano.png",
-            Theme = CocktailTheme.Burgundy,
-            ModeName = "OG Mode",
-            LedRgb = (0, 255, 0),
-            IsActive = false,
-            Ingredients =
-            [
-                new CocktailIngredient("Campari", 30),
-                new CocktailIngredient("Vermouth", 30)
-            ]
-        },
-        new Cocktail
-        {
-            Id = "camparispritz",
-            Title = "Campari Spritz",
-            Subtitle = "Campari, Prosecco",
-            ImageSource = AssetsBase + "camparispritz.png",
-            Theme = CocktailTheme.Burgundy,
-            ModeName = "OG Mode",
-            LedRgb = (10, 255, 0),
-            IsActive = false,
-            Ingredients =
-            [
-                new CocktailIngredient("Campari", 50),
-                new CocktailIngredient("Prosecco", 80)
-            ]
-        }
-    ];
+    public MaxCocktailRepository()
+    {
+        var config = AppConfigService.Instance.Config;
+        _cocktails = config.Cocktails.Select(MapCocktail).ToList();
+    }
 
-    public IReadOnlyList<Cocktail> GetAll() => Cocktails;
+    public IReadOnlyList<Cocktail> GetAll() => _cocktails;
 
     public IReadOnlyList<Cocktail> GetByMode(string modeName) =>
-        Cocktails.Where(c => c.ModeName.Equals(modeName, StringComparison.OrdinalIgnoreCase)).ToList();
+        _cocktails.Where(c => c.ModeName.Equals(modeName, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    private static Cocktail MapCocktail(CocktailConfig c) => new()
+    {
+        Id = c.Id,
+        Title = c.Name,
+        Subtitle = c.Subtitle,
+        ImageSource = AssetsBase + c.Image + ".png",
+        Theme = Enum.TryParse<CocktailTheme>(c.Theme, ignoreCase: true, out var theme) ? theme : CocktailTheme.Burgundy,
+        ModeName = string.Empty,
+        IsActive = c.IsActive,
+        LedRgb = c.LedR.HasValue && c.LedG.HasValue && c.LedB.HasValue
+            ? ((byte)Math.Clamp(c.LedR.Value, 0, 255),
+               (byte)Math.Clamp(c.LedG.Value, 0, 255),
+               (byte)Math.Clamp(c.LedB.Value, 0, 255))
+            : null,
+        Ingredients = c.Ingredients.Select(i => new CocktailIngredient(i.Name, i.Milliliters)).ToArray()
+    };
 }
