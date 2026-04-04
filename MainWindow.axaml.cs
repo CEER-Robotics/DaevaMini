@@ -106,11 +106,6 @@ public partial class MainWindow : Window
         try
         {
             var manager = ArduinoSerialManager.Instance;
-            if (!manager.IsConnected)
-            {
-                Console.WriteLine("[MainWindow] Arduino not connected");
-                return;
-            }
 
             var config = AppConfigService.Instance.Config;
             var channelDurations = ArduinoProtocolHelper.MapIngredientsToChannels(
@@ -126,34 +121,34 @@ public partial class MainWindow : Window
                 : ArduinoProtocolHelper.BuildActiveCommand("ORANGE", channelDurations);
             Console.WriteLine($"[MainWindow] Sending command: {command}");
 
+            if (!manager.IsConnected)
+            {
+                Console.WriteLine("[MainWindow] Arduino not connected");
+#if DEBUG
+                int totalDurationDebug = 0;
+                foreach (var ms in channelDurations.Values)
+                    if (ms > totalDurationDebug) totalDurationDebug = ms;
+                Console.WriteLine($"[MainWindow] DEBUG: simulating dispense for {totalDurationDebug}ms");
+                await card.StartDispensing(totalDurationDebug);
+#endif
+                return;
+            }
+
             if (!manager.Send(command))
             {
                 Console.WriteLine("[MainWindow] Failed to send command");
                 return;
             }
 
+            int totalDuration = 0;
+            foreach (var ms in channelDurations.Values)
+                if (ms > totalDuration) totalDuration = ms;
+            var dispensingTask = card.StartDispensing(totalDuration);
+
             var response = ArduinoProtocolHelper.ParseActivateResponse(manager.ReadLine());
-            switch (response)
-            {
-                case ActivateResponse.Success:
-                    int totalDuration = 0;
-                    foreach (var ms in channelDurations.Values)
-                        if (ms > totalDuration) totalDuration = ms;
-                    await card.StartDispensing(totalDuration);
-                    break;
-                case ActivateResponse.ErrColor:
-                    Console.WriteLine("[MainWindow] Arduino reported ERR ACTIVE COLOR");
-                    break;
-                case ActivateResponse.ErrParams:
-                    Console.WriteLine("[MainWindow] Arduino reported ERR ACTIVE PARAMS");
-                    break;
-                case ActivateResponse.Ignored:
-                    Console.WriteLine("[MainWindow] Arduino reported IGNORED ACTIVE");
-                    break;
-                case ActivateResponse.NoResponse:
-                    Console.WriteLine("[MainWindow] No response from Arduino");
-                    break;
-            }
+            Console.WriteLine($"[MainWindow] Arduino response: {response}");
+
+            await dispensingTask;
         }
         catch (Exception ex)
         {

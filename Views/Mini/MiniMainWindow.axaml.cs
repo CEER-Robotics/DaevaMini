@@ -141,11 +141,6 @@ public partial class MiniMainWindow : Window
         try
         {
             var manager = ArduinoSerialManager.Instance;
-            if (!manager.IsConnected)
-            {
-                Console.WriteLine("[MiniMainWindow] Arduino not connected");
-                return;
-            }
 
             var mode = _modesViewModel.CurrentMode;
             int msPerMl = AppConfigService.Instance.Config.FlowRate.MillisecondsPerMilliliter;
@@ -161,34 +156,34 @@ public partial class MiniMainWindow : Window
                 : ArduinoProtocolHelper.BuildActiveCommand(mode.LedColor, channelDurations);
             Console.WriteLine($"[MiniMainWindow] Sending command: {command}");
 
+            if (!manager.IsConnected)
+            {
+                Console.WriteLine("[MiniMainWindow] Arduino not connected");
+#if DEBUG
+                int totalDurationDebug = 0;
+                foreach (var ms in channelDurations.Values)
+                    if (ms > totalDurationDebug) totalDurationDebug = ms;
+                Console.WriteLine($"[MiniMainWindow] DEBUG: simulating dispense for {totalDurationDebug}ms");
+                await card.StartDispensing(totalDurationDebug);
+#endif
+                return;
+            }
+
             if (!manager.Send(command))
             {
                 Console.WriteLine("[MiniMainWindow] Failed to send command");
                 return;
             }
 
+            int totalDuration = 0;
+            foreach (var ms in channelDurations.Values)
+                if (ms > totalDuration) totalDuration = ms;
+            var dispensingTask = card.StartDispensing(totalDuration);
+
             var response = ArduinoProtocolHelper.ParseActivateResponse(manager.ReadLine());
-            switch (response)
-            {
-                case ActivateResponse.Success:
-                    int totalDuration = 0;
-                    foreach (var ms in channelDurations.Values)
-                        if (ms > totalDuration) totalDuration = ms;
-                    await card.StartDispensing(totalDuration);
-                    break;
-                case ActivateResponse.ErrColor:
-                    Console.WriteLine("[MiniMainWindow] Arduino reported ERR ACTIVE COLOR");
-                    break;
-                case ActivateResponse.ErrParams:
-                    Console.WriteLine("[MiniMainWindow] Arduino reported ERR ACTIVE PARAMS");
-                    break;
-                case ActivateResponse.Ignored:
-                    Console.WriteLine("[MiniMainWindow] Arduino reported IGNORED ACTIVE");
-                    break;
-                case ActivateResponse.NoResponse:
-                    Console.WriteLine("[MiniMainWindow] No response from Arduino");
-                    break;
-            }
+            Console.WriteLine($"[MiniMainWindow] Arduino response: {response}");
+
+            await dispensingTask;
         }
         catch (Exception ex)
         {
