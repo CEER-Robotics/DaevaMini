@@ -1,3 +1,11 @@
 /bin
 /obj
+/machine/bin
+/machine/obj
 .idea
+/backend/.venv
+/backend/__pycache__
+/backend/.pytest_cache
+/backend/data
+/frontend/node_modules
+/frontend/dist
