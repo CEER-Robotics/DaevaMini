@@ -2,66 +2,153 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
              x:Class="DaevaMini.Views.Max.SplashPage">
 
-    <!-- Single-page splash - ImprovedInterface start panel look -->
-    <Grid Background="#131818"
-          RowDefinitions="Auto,*,Auto">
+    <UserControl.Styles>
+        <Style Selector="Button.ChromeButton">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      CornerRadius="{TemplateBinding CornerRadius}"
+                                      Content="{TemplateBinding Content}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      Padding="{TemplateBinding Padding}"/>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.ChromeButton:pressed">
+            <Setter Property="Opacity" Value="0.7"/>
+        </Style>
+        <Style Selector="Button.StatusButton:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#353535"/>
+        </Style>
+        <Style Selector="Button.UnlockButton:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+        <Style Selector="Button.UnlockButton:pressed">
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+        <Style Selector="Button.UnlockButton:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+    </UserControl.Styles>
 
-        <!-- Top-right: settings gear icon -->
-        <Button Grid.Row="0"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Margin="0,16,16,0"
-                Background="Transparent"
+    <Canvas Width="1920" Height="1080">
+        <Canvas.Background>
+            <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%" RadiusX="80%" RadiusY="80%">
+                <GradientStop Color="#1A2222" Offset="0"/>
+                <GradientStop Color="#0B0D0D" Offset="1"/>
+            </RadialGradientBrush>
+        </Canvas.Background>
+
+        <StackPanel Canvas.Left="60" Canvas.Top="40" Orientation="Horizontal" VerticalAlignment="Center">
+            <TextBlock x:Name="ClockText"
+                       Text="14:28"
+                       Foreground="#E7E6DC"
+                       FontSize="36"
+                       FontWeight="Medium"
+                       FontFamily="Space Grotesk"/>
+
+            <Rectangle Width="1" Height="20" Fill="#E7E6DC" Opacity="0.3" Margin="15,0" VerticalAlignment="Center"/>
+
+            <TextBlock Text="TURIN, IT"
+                       Foreground="#CAF0F8"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       FontFamily="Space Grotesk"
+                       VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <Button Classes="ChromeButton StatusButton"
+                Canvas.Left="1700"
+                Canvas.Top="40"
+                Width="160"
+                Height="48"
+                Background="#2D2D2D"
+                BorderBrush="#404040"
+                BorderThickness="1"
+                CornerRadius="24"
+                Cursor="Hand"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
                 Click="OnSettingsClick">
-            <PathIcon Foreground="#2A3030"
-                      Width="60"
-                      Height="60"
-                      Data="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Ellipse Width="10" Height="10" Fill="#10B981" Margin="0,0,10,0"/>
+
+                <TextBlock Text="PRONTO"
+                           Foreground="#E7E6DC"
+                           Opacity="0.7"
+                           FontSize="14"
+                           FontWeight="Bold"
+                           FontFamily="Space Grotesk"
+                           LetterSpacing="2"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
         </Button>
 
-        <!-- Center: DaevaMax image (ImprovedInterface style) -->
-        <Border Grid.Row="1">
-            <Image Source="avares://Daeva/Assets/DaevaMaxFinal.png"
-                   Width="1494"
-                   Height="317"
-                   Stretch="Uniform"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Margin="0,0,-170,0"/>
-        </Border>
+        <Image Canvas.Left="685"
+               Canvas.Top="480"
+               Width="400"
+               Height="120"
+               Stretch="Uniform"
+               Source="avares://Daeva/Assets/DaevaWhite.png">
+            <Image.Effect>
+                <DropShadowEffect BlurRadius="25" Color="#CAF0F8" Opacity="0.6"/>
+            </Image.Effect>
+        </Image>
 
-        <!-- Touch to start - ImprovedInterface button style -->
-        <Border Grid.Row="2" Padding="0,0,0,-10">
-            <Button Name="TouchToStartButton"
-                    Content="Touch to start"
-                    Width="1010"
-                    Height="108"
-                    CornerRadius="15"
-                    Background="#539CA8"
-                    Foreground="#111111"
-                    FontSize="42"
-                    FontWeight="Medium"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    HorizontalContentAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    Cursor="Hand"
-                    Click="OnTouchToStart">
-                <Button.Styles>
-                    <Style Selector="Button:pointerover /template/ ContentPresenter">
-                        <Setter Property="Background" Value="#427D86"/>
-                        <Setter Property="Foreground" Value="#111111"/>
-                    </Style>
-                    <Style Selector="Button:pressed /template/ ContentPresenter">
-                        <Setter Property="Background" Value="#36666E"/>
-                        <Setter Property="Foreground" Value="#111111"/>
-                    </Style>
-                </Button.Styles>
-            </Button>
-        </Border>
-    </Grid>
+        <TextBlock Canvas.Left="1095"
+                   Canvas.Top="540"
+                   Text="max"
+                   Foreground="#CAF0F8"
+                   FontSize="32"
+                   FontWeight="Bold"
+                   FontFamily="Space Grotesk">
+            <TextBlock.Effect>
+                <DropShadowEffect BlurRadius="20" Color="#CAF0F8" Opacity="0.8"/>
+            </TextBlock.Effect>
+        </TextBlock>
+
+        <Button Name="TouchToStartButton"
+                Classes="ChromeButton UnlockButton"
+                Canvas.Left="700"
+                Canvas.Top="930"
+                Width="520"
+                Height="140"
+                Background="Transparent"
+                BorderThickness="0"
+                Cursor="Hand"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Click="OnTouchToStart">
+            <StackPanel HorizontalAlignment="Center">
+                <Rectangle Width="150" Height="2" Fill="#E7E6DC" Opacity="0.3" Margin="0,0,0,20" HorizontalAlignment="Center"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <PathIcon Width="20" Height="20"
+                              Foreground="#E7E6DC"
+                              Opacity="0.6"
+                              Margin="0,0,10,0"
+                              Data="M12,17A2,2 0 0,0 14,15C14,13.89 13.11,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8,6A4,4 0 0,1 12,2A4,4 0 0,1 16,6V8H8V6Z"/>
+
+                    <TextBlock Text="TOCCA PER SBLOCCARE"
+                               Foreground="#E7E6DC"
+                               Opacity="0.6"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               FontFamily="Space Grotesk"
+                               LetterSpacing="2"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+        </Button>
+    </Canvas>
 </UserControl>
 
