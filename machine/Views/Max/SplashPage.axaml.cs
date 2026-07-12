@@ -31,7 +31,7 @@ public partial class SplashPage : UserControl
     private void OnSettingsClick(object? sender, RoutedEventArgs e)
     {
         if (VisualRoot is MainWindow mainWindow)
-            mainWindow.ShowSettingsPage();
+            mainWindow.ShowSettingsUnlockPage();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)

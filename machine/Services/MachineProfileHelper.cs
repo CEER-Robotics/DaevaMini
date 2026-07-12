@@ -22,8 +22,14 @@ public static class MachineProfileHelper
     {
         string? overrideUrl = Environment.GetEnvironmentVariable("DAEVA_BACKEND_URL");
         return string.IsNullOrWhiteSpace(overrideUrl)
-            ? "http://127.0.0.1:8000"
+            ? "https://demoapp-production-e677.up.railway.app"
             : overrideUrl.Trim().TrimEnd('/');
+    }
+
+    public static string ResolveMachineSecret()
+    {
+        string? secret = Environment.GetEnvironmentVariable("DAEVA_MACHINE_SECRET");
+        return string.IsNullOrWhiteSpace(secret) ? string.Empty : secret.Trim();
     }
 
     public static string ResolveVariant(string? profileKey)

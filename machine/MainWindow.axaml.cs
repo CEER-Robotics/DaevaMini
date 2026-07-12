@@ -203,6 +203,14 @@ public partial class MainWindow : Window
         }
     }
 
+    public void ShowSettingsUnlockPage()
+    {
+        if (_pageContainer != null)
+        {
+            _pageContainer.Content = new NumberPadPage();
+        }
+    }
+
     public void ShowContainerSetupPage()
     {
         if (_pageContainer != null)

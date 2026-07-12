@@ -9,72 +9,140 @@
              x:DataType="models:Cocktail">
 
     <UserControl.Styles>
-        <StyleInclude Source="avares://Daeva/Styles/CocktailCardStyles.axaml"/>
+        <Style Selector="Button.InvisibleBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.InvisibleBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="Button.InvisibleBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Opacity" Value="0.6"/>
+        </Style>
+
+        <Style Selector="Border.GlassCardStyle">
+            <Setter Property="Background" Value="#1AFFFFFF"/>
+            <Setter Property="BorderBrush" Value="#1AFFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="64"/>
+        </Style>
+
+        <Style Selector="Border.BadgeStyle">
+            <Setter Property="Background" Value="#26FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#4DFFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="16"/>
+        </Style>
+
+        <Style Selector="Button.StartPourBtn">
+            <Setter Property="Background" Value="#CAF0F8"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.StartPourBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#B0E5F0"/>
+            <Setter Property="Effect">
+                <DropShadowEffect BlurRadius="20" Color="#CAF0F8" Opacity="0.5"/>
+            </Setter>
+        </Style>
+        <Style Selector="Button.StartPourBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#A0D8E5"/>
+        </Style>
+        <Style Selector="Button.StartPourBtn:disabled">
+            <Setter Property="Opacity" Value="0.4"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
+        <Style Selector="ProgressBar.DispenseProgress">
+            <Setter Property="Foreground" Value="#CAF0F8"/>
+            <Setter Property="Background" Value="#24FFFFFF"/>
+            <Setter Property="CornerRadius" Value="20"/>
+        </Style>
     </UserControl.Styles>
 
     <UserControl.Resources>
         <converters:BitmapAssetConverter x:Key="BitmapAssetConverter"/>
     </UserControl.Resources>
 
-    <Grid Background="#131818">
+    <Canvas Width="1920" Height="1080">
+        <Canvas.Background>
+            <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%" RadiusX="80%" RadiusY="80%">
+                <GradientStop Color="#1A2222" Offset="0"/>
+                <GradientStop Color="#0B0D0D" Offset="1"/>
+            </RadialGradientBrush>
+        </Canvas.Background>
 
-        <Border Width="800" Height="90"
-                VerticalAlignment="Top"
-                HorizontalAlignment="Center"
-                CornerRadius="0,0,45,45">
-            <Image Source="avares://Daeva/Assets/logo_white.png"
-                   Stretch="Uniform"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Margin="5"/>
+        <Button x:Name="CloseButton" Canvas.Left="60" Canvas.Top="40" Classes="InvisibleBtn" Width="250" Height="48">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <PathIcon Width="24" Height="24" Foreground="#E7E6DC"
+                          Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                <TextBlock Text="BACK TO MENU" Foreground="#E7E6DC" FontFamily="Space Grotesk"
+                           FontWeight="Bold" FontSize="18" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+
+        <Image Canvas.Left="870" Canvas.Top="30" Width="180" Height="50"
+               Source="avares://Daeva/Assets/DaevaWhite.png" Stretch="Uniform">
+            <Image.Effect>
+                <DropShadowEffect BlurRadius="25" Color="#CAF0F8" Opacity="0.6" OffsetX="0" OffsetY="0"/>
+            </Image.Effect>
+        </Image>
+
+        <Border Canvas.Left="160" Canvas.Top="150" Width="1600" Height="780" Classes="GlassCardStyle">
+            <Canvas Width="1600" Height="780">
+                <Border Canvas.Left="64" Canvas.Top="64" Width="520" Height="652"
+                        CornerRadius="48" ClipToBounds="True" Background="#161816">
+                    <Grid>
+                        <Image Source="{Binding ImageSource, Converter={StaticResource BitmapAssetConverter}}"
+                               Stretch="UniformToFill" Opacity="0.95"/>
+                        <Border Background="#26000000"/>
+                    </Grid>
+                </Border>
+
+                <Border Canvas.Left="640" Canvas.Top="75" Width="190" Height="32" Classes="BadgeStyle">
+                    <TextBlock Text="{Binding Theme}" Foreground="#FFFFFF" FontSize="12" FontWeight="Bold"
+                               FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+
+                <TextBlock Canvas.Left="640" Canvas.Top="112" Width="860" Height="140"
+                           Text="{Binding Title}" Foreground="#FFFFFF" FontSize="92" FontWeight="Bold"
+                           FontFamily="Space Grotesk" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
+
+                <TextBlock Canvas.Left="640" Canvas.Top="265" Width="650" Height="42"
+                           Text="{Binding Subtitle}" Foreground="#CAF0F8" FontSize="24" FontWeight="Bold"
+                           FontFamily="Space Grotesk" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+
+                <ItemsControl Canvas.Left="640" Canvas.Top="330" Width="520" Height="180"
+                              ItemsSource="{Binding Ingredients}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="models:CocktailIngredient">
+                            <Grid Margin="0,0,0,8">
+                                <TextBlock Text="{Binding Name}" Foreground="#E7E6DC" FontSize="24"
+                                           FontWeight="Bold" FontFamily="Space Grotesk"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Canvas.Left="640" Canvas.Top="540" Width="700" Height="48"
+                           Text="Precision mixed by Daeva Max." Foreground="#E7E6DC"
+                           FontSize="18" TextWrapping="Wrap" LineHeight="28" Opacity="0.8"/>
+
+                <Button x:Name="DaleButton" Canvas.Left="640" Canvas.Top="620" Width="400" Height="80"
+                        Classes="StartPourBtn">
+                    <TextBlock Text="START POUR" Foreground="#000000" FontSize="28" FontWeight="Bold"
+                               FontFamily="Space Grotesk" LetterSpacing="2"/>
+                </Button>
+
+                <ProgressBar x:Name="DispenseProgress" Canvas.Left="640" Canvas.Top="630" Width="400" Height="60"
+                             Classes="DispenseProgress" Minimum="0" Maximum="100" Value="0"
+                             IsVisible="False"/>
+            </Canvas>
         </Border>
-
-        <Border Width="500"
-                Background="{Binding CardBackground}"
-                CornerRadius="30"
-                BoxShadow="0 10 40 10 #50000000"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center">
-
-            <Grid>
-                <StackPanel Spacing="10">
-
-                    <Panel Height="40"/>
-
-                    <Image Source="{Binding ImageSource, Converter={StaticResource BitmapAssetConverter}}"
-                           Height="320"
-                           HorizontalAlignment="Center"/>
-
-                    <StackPanel HorizontalAlignment="Center" Spacing="5">
-                        <TextBlock Text="{Binding Title}"
-                                   FontFamily="Arial"
-                                   FontSize="50"
-                                   FontWeight="Bold"
-                                   Foreground="Black"
-                                   TextAlignment="Center"/>
-
-                        <TextBlock Text="{Binding Subtitle}"
-                                   FontSize="28"
-                                   FontWeight="Medium"
-                                   Foreground="Black"
-                                   TextAlignment="Center"
-                                   Opacity="1.0"/>
-                    </StackPanel>
-
-                    <Button Name="DaleButton" Content="Start"
-                            Classes.DaleBtnBurgundy="{Binding IsBurgundyTheme}"
-                            Classes.DaleBtnTeal="{Binding IsTealTheme}"
-                            Classes.DaleBtnOrange="{Binding IsOrangeTheme}"/>
-                    <ProgressBar Name="DispenseProgress"
-                                 Minimum="0" Maximum="100" Value="0"
-                                 Foreground="#CC000000"
-                                 Background="#4DFFFFFF"
-                                 IsVisible="False"
-                                 Height="72" Margin="40,20,40,40" CornerRadius="15"/>
-                </StackPanel>
-
-                <Button Classes="CloseBtn" Content="✕" Name="CloseButton"/>
-            </Grid>
-        </Border>
-    </Grid>
+    </Canvas>
 </UserControl>

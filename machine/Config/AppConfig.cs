@@ -14,6 +14,9 @@ public sealed class AppConfig
     [YamlMember(Alias = "CleanDurationMs")]
     public int CleanDurationMs { get; set; } = 10000;
 
+    [YamlMember(Alias = "SettingsPin")]
+    public string SettingsPin { get; set; } = "1234";
+
     [YamlMember(Alias = "LiquidAssignments")]
     public string[] LiquidAssignments { get; set; } = Array.Empty<string>();
 

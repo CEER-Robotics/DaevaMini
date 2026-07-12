@@ -3,6 +3,7 @@ FlowRate:
 
 FillDurationMs: 3000
 CleanDurationMs: 10000
+SettingsPin: "1234"
 
 LiquidAssignments:
   - "Aperol"

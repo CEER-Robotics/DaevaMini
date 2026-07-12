@@ -17,6 +17,11 @@ public partial class ChangeBottle : UserControl
     private readonly ModesViewModel _modesViewModel;
     private readonly ToggleButton?[] _bottles;
 
+    public ChangeBottle()
+        : this(new ModesViewModel())
+    {
+    }
+
     public ChangeBottle(ModesViewModel modesViewModel)
     {
         InitializeComponent();

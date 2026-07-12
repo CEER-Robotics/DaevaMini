@@ -5,6 +5,7 @@
              xmlns:converters="clr-namespace:DaevaMini.Converters"
              xmlns:models="clr-namespace:DaevaMini.Models"
              xmlns:vm="clr-namespace:DaevaMini.ViewModels"
+             xmlns:max="clr-namespace:DaevaMini.Views.Max"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
              x:Class="DaevaMini.Views.Max.CocktailMenu"
              x:Name="MenuHost"
@@ -14,34 +15,113 @@
         <converters:BitmapAssetConverter x:Key="BitmapAssetConverter"/>
     </UserControl.Resources>
 
-    <Grid RowDefinitions="Auto, *" Background="#121212">
+    <UserControl.Styles>
+        <Style Selector="Button.InvisibleBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      CornerRadius="{TemplateBinding CornerRadius}"
+                                      Content="{TemplateBinding Content}"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      Padding="{TemplateBinding Padding}"/>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.InvisibleBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="Button.InvisibleBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Opacity" Value="0.6"/>
+        </Style>
+        <Style Selector="Button.InvisibleBtn:disabled">
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+        <Style Selector="Button.InvisibleBtn:disabled /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+    </UserControl.Styles>
 
-        <Grid Grid.Row="0" Height="120">
-            <Border Width="800" Height="90"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Center"
-                    CornerRadius="0,0,45,45">
-                <Image Source="avares://Daeva/Assets/logo_white.png"
-                       Stretch="Uniform"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       Margin="5"/>
-            </Border>
-            
-            <Button Name="BackButton"
-                    Width="60" Height="60"
-                    VerticalAlignment="Top"
-                    HorizontalAlignment="Left"
-                    Margin="30,20,0,0"
-                    Background="Transparent"
-                    Cursor="Hand">
-                <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
-                          Foreground="White"
-                          Width="35" Height="35"/>
-            </Button>
-        </Grid>
+    <Canvas x:Name="PageSurface" Width="1920" Height="1080">
+        <Canvas.Background>
+            <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%" RadiusX="80%" RadiusY="80%">
+                <GradientStop Color="#1A2222" Offset="0"/>
+                <GradientStop Color="#0B0D0D" Offset="1"/>
+            </RadialGradientBrush>
+        </Canvas.Background>
 
-        <ItemsControl Grid.Row="1" ItemsSource="{Binding Cocktails}" Margin="40,10">
+        <Button Name="BackButton"
+                Classes="InvisibleBtn"
+                Canvas.Left="48"
+                Canvas.Top="42"
+                Width="52"
+                Height="52">
+            <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
+                      Foreground="#E7E6DC"
+                      Opacity="0.8"
+                      Width="34"
+                      Height="34"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"/>
+        </Button>
+
+        <Image Canvas.Left="860"
+               Canvas.Top="30"
+               Width="200"
+               Height="60"
+               Source="avares://Daeva/Assets/DaevaWhite.png"
+               Stretch="Uniform">
+            <Image.Effect>
+                <DropShadowEffect BlurRadius="20" Color="#CAF0F8" Opacity="0.4"/>
+            </Image.Effect>
+        </Image>
+
+        <Border Canvas.Left="660"
+                Canvas.Top="120"
+                Width="600"
+                Height="56"
+                Background="#161816"
+                CornerRadius="28"
+                BorderBrush="#2A2C22"
+                BorderThickness="1"
+                Padding="4">
+            <UniformGrid Columns="5">
+                <Border Background="#2A3030" CornerRadius="24">
+                    <TextBlock Text="Home" Foreground="#E7E6DC" FontFamily="Space Grotesk" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <Border Background="Transparent" CornerRadius="24">
+                    <TextBlock Text="Gin" Foreground="#888888" FontFamily="Space Grotesk" FontWeight="Medium" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <Border Background="Transparent" CornerRadius="24">
+                    <TextBlock Text="Vodka" Foreground="#888888" FontFamily="Space Grotesk" FontWeight="Medium" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <Border Background="Transparent" CornerRadius="24">
+                    <TextBlock Text="Spritz" Foreground="#888888" FontFamily="Space Grotesk" FontWeight="Medium" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <Border Background="Transparent" CornerRadius="24">
+                    <TextBlock Text="Negroni" Foreground="#888888" FontFamily="Space Grotesk" FontWeight="Medium" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+            </UniformGrid>
+        </Border>
+
+        <ItemsControl Canvas.Left="100"
+                      Canvas.Top="220"
+                      Width="1720"
+                      Height="780"
+                      ItemsSource="{Binding VisibleCocktails, ElementName=MenuHost}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Columns="4" Rows="2"/>
@@ -49,33 +129,88 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="models:Cocktail">
-                    <Button Margin="15" Padding="0" CornerRadius="15" Background="#253540"
-                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                    <Button Classes="InvisibleBtn"
+                            Margin="15"
                             IsEnabled="{Binding IsActive}"
                             Command="{Binding DataContext.SelectCocktailCommand, ElementName=MenuHost}"
                             CommandParameter="{Binding}">
-                        <Button.Styles>
-                            <!-- Suppress Avalonia's default disabled opacity — we handle it via overlay -->
-                            <Style Selector="Button:disabled">
-                                <Setter Property="Opacity" Value="1"/>
-                            </Style>
-                        </Button.Styles>
-                        <Grid RowDefinitions="*, Auto">
-                            <Image Grid.Row="0" Source="{Binding ImageSource, Converter={StaticResource BitmapAssetConverter}}"
-                                   Margin="20" Stretch="Uniform"/>
-                            <Border Grid.Row="1" Background="{Binding CardBackground}" Height="60"
-                                    CornerRadius="0,0,15,15">
-                                <TextBlock Text="{Binding Title}" Foreground="Black" FontWeight="Bold"
-                                           FontSize="30" HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
-                            </Border>
-                            <!-- Inactive overlay — rendered on top, covers both rows -->
-                            <Border Grid.RowSpan="2" Background="#BB121212" CornerRadius="15"
-                                    IsVisible="{Binding IsInactive}"/>
-                        </Grid>
+                        <Border Width="400"
+                                Height="360"
+                                CornerRadius="24"
+                                ClipToBounds="True"
+                                Background="#1B1C16">
+                            <Grid>
+                                <!-- Cocktail images temporarily hidden for the restyle pass.
+                                <Image Source="{Binding ImageSource, Converter={StaticResource BitmapAssetConverter}}"
+                                       Stretch="UniformToFill"
+                                       Opacity="0.92"/>
+                                -->
+
+                                <Border>
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0%,30%" EndPoint="0%,100%">
+                                            <GradientStop Color="Transparent" Offset="0"/>
+                                            <GradientStop Color="#EB050505" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+
+                                <StackPanel VerticalAlignment="Bottom" Margin="24">
+                                    <TextBlock Text="{Binding Title}"
+                                               Foreground="#E7E6DC"
+                                               FontSize="28"
+                                               FontWeight="Bold"
+                                               FontFamily="Space Grotesk"
+                                               TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Subtitle}"
+                                               Foreground="#A0A0A0"
+                                               FontSize="14"
+                                               FontFamily="Space Grotesk"
+                                               Margin="0,4,0,0"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+
+                                <Border Background="#BB121212"
+                                        IsHitTestVisible="False"
+                                        IsVisible="{Binding IsInactive}"/>
+                            </Grid>
+                        </Border>
                     </Button>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-    </Grid>
+
+        <Border Canvas.Top="1000"
+                Width="1920"
+                Height="60"
+                IsVisible="{Binding IsPagerVisible, ElementName=MenuHost}">
+            <ItemsControl ItemsSource="{Binding PageIndicators, ElementName=MenuHost}"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="6"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="max:PageIndicator">
+                        <Button Classes="InvisibleBtn"
+                                Width="44"
+                                Height="24"
+                                CommandParameter="{Binding Index}"
+                                Click="OnPageIndicatorClick">
+                            <Rectangle Width="{Binding Width}"
+                                       Height="4"
+                                       Fill="#E7E6DC"
+                                       RadiusX="2"
+                                       RadiusY="2"
+                                       Opacity="{Binding Opacity}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+    </Canvas>
 </UserControl>

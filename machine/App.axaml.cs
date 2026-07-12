@@ -32,7 +32,8 @@ public partial class App : Application
 
             desktop.Exit += OnExit;
             ArduinoSerialManager.Instance.Initialize();
-            MachineSyncService.Instance.Start(AppConfigService.Instance.CurrentProfileKey);
+            if (!isMini)
+                MachineSyncService.Instance.Start(AppConfigService.Instance.CurrentProfileKey);
         }
 
         base.OnFrameworkInitializationCompleted();

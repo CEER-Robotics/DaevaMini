@@ -6,107 +6,95 @@
              x:Class="DaevaMini.Views.Max.SettingsDaevaMax">
 
     <UserControl.Styles>
-        
-        <Style Selector="Button.DoneBtn">
-            <Setter Property="Background" Value="#F7940A"/> 
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="FontSize" Value="40"/> 
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="CornerRadius" Value="22"/> 
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Width" Value="525"/> 
-            <Setter Property="Height" Value="100"/>
-            <Setter Property="Cursor" Value="Hand"/>
-        </Style>
-        <Style Selector="Button.DoneBtn:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#C67608"/> 
-        </Style>
-        <Style Selector="Button.DoneBtn:pressed /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="#A05A00"/>
-        </Style>
-        <Style Selector="Button.DoneBtn:pressed TextBlock">
-            <Setter Property="Foreground" Value="Black"/>
-        </Style>
-
-        <Style Selector="Button.BackBtn">
+        <Style Selector="Button.InvisibleBtn">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Padding" Value="18"/>
-            <Setter Property="CornerRadius" Value="50"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
         </Style>
-        <Style Selector="Button.BackBtn:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#20FFFFFF"/> 
+        <Style Selector="Button.InvisibleBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
         </Style>
-
-        <Style Selector="Button.StartBlueBtn">
-            <Setter Property="Background" Value="#0084FF"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="FontSize" Value="40"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="CornerRadius" Value="22"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Height" Value="90"/>
-            <Setter Property="Width" Value="338"/>
-            <Setter Property="Cursor" Value="Hand"/>
+        <Style Selector="Button.InvisibleBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Opacity" Value="0.6"/>
         </Style>
-        <Style Selector="Button.StartBlueBtn:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#005BBB"/> 
-        </Style>
-        <Style Selector="Button.StartBlueBtn:pressed /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="#004185"/> 
-        </Style>
-
-        <Style Selector="Button.StartRedBtn">
-            <Setter Property="Background" Value="#FF3B3B"/>
-            <Setter Property="Foreground" Value="Black"/> 
-            <Setter Property="FontSize" Value="40"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="CornerRadius" Value="22"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Height" Value="90"/>
-            <Setter Property="Width" Value="338"/>
-            <Setter Property="Cursor" Value="Hand"/>
-        </Style>
-        <Style Selector="Button.StartRedBtn:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#FF5C5C"/> 
-        </Style>
-        <Style Selector="Button.StartRedBtn:pressed /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="#CC2E2E"/> 
-        </Style>
-        <Style Selector="Button.StartRedBtn:pressed TextBlock">
-            <Setter Property="Foreground" Value="Black"/> 
-        </Style>
-
     </UserControl.Styles>
 
-    <Grid Background="#131818" RowDefinitions="Auto, *, Auto">
+    <Canvas Width="1920" Height="1080">
+        <Canvas.Background>
+            <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%" RadiusX="80%" RadiusY="80%">
+                <GradientStop Color="#1A2222" Offset="0"/>
+                <GradientStop Color="#0B0D0D" Offset="1"/>
+            </RadialGradientBrush>
+        </Canvas.Background>
 
-        <Grid Grid.Row="0" Margin="38,36,38,0">
-            <Button Classes="BackBtn" HorizontalAlignment="Left" VerticalAlignment="Center" Click="OnBackClick">
-                <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
-                          Foreground="White" Width="50" Height="50"/>
-            </Button>
-            <TextBlock Text="Settings" Foreground="White" FontSize="68" FontWeight="Bold" 
-                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        </Grid>
-
-        <StackPanel Grid.Row="1" Width="1031" Spacing="63" VerticalAlignment="Center" HorizontalAlignment="Center">
-            
-            <StackPanel Spacing="27" HorizontalAlignment="Left">
-                <TextBlock Text="Filling:" Foreground="White" FontSize="40" FontWeight="Bold"/>
-                <Button Classes="StartRedBtn" Content="Start" Click="OnFillingClick"/>
+        <Button Canvas.Left="60" Canvas.Top="40" Classes="InvisibleBtn" Click="OnBackClick" Width="220" Height="48">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
+                <PathIcon Width="20" Height="20" Foreground="#E7E6DC" Margin="0,0,12,0"
+                          Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                <TextBlock Text="BACK" Foreground="#E7E6DC" FontSize="16" FontFamily="Space Grotesk"
+                           FontWeight="Bold" LetterSpacing="2" VerticalAlignment="Center"/>
             </StackPanel>
+        </Button>
 
-            <StackPanel Spacing="27" HorizontalAlignment="Left">
-                <TextBlock Text="Cleaning:" Foreground="White" FontSize="40" FontWeight="Bold"/>
-                <Button Classes="StartBlueBtn" Content="Start" Click="OnCleaningClick"/>
+        <TextBlock Canvas.Top="40" Width="1920" Text="IMPOSTAZIONI" Foreground="#E7E6DC"
+                   FontSize="28" FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="4"
+                   HorizontalAlignment="Center" TextAlignment="Center"/>
+
+        <Border Canvas.Left="260" Canvas.Top="260" Width="1400" Height="460" CornerRadius="32"
+                Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1">
+            <StackPanel VerticalAlignment="Center" Margin="60" Spacing="25">
+
+                <Border Height="140" CornerRadius="24" Background="#0CFFFFFF" Padding="30,0">
+                    <Grid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="24">
+                            <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
+                                <PathIcon Width="24" Height="24" Foreground="#E7E6DC"
+                                          Data="M16,10H14V17H11L15,21L19,17H16V10M8,14H10V7H13L9,3L5,7H8V14Z"/>
+                            </Border>
+                            <TextBlock Text="Cambio contenitori" Foreground="#E7E6DC" FontSize="24"
+                                       FontFamily="Space Grotesk" FontWeight="Medium" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <Button Classes="InvisibleBtn" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Click="OnFillingClick" Width="160" Height="54">
+                            <Border Background="#CAF0F8" CornerRadius="27">
+                                <TextBlock Text="START" Foreground="#131818" FontWeight="Bold" FontSize="18"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
+                            </Border>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <Border Height="140" CornerRadius="24" Background="#0CFFFFFF" Padding="30,0">
+                    <Grid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="24">
+                            <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
+                                <PathIcon Width="24" Height="24" Foreground="#E7E6DC"
+                                          Data="M12,20A6,6 0 0,1 6,14C6,10 12,3.25 12,3.25C12,3.25 18,10 18,14A6,6 0 0,1 12,20Z"/>
+                            </Border>
+                            <TextBlock Text="Risciacquo" Foreground="#E7E6DC" FontSize="24"
+                                       FontFamily="Space Grotesk" FontWeight="Medium" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <Button Classes="InvisibleBtn" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Click="OnCleaningClick" Width="160" Height="54">
+                            <Border Background="#CAF0F8" CornerRadius="27">
+                                <TextBlock Text="START" Foreground="#131818" FontWeight="Bold" FontSize="18"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
+                            </Border>
+                        </Button>
+                    </Grid>
+                </Border>
+
             </StackPanel>
+        </Border>
 
-        </StackPanel>
-
-    </Grid>
+    </Canvas>
 </UserControl>

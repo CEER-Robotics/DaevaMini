@@ -6,25 +6,19 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using DaevaMini.Config;
 
 namespace DaevaMini.Services;
 
 public sealed class MachineSyncService : IDisposable
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
-
-    private static readonly TimeSpan DefaultPollInterval = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan DefaultPollInterval = TimeSpan.FromSeconds(25);
 
     private readonly HttpClient _httpClient;
     private CancellationTokenSource? _cancellationTokenSource;
     private Task? _syncLoopTask;
     private string? _profileKey;
     private string? _machineId;
-    private bool _hasPendingConfigRefresh;
+    private string? _machineSecret;
 
     private static MachineSyncService? _instance;
     private static readonly object LockObject = new();
@@ -60,6 +54,7 @@ public sealed class MachineSyncService : IDisposable
 
         _profileKey = profileKey;
         _machineId = MachineProfileHelper.ResolveMachineId(profileKey);
+        _machineSecret = MachineProfileHelper.ResolveMachineSecret();
         _httpClient.BaseAddress = new Uri(MachineProfileHelper.ResolveBackendBaseUrl());
 
         LocalMachineStore.Instance.SeedSyncState(profileKey, _machineId);
@@ -103,13 +98,17 @@ public sealed class MachineSyncService : IDisposable
             MachineSyncStateRecord syncState = LocalMachineStore.Instance.GetSyncState(profileKey);
             var payload = new
             {
-                status = "offline",
-                appliedConfigVersion = syncState.AppliedRemoteConfigVersion,
-                currentOperation = (string?)null
+                machineId,
+                isOnline = false,
+                healthStatus = "RED",
+                errors = new[] { "machine-shutdown" },
+                timestamp = DateTime.UtcNow.ToString("O"),
+                appliedConfigVersion = syncState.AppliedRemoteConfigVersion
             };
 
+            using HttpRequestMessage request = CreateJsonRequest(HttpMethod.Post, "/api/machine-status", payload);
             using HttpResponseMessage response = _httpClient
-                .PostAsJsonAsync($"/api/machines/{machineId}/heartbeat", payload)
+                .SendAsync(request)
                 .GetAwaiter()
                 .GetResult();
 
@@ -139,18 +138,10 @@ public sealed class MachineSyncService : IDisposable
                 if (string.IsNullOrWhiteSpace(_profileKey) || string.IsNullOrWhiteSpace(_machineId))
                     return;
 
-                var heartbeat = await SendHeartbeatAsync(_profileKey, _machineId, cancellationToken);
+                await SendHeartbeatAsync(_profileKey, _machineId, cancellationToken);
                 LocalMachineStore.Instance.UpdateHeartbeat(_profileKey);
 
-                if (heartbeat.ShouldRefreshConfig)
-                    _hasPendingConfigRefresh = true;
-
-                if (_hasPendingConfigRefresh && !MachineRuntimeState.Instance.IsBusy)
-                    await RefreshDesiredConfigAsync(_profileKey, _machineId, cancellationToken);
-
                 await UploadPendingEventsAsync(_profileKey, _machineId, cancellationToken);
-
-                delay = TimeSpan.FromSeconds(Math.Max(5, heartbeat.PollIntervalSeconds));
             }
             catch (OperationCanceledException)
             {
@@ -175,7 +166,7 @@ public sealed class MachineSyncService : IDisposable
         }
     }
 
-    private async Task<MachineHeartbeatResponseDto> SendHeartbeatAsync(
+    private async Task SendHeartbeatAsync(
         string profileKey,
         string machineId,
         CancellationToken cancellationToken)
@@ -183,61 +174,18 @@ public sealed class MachineSyncService : IDisposable
         MachineSyncStateRecord syncState = LocalMachineStore.Instance.GetSyncState(profileKey);
         var payload = new
         {
-            status = MachineRuntimeState.Instance.Status,
-            appliedConfigVersion = syncState.AppliedRemoteConfigVersion,
-            currentOperation = MachineRuntimeState.Instance.CurrentOperation
+            machineId,
+            isOnline = true,
+            healthStatus = MachineRuntimeState.Instance.IsBusy ? "YELLOW" : "GREEN",
+            errors = Array.Empty<string>(),
+            timestamp = DateTime.UtcNow.ToString("O"),
+            runtimeStatus = MachineRuntimeState.Instance.Status,
+            currentOperation = MachineRuntimeState.Instance.CurrentOperation,
+            appliedConfigVersion = syncState.AppliedRemoteConfigVersion
         };
 
-        using HttpResponseMessage response = await _httpClient.PostAsJsonAsync(
-            $"/api/machines/{machineId}/heartbeat",
-            payload,
-            cancellationToken);
-        response.EnsureSuccessStatusCode();
-
-        MachineHeartbeatResponseDto? result = await response.Content.ReadFromJsonAsync<MachineHeartbeatResponseDto>(JsonOptions, cancellationToken);
-        return result ?? new MachineHeartbeatResponseDto();
-    }
-
-    private async Task RefreshDesiredConfigAsync(
-        string profileKey,
-        string machineId,
-        CancellationToken cancellationToken)
-    {
-        MachineSyncStateRecord syncState = LocalMachineStore.Instance.GetSyncState(profileKey);
-
-        DesiredConfigResponseDto? desiredConfig = await _httpClient.GetFromJsonAsync<DesiredConfigResponseDto>(
-            $"/api/machines/{machineId}/desired-config",
-            JsonOptions,
-            cancellationToken);
-
-        if (desiredConfig?.Machine == null || desiredConfig.Config == null)
-            return;
-
-        if (desiredConfig.Machine.DesiredConfigVersion <= syncState.AppliedRemoteConfigVersion)
-        {
-            _hasPendingConfigRefresh = false;
-            return;
-        }
-
-        AppConfigService.Instance.ApplyConfig(desiredConfig.Config, $"remote-sync-v{desiredConfig.Machine.DesiredConfigVersion}");
-        LocalMachineStore.Instance.UpdateAppliedRemoteConfigVersion(profileKey, desiredConfig.Machine.DesiredConfigVersion);
-        _hasPendingConfigRefresh = false;
-
-        var appliedPayload = new
-        {
-            appliedConfigVersion = desiredConfig.Machine.DesiredConfigVersion,
-            status = MachineRuntimeState.Instance.Status,
-            details = new Dictionary<string, object?>
-            {
-                ["source"] = "machine-sync",
-                ["localConfigVersion"] = LocalMachineStore.Instance.GetConfigVersion(profileKey)
-            }
-        };
-
-        using HttpResponseMessage response = await _httpClient.PostAsJsonAsync(
-            $"/api/machines/{machineId}/config-applied",
-            appliedPayload,
-            cancellationToken);
+        using HttpRequestMessage request = CreateJsonRequest(HttpMethod.Post, "/api/machine-status", payload);
+        using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
         response.EnsureSuccessStatusCode();
     }
 
@@ -250,30 +198,89 @@ public sealed class MachineSyncService : IDisposable
         if (pendingEvents.Count == 0)
             return;
 
-        var payload = new
+        foreach (PendingMachineEventRecord pendingEvent in pendingEvents)
         {
-            events = pendingEvents.Select(e => new
+            if (!IsGestionalePourEvent(pendingEvent))
             {
-                category = e.Category,
-                operationType = e.OperationType,
-                status = e.Status,
-                occurredAt = e.OccurredAtUtc,
-                cocktailId = e.CocktailId,
-                cocktailName = e.CocktailName,
-                modeName = e.ModeName,
-                totalMilliliters = e.TotalMilliliters,
-                totalDurationMs = e.TotalDurationMs,
-                payload = DeserializePayload(e.PayloadJson)
-            }).ToArray()
+                LocalMachineStore.Instance.MarkEventsUploaded(new[] { pendingEvent.Id });
+                continue;
+            }
+
+            var payload = new
+            {
+                machineId,
+                clientEventId = pendingEvent.Id.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                cocktailName = pendingEvent.CocktailName,
+                liquidPortions = BuildLiquidPortions(pendingEvent),
+                timestamp = pendingEvent.OccurredAtUtc.ToString("O"),
+                localEventId = pendingEvent.Id,
+                machineVariant = pendingEvent.MachineVariant,
+                totalDurationMs = pendingEvent.TotalDurationMs
+            };
+
+            using HttpRequestMessage request = CreateJsonRequest(HttpMethod.Post, "/api/machine-events", payload);
+            using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            LocalMachineStore.Instance.MarkEventsUploaded(new[] { pendingEvent.Id });
+        }
+    }
+
+    private HttpRequestMessage CreateJsonRequest<T>(HttpMethod method, string requestUri, T payload)
+    {
+        var request = new HttpRequestMessage(method, requestUri)
+        {
+            Content = JsonContent.Create(payload)
         };
 
-        using HttpResponseMessage response = await _httpClient.PostAsJsonAsync(
-            $"/api/machines/{machineId}/telemetry",
-            payload,
-            cancellationToken);
-        response.EnsureSuccessStatusCode();
+        if (!string.IsNullOrWhiteSpace(_machineSecret))
+            request.Headers.Add("x-machine-secret", _machineSecret);
 
-        LocalMachineStore.Instance.MarkEventsUploaded(pendingEvents.Select(e => e.Id));
+        return request;
+    }
+
+    private static bool IsGestionalePourEvent(PendingMachineEventRecord record)
+    {
+        return string.Equals(record.Category, "operation", StringComparison.OrdinalIgnoreCase)
+            && string.Equals(record.OperationType, "dispense", StringComparison.OrdinalIgnoreCase)
+            && string.Equals(record.Status, "completed", StringComparison.OrdinalIgnoreCase)
+            && !string.IsNullOrWhiteSpace(record.CocktailName);
+    }
+
+    private static object[] BuildLiquidPortions(PendingMachineEventRecord record)
+    {
+        JsonElement payload = DeserializePayload(record.PayloadJson);
+        if (payload.TryGetProperty("ingredients", out JsonElement ingredients) &&
+            ingredients.ValueKind == JsonValueKind.Array)
+        {
+            var portions = new List<object>();
+            foreach (JsonElement ingredient in ingredients.EnumerateArray())
+            {
+                string? name = TryGetStringProperty(ingredient, "Name") ?? TryGetStringProperty(ingredient, "name");
+                int? milliliters = TryGetIntProperty(ingredient, "Milliliters") ?? TryGetIntProperty(ingredient, "milliliters");
+
+                if (!string.IsNullOrWhiteSpace(name) && milliliters.HasValue)
+                {
+                    portions.Add(new
+                    {
+                        name,
+                        amountMl = milliliters.Value
+                    });
+                }
+            }
+
+            if (portions.Count > 0)
+                return portions.ToArray();
+        }
+
+        return new[]
+        {
+            new
+            {
+                name = record.CocktailName ?? "Drink",
+                amountMl = record.TotalMilliliters ?? 0
+            }
+        };
     }
 
     private static JsonElement DeserializePayload(string? payloadJson)
@@ -291,20 +298,21 @@ public sealed class MachineSyncService : IDisposable
         }
     }
 
-    private sealed class MachineHeartbeatResponseDto
+    private static string? TryGetStringProperty(JsonElement element, string propertyName)
     {
-        public bool ShouldRefreshConfig { get; set; }
-        public int PollIntervalSeconds { get; set; } = 15;
+        return element.TryGetProperty(propertyName, out JsonElement property) && property.ValueKind == JsonValueKind.String
+            ? property.GetString()
+            : null;
     }
 
-    private sealed class DesiredConfigResponseDto
+    private static int? TryGetIntProperty(JsonElement element, string propertyName)
     {
-        public MachineSummaryDto? Machine { get; set; }
-        public AppConfig? Config { get; set; }
-    }
+        if (!element.TryGetProperty(propertyName, out JsonElement property))
+            return null;
 
-    private sealed class MachineSummaryDto
-    {
-        public int DesiredConfigVersion { get; set; }
+        if (property.ValueKind == JsonValueKind.Number && property.TryGetInt32(out int value))
+            return value;
+
+        return null;
     }
 }

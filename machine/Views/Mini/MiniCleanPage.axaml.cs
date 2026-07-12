@@ -17,6 +17,11 @@ public partial class MiniCleanPage : UserControl
     private readonly ModesViewModel _modesViewModel;
     private readonly ToggleButton?[] _bottles;
 
+    public MiniCleanPage()
+        : this(new ModesViewModel())
+    {
+    }
+
     public MiniCleanPage(ModesViewModel modesViewModel)
     {
         InitializeComponent();
