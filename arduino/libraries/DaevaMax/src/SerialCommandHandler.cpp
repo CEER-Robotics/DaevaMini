@@ -158,7 +158,7 @@ static void handleSerialLine(const char* line) {
   if (isExactCommand(line, "MANUTENZIONE")) {
     if (LedAnimations::handleMaintenanceCommand()) {
       PumpControl::allOff();
-      SerialUSB.println("OK MANUTENZIONE");
+      DAEVA_SERIAL.println("OK MANUTENZIONE");
     }
     return;
   }
@@ -166,7 +166,7 @@ static void handleSerialLine(const char* line) {
   if (isExactCommand(line, "READY")) {
     const bool wasWaiting = LedAnimations::isWaitingForCommand();
     if (LedAnimations::handleReadyCommand() && wasWaiting) {
-      SerialUSB.println("OK READY");
+      DAEVA_SERIAL.println("OK READY");
     }
     return;
   }
@@ -174,7 +174,7 @@ static void handleSerialLine(const char* line) {
   if (isExactCommand(line, "TOXIC")) {
     if (LedAnimations::handleToxicCommand()) {
       PumpControl::allOff();
-      SerialUSB.println("OK TOXIC");
+      DAEVA_SERIAL.println("OK TOXIC");
     }
     return;
   }
@@ -188,12 +188,12 @@ static void handleSerialLine(const char* line) {
   bool isRgb = false;
   if (!extractActiveColor(line, colorName, sizeof(colorName),
                           &rgbR, &rgbG, &rgbB, &isRgb)) {
-    SerialUSB.println("ERR ACTIVE COLOR");
+    DAEVA_SERIAL.println("ERR ACTIVE COLOR");
     return;
   }
 
   if (!LedAnimations::isWaitingForCommand()) {
-    SerialUSB.println("IGNORED ACTIVE");
+    DAEVA_SERIAL.println("IGNORED ACTIVE");
     return;
   }
 
@@ -201,19 +201,19 @@ static void handleSerialLine(const char* line) {
   if (isRgb) {
     selectedColor = ((uint32_t)rgbR << 16) | ((uint32_t)rgbG << 8) | (uint32_t)rgbB;
   } else if (!LedAnimations::parsePresetColor(colorName, selectedColor)) {
-    SerialUSB.println("ERR ACTIVE COLOR");
+    DAEVA_SERIAL.println("ERR ACTIVE COLOR");
     return;
   }
 
   PumpControl::allOff();
   const uint32_t maxEnd = PumpControl::scheduleFromLine(line);
   if (maxEnd == 0) {
-    SerialUSB.println("ERR ACTIVE PARAMS");
+    DAEVA_SERIAL.println("ERR ACTIVE PARAMS");
     return;
   }
 
   if (LedAnimations::startActiveWithColor(maxEnd, selectedColor)) {
-    SerialUSB.println("OK ACTIVE");
+    DAEVA_SERIAL.println("OK ACTIVE");
   }
 }
 
@@ -227,8 +227,8 @@ void begin() {
 }
 
 void update() {
-  while (SerialUSB.available() > 0) {
-    char c = (char)SerialUSB.read();
+  while (DAEVA_SERIAL.available() > 0) {
+    char c = (char)DAEVA_SERIAL.read();
     if (c == '\r') {
       continue;
     }

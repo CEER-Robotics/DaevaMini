@@ -1,7 +1,8 @@
 #pragma once
 
 #include <Arduino.h>
-#include <array>
+
+#include "BoardConfig.h"
 
 namespace ProjectConfig {
 
@@ -17,17 +18,9 @@ namespace Pump {
 constexpr uint8_t kCount = 17;
 // Default PWM duty for pump activation (0-255).
 constexpr uint8_t kDefaultPwm = 110;
-// Arduino pins mapped to pumps P1..PkCount.
-constexpr std::array<uint8_t, kCount> kPins = {
-    6,  7,  8,  9,  10, 11, 12, 13, 22,
-    24, 26, 28, 30, 32, 34, 36, 38};
 }  // namespace Pump
 
 namespace Strips {
-// Data pin for WS2812 strip 1.
-constexpr uint8_t kStrip1Pin = 2;
-// Data pin for WS2812 strip 2.
-constexpr uint8_t kStrip2Pin = 3;
 // Total LED count of strip 1.
 constexpr uint16_t kStrip1Len = 24;
 // Total LED count of strip 2.

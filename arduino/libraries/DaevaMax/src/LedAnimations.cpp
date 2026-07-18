@@ -10,10 +10,10 @@
 namespace {
 
 Adafruit_NeoPixel strip1(ProjectConfig::Strips::kStrip1Len,
-                         ProjectConfig::Strips::kStrip1Pin,
+                         BoardConfig::Strips::kStrip1Pin,
                          NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel strip2(ProjectConfig::Strips::kStrip2Len,
-                         ProjectConfig::Strips::kStrip2Pin,
+                         BoardConfig::Strips::kStrip2Pin,
                          NEO_GRB + NEO_KHZ800);
 
 uint32_t CYAN = 0;
@@ -554,7 +554,7 @@ void begin() {
   activeColorValid = false;
   endingColor = BLU_DAEVA;
 
-  randomSeed(analogRead(A0) ^ micros());
+  randomSeed(analogRead(BoardConfig::Random::kAnalogSeedPin) ^ micros());
 
   LedStateMachine::setStartupDurationMs(ProjectConfig::Timing::kStartupDurationMs);
   LedStateMachine::setToxicTimeoutMs(ProjectConfig::Timing::kToxicTimeoutMs);
@@ -589,7 +589,7 @@ bool handleReadyCommand() {
   if (handled && before != after) {
     onStateEntered(after, millis());
     if (after == LedStateMachine::ST_WAIT) {
-      SerialUSB.println("OK READY");
+      DAEVA_SERIAL.println("OK READY");
     }
   }
   return handled;
@@ -632,7 +632,7 @@ bool update() {
   if (tickRes.enteredState) {
     onStateEntered(tickRes.state, now);
     if (tickRes.state == LedStateMachine::ST_WAIT) {
-      SerialUSB.println("OK READY");
+      DAEVA_SERIAL.println("OK READY");
     }
   }
 

@@ -1,10 +1,11 @@
-# Serial Command Protocol (Host -> Arduino Due)
+# Daeva MAX Serial Command Protocol
 
 This document is the reference for anyone writing software that communicates with this firmware over USB serial.
 
 ## 1. Connection
 
-- Port: Arduino Due native USB port (`SerialUSB`)
+- Arduino Due port: native USB (`SerialUSB`)
+- Teensy 4.1 port: USB (`Serial`, with USB Type set to `Serial`)
 - Baud rate: `115200`
 - Data bits / parity / stop bits: `8N1`
 - Flow control: none

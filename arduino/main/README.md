@@ -1,4 +1,4 @@
-# Arduino Due Firmware (Pumps + WS2812 Animations)
+# Daeva MAX - Arduino Due Target
 
 Firmware for an Arduino Due that controls:
 
@@ -6,14 +6,12 @@ Firmware for an Arduino Due that controls:
 - 2 WS2812 strips (state-based animations)
 - A serial command interface for runtime control
 
-The code is split into focused modules:
+The board sketch is deliberately small. Shared firmware lives in the local
+`DaevaMax` library:
 
-- `main.ino`: top-level setup/loop orchestration
-- `SerialCommandHandler.*`: serial RX, command parsing, and dispatch
-- `PumpControl.*`: pump pin control and ON-duration scheduling
-- `LedStateMachine.*`: finite state machine and transitions
-- `LedAnimations.*`: animation rendering per state
-- `ProjectConfig.h`: centralized pins, timings, animation parameters, and colors
+- `main.ino`: calls the shared firmware entry points
+- `../libraries/DaevaMax/src`: shared MAX implementation
+- `../libraries/DaevaMax/src/boards/ArduinoDue.h`: Due-only pins and serial setup
 
 ## Features
 
@@ -25,7 +23,7 @@ The code is split into focused modules:
 
 ### Toxic animation mode selection
 
-In `ProjectConfig.h`:
+In `../libraries/DaevaMax/src/ProjectConfig.h`:
 
 - `Animation::kToxicAnim = 1`: current toxic random patterns (strobe/chase/alternate)
 - `Animation::kToxicAnim = 2`: slow breathing animation using the WAIT color (`kBluDaeva`)
@@ -49,7 +47,8 @@ Baud rate: `115200` on `SerialUSB`.
 
 Send one command line terminated by `\n`.
 
-For a full host-integration reference (parser behavior, edge cases, and implementation notes), see `SERIAL_PROTOCOL.md`.
+For a full host-integration reference, see
+`../libraries/DaevaMax/SERIAL_PROTOCOL.md`.
 
 ### 1. ACTIVE command
 
@@ -169,3 +168,4 @@ All state colors (startup, wait/base, toxic, maintenance, ending fallback) and p
 ## Dependency
 
 - `Adafruit NeoPixel` library
+- Repository-local `DaevaMax` library; see `../README.md` for IDE setup

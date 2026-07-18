@@ -3,15 +3,18 @@
 
 namespace {
 
+static_assert(BoardConfig::Pump::kPins.size() == ProjectConfig::Pump::kCount,
+              "The board profile must define exactly 17 pump pins.");
+
 static uint32_t offAtMs[ProjectConfig::Pump::kCount];
 
 static inline void pumpOff(uint8_t idx) {
-  analogWrite(ProjectConfig::Pump::kPins[idx], 0);
+  analogWrite(BoardConfig::Pump::kPins[idx], 0);
   offAtMs[idx] = 0;
 }
 
 static inline void pumpOnFor(uint8_t idx, uint32_t durationMs) {
-  analogWrite(ProjectConfig::Pump::kPins[idx], ProjectConfig::Pump::kDefaultPwm);
+  analogWrite(BoardConfig::Pump::kPins[idx], ProjectConfig::Pump::kDefaultPwm);
   offAtMs[idx] = millis() + durationMs;
 }
 
@@ -20,16 +23,17 @@ static inline void pumpOnFor(uint8_t idx, uint32_t durationMs) {
 namespace PumpControl {
 
 void begin() {
+  BoardConfig::Pump::configurePwm();
   for (uint8_t i = 0; i < ProjectConfig::Pump::kCount; i++) {
-    pinMode(ProjectConfig::Pump::kPins[i], OUTPUT);
-    digitalWrite(ProjectConfig::Pump::kPins[i], LOW);
+    pinMode(BoardConfig::Pump::kPins[i], OUTPUT);
+    digitalWrite(BoardConfig::Pump::kPins[i], LOW);
     offAtMs[i] = 0;
   }
 }
 
 void allOff() {
   for (uint8_t i = 0; i < ProjectConfig::Pump::kCount; i++) {
-    analogWrite(ProjectConfig::Pump::kPins[i], 0);
+    analogWrite(BoardConfig::Pump::kPins[i], 0);
     offAtMs[i] = 0;
   }
 }
