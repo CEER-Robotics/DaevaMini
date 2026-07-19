@@ -135,16 +135,24 @@ public partial class MainWindow : Window
             if (!manager.IsConnected)
             {
                 Console.WriteLine("[MainWindow] Arduino not connected");
-                MachineTelemetryService.Instance.RecordDispenseEvent(profileKey, "failed", cocktail, null, channelDurations, new
-                {
-                    reason = "arduino-not-connected"
-                });
 #if DEBUG
                 int totalDurationDebug = 0;
                 foreach (var ms in channelDurations.Values)
                     if (ms > totalDurationDebug) totalDurationDebug = ms;
                 Console.WriteLine($"[MainWindow] DEBUG: simulating dispense for {totalDurationDebug}ms");
                 await card.StartDispensing(totalDurationDebug);
+                MachineTelemetryService.Instance.RecordDispenseEvent(
+                    profileKey,
+                    "completed",
+                    cocktail,
+                    null,
+                    channelDurations,
+                    new { simulated = true });
+#else
+                MachineTelemetryService.Instance.RecordDispenseEvent(profileKey, "failed", cocktail, null, channelDurations, new
+                {
+                    reason = "arduino-not-connected"
+                });
 #endif
                 return;
             }
