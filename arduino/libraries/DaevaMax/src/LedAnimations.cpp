@@ -152,12 +152,31 @@ static uint8_t maintenanceUpdateBrightness() {
   return (uint8_t)maintPhase;
 }
 
+// Last frame pushed by staticFill, and whether it is still what the strips are
+// showing. Any animation that writes pixels itself must invalidate this.
+static uint32_t lastStaticColor = 0;
+static bool staticFrameValid = false;
+
+static void invalidateStaticFrame() { staticFrameValid = false; }
+
+// Re-sending a frame the strips are already displaying achieves nothing, and on
+// a data line driven at 3.3 V (below the WS2812 0.7 x VDD threshold, no level
+// shifter fitted) every refresh is another chance to latch a corrupted bit and
+// flicker a pixel. Static states therefore transmit only when the image really
+// changes, which for WAIT means once on entry rather than 25 times a second.
 static void staticFill(uint32_t color) {
+  if (staticFrameValid && color == lastStaticColor) {
+    return;
+  }
+
   fillWindow(strip1, win1, color);
   fillWindow(strip2, win2, color);
 
   strip1.show();
   strip2.show();
+
+  lastStaticColor = color;
+  staticFrameValid = true;
 }
 
 static void waitAnimStep(uint32_t color) {
@@ -169,6 +188,7 @@ static uint32_t currentActiveColor() {
 }
 
 static void activeAnim1Step(uint32_t color) {
+  invalidateStaticFrame();
   strip1.clear();
   strip2.clear();
 
@@ -191,6 +211,7 @@ static void activeAnim1Step(uint32_t color) {
 }
 
 static void activeAnim2Step(uint32_t color) {
+  invalidateStaticFrame();
   const uint8_t up = breatheUpdateGetBrightness();
   const uint8_t dn = (uint8_t)(255 - breathePhase);
 
@@ -246,6 +267,7 @@ static void bounceAnimBegin(uint32_t durationMs,
                             uint16_t strip2Start,
                             uint16_t strip2End,
                             uint32_t strip2Color) {
+  invalidateStaticFrame();
   bounceStartMs = millis();
   bounceDurationMs = (durationMs == 0) ? 1 : durationMs;
   bounceHalfPeriodMs = halfPeriodMs;
@@ -267,6 +289,7 @@ static void bounceAnimBegin(uint32_t durationMs,
 }
 
 static void bounceAnimStep() {
+  invalidateStaticFrame();
   const uint32_t now = millis();
   uint32_t dt = now - bounceStartMs;
   if (dt > bounceDurationMs) {
@@ -300,6 +323,7 @@ static void bounceAnimStep() {
 }
 
 static void startupAnimStep() {
+  invalidateStaticFrame();
   const uint32_t now = millis();
   uint32_t elapsed = now - startupAnimStartMs;
   const uint32_t durationMs = (ProjectConfig::Timing::kStartupDurationMs == 0)
@@ -415,6 +439,7 @@ static void toxicAnimPatternStep(uint32_t now) {
   }
 
   if (toxicPattern == TOXIC_CHASE) {
+    invalidateStaticFrame();
     strip1.clear();
     strip2.clear();
 
@@ -438,6 +463,7 @@ static void toxicAnimPatternStep(uint32_t now) {
           ? 1
           : ProjectConfig::Animation::kToxicAlternateHalfPeriodMs;
   const bool phase = (((now / halfPeriodMs) % 2) == 0);
+  invalidateStaticFrame();
   strip1.clear();
   strip2.clear();
   for (uint16_t i = 0; i < win1.len; i++) {
@@ -491,6 +517,8 @@ static void enterActiveState() {
 
 static void onStateEntered(LedStateMachine::ProgramState st, uint32_t now) {
   nextFrameAt = 0;
+  // The next state paints something different, so the cached frame is stale.
+  invalidateStaticFrame();
 
   if (st == LedStateMachine::ST_STARTUP) {
     startupAnimStartMs = now;

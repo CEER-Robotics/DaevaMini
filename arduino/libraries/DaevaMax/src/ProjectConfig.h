@@ -22,23 +22,19 @@ constexpr uint8_t kDefaultPwm = 255;
 
 namespace Strips {
 // Total LED count of strip 1.
-constexpr uint16_t kStrip1Len = 30;
+constexpr uint16_t kStrip1Len = 31;
 // Total LED count of strip 2.
 constexpr uint16_t kStrip2Len = 44;
 
 // Pixels hidden by the chassis at each end of a strip. These are never lit in
 // any state: the visible window is the strip minus a margin at both ends.
 //
-// Both margins are pinned to 0 on purpose, and a non-zero value on strip 2 is
-// known to break it. There is no level shifter on the LED data lines, so the
-// first pixel of each strip has to latch the Teensy's 3.3 V output against a
-// 0.7 x VDD = 3.5 V threshold — already out of spec. Darkening that first pixel
-// drops its current draw, lifts its local supply rail and so lifts the
-// threshold further away from 3.3 V; the strip then mis-latches bits and
-// scattered pixels flicker at random. Keeping pixel 0 lit is what has been
-// masking the marginal link all along. Restore the margins only once a
-// 74AHCT125/74HCT245 is fitted (or the strip supply is dropped to ~4.3 V with a
-// series diode) — see arduino/teensy_max/README.md.
+// Both margins are pinned to 0, but note this is a default rather than a proven
+// requirement: a non-zero margin was suspected of causing the strip flicker
+// seen on the bench and that turned out to be wrong (the real cause is the
+// unshifted data line described below, and strip 1 flickered with its margin
+// already at 0). Margins have not been re-tested since. Set one if you need it,
+// but verify on hardware.
 constexpr uint16_t kStrip1Margin = 0;
 constexpr uint16_t kStrip2Margin = 0;
 

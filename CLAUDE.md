@@ -143,7 +143,13 @@ Pi UART config is already correct and rarely the fault (`/boot/firmware/config.t
 
 ### LED strips: no level shifter is fitted
 
-`Strips::kStrip1Margin` / `kStrip2Margin` in `ProjectConfig.h` must stay `0`. The Teensy's 3.3 V data output sits below the WS2812's 0.7 × VDD = 3.5 V threshold, so the whole strip depends on the *first* pixel latching a marginal signal — every later pixel gets a clean regenerated 5 V one. Any non-zero margin darkens that first pixel, which raises its local rail and threshold and makes scattered pixels flicker at random. Symptom: random per-pixel flicker that correlates with firmware changes but is actually electrical. Fix properly with a 74AHCT125/74HCT245, or drop strip VDD to ~4.3 V with a series diode.
+**The WS2812 data lines are driven straight from the Teensy at 3.3 V, below the 0.7 × VDD = 3.5 V threshold of a 5 V-powered WS2812.** Every `show()` is therefore a chance to latch a corrupted bit, and the symptom is scattered pixels flickering at random. Strip 2 tolerates it and strip 1 does not — consistent with different LED revisions (WS2812B-V5 enforces the threshold strictly, older WS2812B is looser). Real fix: a `74AHCT125`/`74HCT245` on both data lines, or drop strip VDD to ~4.3 V with a series diode. Series resistors and wiring are already identical on both channels, so don't re-investigate those.
+
+Diagnosing it: raise `Animation::kFrameWaitMs` to ~30000 temporarily. If the strip goes stable between refreshes the corruption is in *transmission* (data line); if it keeps flickering it is *power*. This is the fastest way to tell them apart.
+
+Mitigation already in firmware: `staticFill` caches the last frame and re-transmits only when the image actually changes, so WAIT sends once on entry instead of 25×/s. Any animation writing pixels directly **must** call `invalidateStaticFrame()`, or it will leave a stale cache and the next static fill will be skipped.
+
+Beware two firmware faults that mimic the electrical one: a `kStripNLen` **shorter** than the physical strip leaves the trailing LEDs unaddressed, so they hold power-on garbage and flicker (strip 1 is 31, not 30); and the margins (`kStrip1Margin`/`kStrip2Margin`) change which pixels light, never how many are transmitted.
 
 ### Pump tester
 
