@@ -22,18 +22,55 @@ constexpr uint8_t kDefaultPwm = 255;
 
 namespace Strips {
 // Total LED count of strip 1.
-constexpr uint16_t kStrip1Len = 34;
+constexpr uint16_t kStrip1Len = 30;
 // Total LED count of strip 2.
-constexpr uint16_t kStrip2Len = 42;
+constexpr uint16_t kStrip2Len = 44;
+
+// Pixels hidden by the chassis at each end of a strip. These are never lit in
+// any state: the visible window is the strip minus a margin at both ends.
+//
+// Both margins are pinned to 0 on purpose, and a non-zero value on strip 2 is
+// known to break it. There is no level shifter on the LED data lines, so the
+// first pixel of each strip has to latch the Teensy's 3.3 V output against a
+// 0.7 x VDD = 3.5 V threshold — already out of spec. Darkening that first pixel
+// drops its current draw, lifts its local supply rail and so lifts the
+// threshold further away from 3.3 V; the strip then mis-latches bits and
+// scattered pixels flicker at random. Keeping pixel 0 lit is what has been
+// masking the marginal link all along. Restore the margins only once a
+// 74AHCT125/74HCT245 is fitted (or the strip supply is dropped to ~4.3 V with a
+// series diode) — see arduino/teensy_max/README.md.
+constexpr uint16_t kStrip1Margin = 0;
+constexpr uint16_t kStrip2Margin = 0;
+
+// A margin only applies when the strip is long enough to keep at least one
+// visible pixel; otherwise it collapses to the whole strip. Without this guard
+// the subtractions below wrap (they are unsigned) and index far out of bounds.
+constexpr bool kStrip1MarginFits = kStrip1Len > 2 * kStrip1Margin;
+constexpr bool kStrip2MarginFits = kStrip2Len > 2 * kStrip2Margin;
 
 // First LED index used on strip 1.
-constexpr uint16_t kStrip1Start = 0;
+constexpr uint16_t kStrip1Start = kStrip1MarginFits ? kStrip1Margin : 0;
 // Last LED index used on strip 1 (inclusive).
-constexpr uint16_t kStrip1End = kStrip1Len - 1;
+constexpr uint16_t kStrip1End =
+    kStrip1Len == 0 ? 0
+                    : (kStrip1MarginFits ? (uint16_t)(kStrip1Len - 1 - kStrip1Margin)
+                                         : (uint16_t)(kStrip1Len - 1));
 // First LED index used on strip 2 (skip initial pixels).
-constexpr uint16_t kStrip2Start = 4;
+constexpr uint16_t kStrip2Start = kStrip2MarginFits ? kStrip2Margin : 0;
 // Last LED index used on strip 2 (inclusive, keep tail margin).
-constexpr uint16_t kStrip2End = kStrip2Len - 1 - 4;
+constexpr uint16_t kStrip2End =
+    kStrip2Len == 0 ? 0
+                    : (kStrip2MarginFits ? (uint16_t)(kStrip2Len - 1 - kStrip2Margin)
+                                         : (uint16_t)(kStrip2Len - 1));
+
+static_assert(kStrip1Len == 0 || kStrip1End < kStrip1Len,
+              "strip 1 window runs past the end of the strip");
+static_assert(kStrip2Len == 0 || kStrip2End < kStrip2Len,
+              "strip 2 window runs past the end of the strip");
+static_assert(kStrip1Len == 0 || kStrip1Start <= kStrip1End,
+              "strip 1 window is inverted");
+static_assert(kStrip2Len == 0 || kStrip2Start <= kStrip2End,
+              "strip 2 window is inverted");
 }  // namespace Strips
 
 namespace Timing {

@@ -16,6 +16,50 @@ Adafruit_NeoPixel strip2(ProjectConfig::Strips::kStrip2Len,
                          BoardConfig::Strips::kStrip2Pin,
                          NEO_GRB + NEO_KHZ800);
 
+// The visible span of a strip. Pixels outside it are hidden by the chassis, so
+// no animation may light them: every effect addresses a window, never the raw
+// strip. Indices are absolute (they index the driver directly) and `len` is 0
+// when the strip is empty, which every caller has to tolerate.
+struct Window {
+  uint16_t start;
+  uint16_t end;  // inclusive
+  uint16_t len;
+};
+
+// Clamps the configured window to the pixels the driver actually allocated, so
+// a mis-set length in ProjectConfig.h cannot make us write out of bounds.
+static Window makeWindow(uint16_t start, uint16_t end, uint16_t physicalLen) {
+  if (physicalLen == 0 || start >= physicalLen || end < start) {
+    return Window{0, 0, 0};
+  }
+  const uint16_t last = (end < physicalLen) ? end : (uint16_t)(physicalLen - 1);
+  return Window{start, last, (uint16_t)(last - start + 1)};
+}
+
+const Window win1 = makeWindow(ProjectConfig::Strips::kStrip1Start,
+                               ProjectConfig::Strips::kStrip1End,
+                               ProjectConfig::Strips::kStrip1Len);
+const Window win2 = makeWindow(ProjectConfig::Strips::kStrip2Start,
+                               ProjectConfig::Strips::kStrip2End,
+                               ProjectConfig::Strips::kStrip2Len);
+
+// Lights every pixel of the window and leaves the hidden margins dark.
+static void fillWindow(Adafruit_NeoPixel& s, const Window& w, uint32_t color) {
+  s.clear();
+  for (uint16_t i = 0; i < w.len; i++) {
+    s.setPixelColor((uint16_t)(w.start + i), color);
+  }
+}
+
+// Maps a free-running counter onto the window, so chases wrap inside the
+// visible span instead of running through the hidden margins.
+static uint16_t windowIndex(const Window& w, uint32_t pos) {
+  if (w.len == 0) {
+    return 0;
+  }
+  return (uint16_t)(w.start + (uint16_t)(pos % w.len));
+}
+
 uint32_t CYAN = 0;
 uint32_t YELL = 0;
 uint32_t BLU_DAEVA = 0;
@@ -109,12 +153,8 @@ static uint8_t maintenanceUpdateBrightness() {
 }
 
 static void staticFill(uint32_t color) {
-  for (uint16_t i = 0; i < strip1.numPixels(); i++) {
-    strip1.setPixelColor(i, color);
-  }
-  for (uint16_t i = 0; i < strip2.numPixels(); i++) {
-    strip2.setPixelColor(i, color);
-  }
+  fillWindow(strip1, win1, color);
+  fillWindow(strip2, win2, color);
 
   strip1.show();
   strip2.show();
@@ -132,18 +172,17 @@ static void activeAnim1Step(uint32_t color) {
   strip1.clear();
   strip2.clear();
 
-  const uint16_t p1 = chasePos % strip1.numPixels();
-  const uint16_t p2 = (chasePos + strip1.numPixels() / 2) % strip1.numPixels();
   const uint32_t accent = scaleColor(
       strip1, color, ProjectConfig::Animation::kActiveAccentBrightness);
 
-  strip1.setPixelColor(p1, color);
-  strip1.setPixelColor(p2, accent);
-
-  const uint16_t q1 = chasePos % strip2.numPixels();
-  const uint16_t q2 = (chasePos + strip2.numPixels() / 3) % strip2.numPixels();
-  strip2.setPixelColor(q1, accent);
-  strip2.setPixelColor(q2, color);
+  if (win1.len > 0) {
+    strip1.setPixelColor(windowIndex(win1, chasePos), color);
+    strip1.setPixelColor(windowIndex(win1, chasePos + win1.len / 2), accent);
+  }
+  if (win2.len > 0) {
+    strip2.setPixelColor(windowIndex(win2, chasePos), accent);
+    strip2.setPixelColor(windowIndex(win2, chasePos + win2.len / 3), color);
+  }
 
   strip1.show();
   strip2.show();
@@ -158,12 +197,8 @@ static void activeAnim2Step(uint32_t color) {
   const uint32_t c1 = scaleColor(strip1, color, up);
   const uint32_t c2 = scaleColor(strip2, color, dn);
 
-  for (uint16_t i = 0; i < strip1.numPixels(); i++) {
-    strip1.setPixelColor(i, c1);
-  }
-  for (uint16_t i = 0; i < strip2.numPixels(); i++) {
-    strip2.setPixelColor(i, c2);
-  }
+  fillWindow(strip1, win1, c1);
+  fillWindow(strip2, win2, c2);
 
   strip1.show();
   strip2.show();
@@ -215,12 +250,12 @@ static void bounceAnimBegin(uint32_t durationMs,
   bounceDurationMs = (durationMs == 0) ? 1 : durationMs;
   bounceHalfPeriodMs = halfPeriodMs;
 
-  const uint16_t n1 = strip1.numPixels();
-  const uint16_t n2 = strip2.numPixels();
-  upA = (n1 > 0) ? (strip1Start % n1) : 0;
-  upB = (n1 > 0) ? (strip1End % n1) : 0;
-  dnA = (n2 > 0) ? (strip2Start % n2) : 0;
-  dnB = (n2 > 0) ? (strip2End % n2) : 0;
+  // Clamp the requested span into the visible window rather than wrapping it:
+  // a modulo here would land the bounce endpoints inside the hidden margins.
+  upA = clampU16(strip1Start, win1.start, win1.end);
+  upB = clampU16(strip1End, win1.start, win1.end);
+  dnA = clampU16(strip2Start, win2.start, win2.end);
+  dnB = clampU16(strip2End, win2.start, win2.end);
 
   upCol = strip1Color;
   dnCol = strip2Color;
@@ -253,10 +288,10 @@ static void bounceAnimStep() {
   strip1.clear();
   strip2.clear();
 
-  if (strip1.numPixels() > 0) {
+  if (win1.len > 0) {
     strip1.setPixelColor(pUp, upCol);
   }
-  if (strip2.numPixels() > 0) {
+  if (win2.len > 0) {
     strip2.setPixelColor(pDn, dnCol);
   }
 
@@ -274,16 +309,8 @@ static void startupAnimStep() {
     elapsed = durationMs;
   }
 
-  const uint16_t strip1Len =
-      (ProjectConfig::Strips::kStrip1End >= ProjectConfig::Strips::kStrip1Start)
-          ? (ProjectConfig::Strips::kStrip1End -
-             ProjectConfig::Strips::kStrip1Start + 1)
-          : 0;
-  const uint16_t strip2Len =
-      (ProjectConfig::Strips::kStrip2End >= ProjectConfig::Strips::kStrip2Start)
-          ? (ProjectConfig::Strips::kStrip2End -
-             ProjectConfig::Strips::kStrip2Start + 1)
-          : 0;
+  const uint16_t strip1Len = win1.len;
+  const uint16_t strip2Len = win2.len;
   const uint16_t strip1Steps = (uint16_t)((strip1Len + 1) / 2);
   const uint16_t strip2Steps = (uint16_t)((strip2Len + 1) / 2);
   const uint16_t totalSteps = (strip1Steps > strip2Steps) ? strip1Steps : strip2Steps;
@@ -297,14 +324,15 @@ static void startupAnimStep() {
     }
   }
 
+  // Guarded against an empty window: `strip1Len - 1` is unsigned and would wrap.
   const uint16_t strip1MidLeft =
-      ProjectConfig::Strips::kStrip1Start + ((strip1Len - 1) / 2);
+      (strip1Len > 0) ? (uint16_t)(win1.start + ((strip1Len - 1) / 2)) : 0;
   const uint16_t strip1MidRight =
-      ProjectConfig::Strips::kStrip1Start + (strip1Len / 2);
+      (strip1Len > 0) ? (uint16_t)(win1.start + (strip1Len / 2)) : 0;
   const uint16_t strip2MidLeft =
-      ProjectConfig::Strips::kStrip2Start + ((strip2Len - 1) / 2);
+      (strip2Len > 0) ? (uint16_t)(win2.start + ((strip2Len - 1) / 2)) : 0;
   const uint16_t strip2MidRight =
-      ProjectConfig::Strips::kStrip2Start + (strip2Len / 2);
+      (strip2Len > 0) ? (uint16_t)(win2.start + (strip2Len / 2)) : 0;
 
   strip1.clear();
   strip2.clear();
@@ -315,12 +343,10 @@ static void startupAnimStep() {
   for (uint16_t i = 0; i < strip1Lit; i++) {
     const int16_t left = (int16_t)strip1MidLeft - (int16_t)i;
     const int16_t right = (int16_t)strip1MidRight + (int16_t)i;
-    if (left >= (int16_t)ProjectConfig::Strips::kStrip1Start &&
-        left < (int16_t)strip1.numPixels()) {
+    if (left >= (int16_t)win1.start && left <= (int16_t)win1.end) {
       strip1.setPixelColor((uint16_t)left, STARTUP_COLOR);
     }
-    if (right <= (int16_t)ProjectConfig::Strips::kStrip1End &&
-        right < (int16_t)strip1.numPixels() &&
+    if (right <= (int16_t)win1.end && right >= (int16_t)win1.start &&
         right != left) {
       strip1.setPixelColor((uint16_t)right, STARTUP_COLOR);
     }
@@ -329,12 +355,10 @@ static void startupAnimStep() {
   for (uint16_t i = 0; i < strip2Lit; i++) {
     const int16_t left = (int16_t)strip2MidLeft - (int16_t)i;
     const int16_t right = (int16_t)strip2MidRight + (int16_t)i;
-    if (left >= (int16_t)ProjectConfig::Strips::kStrip2Start &&
-        left < (int16_t)strip2.numPixels()) {
+    if (left >= (int16_t)win2.start && left <= (int16_t)win2.end) {
       strip2.setPixelColor((uint16_t)left, STARTUP_COLOR);
     }
-    if (right <= (int16_t)ProjectConfig::Strips::kStrip2End &&
-        right < (int16_t)strip2.numPixels() &&
+    if (right <= (int16_t)win2.end && right >= (int16_t)win2.start &&
         right != left) {
       strip2.setPixelColor((uint16_t)right, STARTUP_COLOR);
     }
@@ -394,13 +418,13 @@ static void toxicAnimPatternStep(uint32_t now) {
     strip1.clear();
     strip2.clear();
 
-    if (strip1.numPixels() > 0) {
-      const uint16_t p1 = toxicChasePos % strip1.numPixels();
-      strip1.setPixelColor(p1, TOXIC_ORANGE);
+    if (win1.len > 0) {
+      strip1.setPixelColor(windowIndex(win1, toxicChasePos), TOXIC_ORANGE);
     }
-    if (strip2.numPixels() > 0) {
-      const uint16_t p2 = strip2.numPixels() - 1 - (toxicChasePos % strip2.numPixels());
-      strip2.setPixelColor(p2, TOXIC_ORANGE);
+    if (win2.len > 0) {
+      // Strip 2 runs the chase backwards, mirroring strip 1.
+      const uint16_t offset = (uint16_t)(toxicChasePos % win2.len);
+      strip2.setPixelColor((uint16_t)(win2.end - offset), TOXIC_ORANGE);
     }
 
     strip1.show();
@@ -414,13 +438,17 @@ static void toxicAnimPatternStep(uint32_t now) {
           ? 1
           : ProjectConfig::Animation::kToxicAlternateHalfPeriodMs;
   const bool phase = (((now / halfPeriodMs) % 2) == 0);
-  for (uint16_t i = 0; i < strip1.numPixels(); i++) {
+  strip1.clear();
+  strip2.clear();
+  for (uint16_t i = 0; i < win1.len; i++) {
     const bool even = ((i % 2) == 0);
-    strip1.setPixelColor(i, (even == phase) ? TOXIC_MAGENTA : CYAN);
+    strip1.setPixelColor((uint16_t)(win1.start + i),
+                         (even == phase) ? TOXIC_MAGENTA : CYAN);
   }
-  for (uint16_t i = 0; i < strip2.numPixels(); i++) {
+  for (uint16_t i = 0; i < win2.len; i++) {
     const bool even = ((i % 2) == 0);
-    strip2.setPixelColor(i, (even == phase) ? CYAN : TOXIC_MAGENTA);
+    strip2.setPixelColor((uint16_t)(win2.start + i),
+                         (even == phase) ? CYAN : TOXIC_MAGENTA);
   }
   strip1.show();
   strip2.show();

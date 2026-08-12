@@ -86,7 +86,7 @@ There is no test project. In `DEBUG` builds, if no Arduino is connected the app 
 
 ### Firmware
 
-⚠️ Per `arduino/main/AGENTS.md`: **do not compile and do not flash** — the board is generally not connected. Edit firmware and update docs, but leave build/upload to the human. When they do build, the commands (from `arduino/README.md`) are:
+⚠️ Per `arduino/main/AGENTS.md`: **do not compile and do not flash** — the board is generally not connected. Edit firmware and update docs, but leave build/upload to the human. This rule is lifted only when the human says the board *is* on USB; see "Firmware debugging workflow" below. When they do build, the commands (from `arduino/README.md`) are:
 
 ```powershell
 # Set the Arduino IDE sketchbook to the arduino/ dir so libraries/DaevaMax is found.
@@ -95,6 +95,55 @@ arduino-cli compile --libraries arduino/libraries --fqbn "teensy:avr:teensy41:us
 ```
 
 Teensy upload has two non-obvious failure modes (the Teensy Loader app must be running; use the `teensy`-protocol port from `arduino-cli board list`, not the COM port) — details in `arduino/teensy_max/README.md`.
+
+### Firmware debugging workflow (Teensy 4.1)
+
+Toolchain setup, once per machine (nothing here ships with the repo):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=~/.local/bin sh
+arduino-cli config add board_manager.additional_urls https://www.pjrc.com/teensy/package_teensy_index.json
+arduino-cli core update-index && arduino-cli core install teensy:avr
+arduino-cli lib install "Adafruit NeoPixel"
+sudo cp ~/.arduino15/packages/teensy/tools/teensy-tools/*/00-teensy.rules /etc/udev/rules.d/   # needs root
+```
+
+Flash with `compile -u` — `--libraries` is rejected by the `upload` subcommand, and the port must be the `teensy`-protocol one, not `/dev/ttyACM*`:
+
+```bash
+PORT=$(arduino-cli board list | awk '$2=="teensy"{print $1}')
+arduino-cli compile -u -p "$PORT" --fqbn "teensy:avr:teensy41:usb=serial,speed=600,opt=o2std,keys=en-us" \
+  --libraries arduino/libraries arduino/teensy_max
+```
+
+**Always read board state from `lsusb -d 16c0:` first** — it distinguishes the two states that look identical from the host app's side:
+- `16c0:0478` HalfKay bootloader → **sketch is halted**, board is silent on `Serial1` and cannot communicate at all. Replugging USB exits it.
+- `16c0:0483` Teensyduino Serial → firmware is running. (`Serial1` is the host link; nothing is written to USB CDC.)
+
+Two misleading failure modes: without the udev rules the upload fails with *"Teensy did not respond to a USB-based request to enter program mode"* — that is a permissions error on the HalfKay HID device, not a board state; and udev rules only apply on re-enumeration, so replug after installing them.
+
+### Testing firmware against the real machine
+
+Pi 5 host: `ssh daeva-max@192.168.68.120`. The UI is a **user** unit — `systemctl --user {stop,start} daeva-max` — and it holds `/dev/ttyAMA0`, so stop it before touching the port and restart it after. Runtime env (backend URL, machine id/secret, `DAEVA_SERIAL_PORT`) lives in `~/.config/daeva/daeva-max.env`, sourced by the `~/.local/bin/daeva-max` wrapper — *not* in the systemd unit. There is no persistent journal; app stdout goes to `~/.xsession-errors`.
+
+Fastest end-to-end check is a UART round-trip:
+
+```bash
+systemctl --user stop daeva-max
+stty -F /dev/ttyAMA0 115200 cs8 -cstopb -parenb raw -echo
+timeout 8 cat /dev/ttyAMA0 &            # ACTIVE is refused for the first 10s (STARTUP)
+printf 'MANUTENZIONE\n' > /dev/ttyAMA0  # expect OK MANUTENZIONE
+printf 'READY\n' > /dev/ttyAMA0         # expect OK READY
+systemctl --user start daeva-max
+```
+
+`ACTIVE` physically runs pumps — confirm with the human first. A full cycle answers `OK ACTIVE` → `DONE` → `OK READY`; a second `ACTIVE` sent *during* the pour must answer `IGNORED ACTIVE` (this is the gate the host's retry safety depends on — leave enough time or you will accidentally test the wrong path).
+
+Pi UART config is already correct and rarely the fault (`/boot/firmware/config.txt`: `enable_uart=1`, `dtparam=uart0=on`; console on `ttyAMA10`, not `ttyAMA0`; `serial-getty@ttyAMA0` masked). Note the `rpi/` directory referenced by the deployed unit, wrapper, and `teensy_max/README.md` (`setup-uart.sh`, `setup-daeva.sh`, `deploy-machine.md`) **is not in this repo** — the Pi was provisioned by scripts that were never committed.
+
+### LED strips: no level shifter is fitted
+
+`Strips::kStrip1Margin` / `kStrip2Margin` in `ProjectConfig.h` must stay `0`. The Teensy's 3.3 V data output sits below the WS2812's 0.7 × VDD = 3.5 V threshold, so the whole strip depends on the *first* pixel latching a marginal signal — every later pixel gets a clean regenerated 5 V one. Any non-zero margin darkens that first pixel, which raises its local rail and threshold and makes scattered pixels flicker at random. Symptom: random per-pixel flicker that correlates with firmware changes but is actually electrical. Fix properly with a 74AHCT125/74HCT245, or drop strip VDD to ~4.3 V with a series diode.
 
 ### Pump tester
 
