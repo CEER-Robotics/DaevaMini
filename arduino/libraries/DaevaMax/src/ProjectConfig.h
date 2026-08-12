@@ -17,14 +17,14 @@ namespace Pump {
 // Number of pump channels supported by firmware.
 constexpr uint8_t kCount = 17;
 // Default PWM duty for pump activation (0-255).
-constexpr uint8_t kDefaultPwm = 110;
+constexpr uint8_t kDefaultPwm = 255;
 }  // namespace Pump
 
 namespace Strips {
 // Total LED count of strip 1.
-constexpr uint16_t kStrip1Len = 24;
+constexpr uint16_t kStrip1Len = 34;
 // Total LED count of strip 2.
-constexpr uint16_t kStrip2Len = 34;
+constexpr uint16_t kStrip2Len = 42;
 
 // First LED index used on strip 1.
 constexpr uint16_t kStrip1Start = 0;
@@ -60,7 +60,7 @@ namespace Animation {
 // Active animation selector: 1 chase, 2 dual-breathe, 3 bounce.
 constexpr uint8_t kActiveAnim = 3;
 // Global strip brightness applied at LED driver level (0-255).
-constexpr uint8_t kGlobalBrightness = 255;
+constexpr uint8_t kGlobalBrightness = 128;
 // Accent brightness used by active animation 1 (0-255).
 constexpr uint8_t kActiveAccentBrightness = 120;
 // Brightness step per frame for WAIT breathing effect.

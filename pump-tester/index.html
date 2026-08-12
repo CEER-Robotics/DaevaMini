@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daeva MAX Pump Tester</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      background: #f3f5f4;
+      color: #18201e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body { margin: 0; }
+
+    header {
+      min-height: 72px;
+      padding: 14px 20px;
+      background: #111817;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    header img {
+      width: 190px;
+      max-width: 46vw;
+      height: 34px;
+      object-fit: contain;
+      object-position: left center;
+    }
+
+    #status { font-size: 14px; color: #b9c3c0; }
+    #status.connected { color: #68d391; }
+
+    main {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      gap: 10px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #cbd2cf;
+    }
+
+    button, select, input {
+      min-height: 40px;
+      border: 1px solid #aeb8b4;
+      border-radius: 5px;
+      background: white;
+      color: #18201e;
+      font: inherit;
+    }
+
+    button {
+      padding: 0 14px;
+      cursor: pointer;
+      font-weight: 650;
+    }
+
+    button:disabled { cursor: not-allowed; opacity: 0.5; }
+    button:hover:not(:disabled) { background: #e8ecea; }
+
+    .run { background: #167d54; border-color: #167d54; color: white; }
+    .run:hover:not(:disabled) { background: #116743; }
+    .stop { background: #b63a3a; border-color: #b63a3a; color: white; }
+    .stop:hover:not(:disabled) { background: #982f2f; }
+
+    label.control {
+      display: grid;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 650;
+      color: #57615e;
+    }
+
+    select { padding: 0 34px 0 10px; }
+
+    .pumps {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin: 16px 0;
+    }
+
+    .pump {
+      min-height: 58px;
+      display: grid;
+      grid-template-columns: 28px minmax(84px, 1fr) minmax(110px, 150px);
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      background: white;
+      border: 1px solid #d2d8d5;
+      border-radius: 5px;
+    }
+
+    .pump:has(input[type="checkbox"]:checked) {
+      border-color: #167d54;
+      box-shadow: inset 3px 0 #167d54;
+    }
+
+    .pump input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      min-height: 20px;
+      accent-color: #167d54;
+    }
+
+    .pump-name { font-weight: 750; }
+    .pin { margin-left: 7px; color: #78817e; font-size: 12px; font-weight: 500; }
+
+    .duration {
+      width: 100%;
+      min-width: 0;
+      padding: 0 8px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .log-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+
+    .log-head h2 { margin: 0; font-size: 15px; }
+    .log-head button { min-height: 32px; padding: 0 10px; font-size: 13px; }
+
+    pre {
+      height: 170px;
+      margin: 8px 0 0;
+      overflow: auto;
+      padding: 12px;
+      border-radius: 5px;
+      background: #111817;
+      color: #d9e2df;
+      font: 13px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 680px) {
+      header { min-height: 64px; }
+      main { padding: 12px; }
+      .pumps { grid-template-columns: 1fr; }
+      .pump { grid-template-columns: 28px minmax(72px, 1fr) minmax(100px, 130px); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="../machine/Assets/DaevaMaxFinal.png" alt="Daeva MAX">
+    <div id="status">Disconnected</div>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <button id="connect">Connect</button>
+      <button id="all">All</button>
+      <button id="none">None</button>
+
+      <label class="control">
+        LED color
+        <select id="color">
+          <option>WHITE</option>
+          <option>ORANGE</option>
+          <option>RED</option>
+          <option>GREEN</option>
+          <option>BLUE</option>
+          <option>CYAN</option>
+          <option>MAGENTA</option>
+          <option>YELLOW</option>
+          <option>WARM_WHITE</option>
+          <option>PURPLE</option>
+        </select>
+      </label>
+
+      <button id="run" class="run" disabled>Run selected</button>
+      <button id="stop" class="stop" disabled>Stop all</button>
+    </div>
+
+    <div id="pumps" class="pumps"></div>
+
+    <div class="log-head">
+      <h2>Serial log</h2>
+      <button id="clear">Clear</button>
+    </div>
+    <pre id="log"></pre>
+  </main>
+
+  <script>
+    const pumpPins = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18, 19, 22, 23, 24, 25, 28];
+    const pumps = document.querySelector('#pumps');
+    const status = document.querySelector('#status');
+    const connectButton = document.querySelector('#connect');
+    const runButton = document.querySelector('#run');
+    const stopButton = document.querySelector('#stop');
+    const log = document.querySelector('#log');
+
+    let port = null;
+    let reader = null;
+    let reading = false;
+    let readTask = null;
+    let receiveBuffer = '';
+
+    pumpPins.forEach((pin, index) => {
+      const pump = index + 1;
+      const row = document.createElement('label');
+      row.className = 'pump';
+      row.innerHTML = `
+        <input class="enabled" type="checkbox" aria-label="Enable pump ${pump}">
+        <span class="pump-name">P${pump}<span class="pin">pin ${pin}</span></span>
+        <input class="duration" type="number" min="1" max="600000" step="100" value="2000" aria-label="Pump ${pump} duration in milliseconds">
+      `;
+      pumps.append(row);
+    });
+
+    function writeLog(prefix, message) {
+      const time = new Date().toLocaleTimeString();
+      log.textContent += `[${time}] ${prefix} ${message}\n`;
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function setConnected(connected) {
+      status.textContent = connected ? 'Connected' : 'Disconnected';
+      status.classList.toggle('connected', connected);
+      connectButton.textContent = connected ? 'Disconnect' : 'Connect';
+      runButton.disabled = !connected;
+      stopButton.disabled = !connected;
+    }
+
+    async function readSerial() {
+      const decoder = new TextDecoder();
+      reading = true;
+
+      try {
+        while (port?.readable && reading) {
+          reader = port.readable.getReader();
+          try {
+            while (reading) {
+              const { value, done } = await reader.read();
+              if (done) break;
+
+              receiveBuffer += decoder.decode(value, { stream: true });
+              const lines = receiveBuffer.split(/\r?\n/);
+              receiveBuffer = lines.pop() ?? '';
+              lines.filter(Boolean).forEach(line => writeLog('<', line));
+            }
+          } finally {
+            reader.releaseLock();
+            reader = null;
+          }
+        }
+      } catch (error) {
+        if (reading) writeLog('!', error.message);
+      }
+    }
+
+    async function connect() {
+      if (!('serial' in navigator)) {
+        writeLog('!', 'Web Serial is not supported by this browser.');
+        return;
+      }
+
+      try {
+        port = await navigator.serial.requestPort({ filters: [{ usbVendorId: 0x16c0 }] });
+        await port.open({ baudRate: 115200 });
+        setConnected(true);
+        writeLog('+', 'Connected');
+        readTask = readSerial();
+      } catch (error) {
+        writeLog('!', error.message);
+        port = null;
+        setConnected(false);
+      }
+    }
+
+    async function disconnect() {
+      reading = false;
+      if (reader) await reader.cancel().catch(() => {});
+      if (readTask) await readTask.catch(() => {});
+      if (port) await port.close().catch(() => {});
+      port = null;
+      receiveBuffer = '';
+      setConnected(false);
+      writeLog('-', 'Disconnected');
+    }
+
+    async function send(command) {
+      if (!port?.writable) return;
+      const writer = port.writable.getWriter();
+      try {
+        await writer.write(new TextEncoder().encode(`${command}\n`));
+        writeLog('>', command);
+      } finally {
+        writer.releaseLock();
+      }
+    }
+
+    connectButton.addEventListener('click', () => port ? disconnect() : connect());
+
+    document.querySelector('#all').addEventListener('click', () => {
+      document.querySelectorAll('.enabled').forEach(input => input.checked = true);
+    });
+
+    document.querySelector('#none').addEventListener('click', () => {
+      document.querySelectorAll('.enabled').forEach(input => input.checked = false);
+    });
+
+    runButton.addEventListener('click', async () => {
+      const segments = [...document.querySelectorAll('.pump')]
+        .map((row, index) => ({
+          enabled: row.querySelector('.enabled').checked,
+          duration: Number(row.querySelector('.duration').value),
+          pump: index + 1
+        }))
+        .filter(item => item.enabled && Number.isInteger(item.duration) && item.duration > 0)
+        .map(item => `P${item.pump}:${item.duration}`);
+
+      if (!segments.length) {
+        writeLog('!', 'Select at least one pump with a valid duration.');
+        return;
+      }
+
+      await send(`ACTIVE, BASE:${document.querySelector('#color').value}, ${segments.join(', ')}`);
+    });
+
+    stopButton.addEventListener('click', async () => {
+      await send('TOXIC');
+      await new Promise(resolve => setTimeout(resolve, 100));
+      await send('READY');
+    });
+
+    document.querySelector('#clear').addEventListener('click', () => log.textContent = '');
+    navigator.serial?.addEventListener('disconnect', event => {
+      if (event.target === port) disconnect();
+    });
+
+    if (!('serial' in navigator)) {
+      connectButton.disabled = true;
+      writeLog('!', 'Open this page in Chrome or Edge.');
+    }
+  </script>
+</body>
+</html>

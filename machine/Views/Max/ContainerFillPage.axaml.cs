@@ -107,7 +107,7 @@ public partial class ContainerFillPage : UserControl
             channelDurations);
         Console.WriteLine($"[ContainerFillPage] Sending: {command}");
 
-        bool sent = manager.Send(command);
+        bool sent = manager.TrySendActive(command, out ActivateResponse response);
         if (!sent)
         {
             Console.WriteLine("[ContainerFillPage] Failed to send command");
@@ -119,8 +119,6 @@ public partial class ContainerFillPage : UserControl
             return;
         }
 
-        string? responseLine = manager.ReadLine();
-        var response = ArduinoProtocolHelper.ParseActivateResponse(responseLine);
         Console.WriteLine($"[ContainerFillPage] Response: {response}");
         if (response != ActivateResponse.Success)
         {

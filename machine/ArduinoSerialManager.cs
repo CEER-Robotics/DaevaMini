@@ -89,7 +89,80 @@ public sealed class ArduinoSerialManager : IDisposable
         return _serial.ReadLine();
     }
 
-    private const string ForcedPort = null; // set to null to use auto-detect
+    /// <summary>
+    /// Sends an ACTIVE command and waits for the firmware to acknowledge it, retrying
+    /// when the command is lost on the wire. Returns false only if the write itself
+    /// failed; otherwise <paramref name="response"/> carries the firmware's answer.
+    /// </summary>
+    /// <remarks>
+    /// The board loses inbound bytes while its LED driver has interrupts disabled, and
+    /// answers nothing at all for a line it cannot parse, so a dropped command is
+    /// indistinguishable from silence and has to be repeated. Retrying cannot pour
+    /// twice: once the firmware is dispensing it is no longer in WAIT, so it replies
+    /// IGNORED ACTIVE and returns before scheduling any pump.
+    /// </remarks>
+    public bool TrySendActive(string command, out ActivateResponse response, int attempts = 3)
+    {
+        response = ActivateResponse.NoResponse;
+
+        for (int attempt = 1; attempt <= attempts; attempt++)
+        {
+            if (!Send(command))
+                return false;
+
+            response = AwaitActivateResponse();
+
+            // A resend that comes back IGNORED means the board is no longer in WAIT —
+            // i.e. it is already dispensing the command we just repeated, so the lost
+            // one did land. Reporting that as a failure would show an error on screen
+            // while the pour is running.
+            if (response == ActivateResponse.Ignored && attempt > 1)
+            {
+                Console.WriteLine("[ArduinoManager] Resend reported IGNORED: the earlier ACTIVE was accepted, treating as success");
+                response = ActivateResponse.Success;
+                return true;
+            }
+
+            if (response != ActivateResponse.NoResponse)
+                return true;
+
+            if (attempt < attempts)
+                Console.WriteLine($"[ArduinoManager] No answer to ACTIVE (attempt {attempt}/{attempts}), resending");
+        }
+
+        Console.WriteLine($"[ArduinoManager] ACTIVE unanswered after {attempts} attempts");
+        return true;
+    }
+
+    /// Reads until the firmware says something about the ACTIVE we just sent, stepping
+    /// over any unsolicited notification that arrives first.
+    private ActivateResponse AwaitActivateResponse()
+    {
+        const int maxLines = 4;
+
+        for (int i = 0; i < maxLines; i++)
+        {
+            string? line = ReadLine();
+            if (line == null)
+                return ActivateResponse.NoResponse;
+
+            ActivateResponse parsed = ArduinoProtocolHelper.ParseActivateResponse(line);
+            if (parsed != ActivateResponse.NoResponse)
+                return parsed;
+
+            Console.WriteLine($"[ArduinoManager] Ignoring unsolicited line while waiting for ACTIVE ack: {line.Trim()}");
+        }
+
+        return ActivateResponse.NoResponse;
+    }
+
+    // Explicit port override, e.g. DAEVA_SERIAL_PORT=/dev/ttyAMA0 when the board
+    // is wired to the Pi's GPIO 14/15 UART instead of USB. Auto-detection cannot
+    // resolve that case on its own: it prefers ttyUSB/ttyACM/COM names, and the
+    // fallback takes whichever port the OS happens to list first — on a Pi 5
+    // that is as likely to be the debug UART as the board. Unset = auto-detect.
+    private static readonly string? ForcedPort =
+        Environment.GetEnvironmentVariable("DAEVA_SERIAL_PORT");
 
     private static string? FindArduinoPort()
     {

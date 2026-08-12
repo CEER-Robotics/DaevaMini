@@ -157,7 +157,7 @@ public partial class MainWindow : Window
                 return;
             }
 
-            if (!manager.Send(command))
+            if (!manager.TrySendActive(command, out ActivateResponse response))
             {
                 Console.WriteLine("[MainWindow] Failed to send command");
                 MachineTelemetryService.Instance.RecordDispenseEvent(profileKey, "failed", cocktail, null, channelDurations, new
@@ -167,13 +167,12 @@ public partial class MainWindow : Window
                 return;
             }
 
+            Console.WriteLine($"[MainWindow] Arduino response: {response}");
+
             int totalDuration = 0;
             foreach (var ms in channelDurations.Values)
                 if (ms > totalDuration) totalDuration = ms;
             var dispensingTask = card.StartDispensing(totalDuration);
-
-            var response = ArduinoProtocolHelper.ParseActivateResponse(manager.ReadLine());
-            Console.WriteLine($"[MainWindow] Arduino response: {response}");
             if (response != ActivateResponse.Success)
             {
                 await dispensingTask;

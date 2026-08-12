@@ -107,6 +107,11 @@ public class ArduinoSerial : IDisposable
                 {
                     if (_port?.IsOpen == true)
                     {
+                        // Start each command from a clean slate. The firmware emits
+                        // unsolicited lines (DONE when a pour finishes, OK READY when it
+                        // re-enters WAIT); left in the buffer they would be read back as
+                        // the answer to this command.
+                        _port.DiscardInBuffer();
                         _port.WriteLine(command);
                         return true;
                     }
