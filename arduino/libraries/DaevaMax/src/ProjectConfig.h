@@ -93,7 +93,7 @@ namespace Animation {
 // Active animation selector: 1 chase, 2 dual-breathe, 3 bounce.
 constexpr uint8_t kActiveAnim = 3;
 // Global strip brightness applied at LED driver level (0-255).
-constexpr uint8_t kGlobalBrightness = 128;
+constexpr uint8_t kGlobalBrightness = 102;
 // Accent brightness used by active animation 1 (0-255).
 constexpr uint8_t kActiveAccentBrightness = 120;
 // Brightness step per frame for WAIT breathing effect.
