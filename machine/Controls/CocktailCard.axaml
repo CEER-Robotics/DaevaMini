@@ -81,7 +81,7 @@
             <StackPanel Orientation="Horizontal" Spacing="12">
                 <PathIcon Width="24" Height="24" Foreground="#E7E6DC"
                           Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
-                <TextBlock Text="BACK TO MENU" Foreground="#E7E6DC" FontFamily="Space Grotesk"
+                <TextBlock Text="TORNA AL MENU" Foreground="#E7E6DC" FontFamily="Space Grotesk"
                            FontWeight="Bold" FontSize="18" VerticalAlignment="Center"/>
             </StackPanel>
         </Button>
@@ -130,12 +130,12 @@
                 </ItemsControl>
 
                 <TextBlock Canvas.Left="640" Canvas.Top="540" Width="700" Height="48"
-                           Text="Precision mixed by Daeva Max." Foreground="#E7E6DC"
+                           Text="Miscelato con precisione da Daeva Max." Foreground="#E7E6DC"
                            FontSize="18" TextWrapping="Wrap" LineHeight="28" Opacity="0.8"/>
 
                 <Button x:Name="DaleButton" Canvas.Left="640" Canvas.Top="620" Width="400" Height="80"
                         Classes="StartPourBtn">
-                    <TextBlock Text="START POUR" Foreground="#000000" FontSize="28" FontWeight="Bold"
+                    <TextBlock Text="EROGA" Foreground="#000000" FontSize="28" FontWeight="Bold"
                                FontFamily="Space Grotesk" LetterSpacing="2"/>
                 </Button>
 

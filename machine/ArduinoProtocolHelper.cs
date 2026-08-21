@@ -92,6 +92,14 @@ public static class ArduinoProtocolHelper
     /// </summary>
     public static Dictionary<int, int> MapIngredientsToChannels(
         IReadOnlyList<CocktailIngredient> ingredients, string[] assignments, int msPerMl)
+        => MapIngredientsToChannels(ingredients, assignments, _ => msPerMl);
+
+    /// <summary>
+    /// Same mapping, but the rate is asked per channel: a keg and a peristaltic pump
+    /// do not share a flow rate.
+    /// </summary>
+    public static Dictionary<int, int> MapIngredientsToChannels(
+        IReadOnlyList<CocktailIngredient> ingredients, string[] assignments, Func<int, int> msPerMlForChannel)
     {
         var channelDurations = new Dictionary<int, int>();
         foreach (var ingredient in ingredients)
@@ -101,7 +109,7 @@ public static class ArduinoProtocolHelper
                 if (assignments[position].Equals(ingredient.Name, StringComparison.OrdinalIgnoreCase))
                 {
                     int channel = position + 1;
-                    int durationMs = ingredient.Milliliters * msPerMl;
+                    int durationMs = ingredient.Milliliters * msPerMlForChannel(channel);
                     if (channelDurations.ContainsKey(channel))
                         channelDurations[channel] += durationMs;
                     else

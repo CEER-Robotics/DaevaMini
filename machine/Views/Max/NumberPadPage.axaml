@@ -37,7 +37,7 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
                 <PathIcon Width="20" Height="20" Foreground="#E7E6DC" Margin="0,0,12,0"
                           Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
-                <TextBlock Text="BACK TO MENU" Foreground="#E7E6DC" FontSize="18" FontFamily="Space Grotesk"
+                <TextBlock Text="TORNA AL MENU" Foreground="#E7E6DC" FontSize="18" FontFamily="Space Grotesk"
                            FontWeight="Bold" LetterSpacing="2" VerticalAlignment="Center"/>
             </StackPanel>
         </Button>
@@ -48,7 +48,7 @@
                 <PathIcon Width="48" Height="48" Foreground="#CAF0F8"
                           Data="M12,17A2,2 0 0,0 14,15C14,13.89 13.11,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8,6A4,4 0 0,1 12,2A4,4 0 0,1 16,6V8H8V6Z"/>
 
-                <TextBlock x:Name="PromptText" Text="ENTER PIN" Foreground="#E7E6DC" FontSize="20"
+                <TextBlock x:Name="PromptText" Text="INSERISCI PIN" Foreground="#E7E6DC" FontSize="20"
                            FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="3"
                            HorizontalAlignment="Center" Margin="0,30,0,0"/>
 
@@ -107,7 +107,7 @@
                     </Button>
                     <Button Classes="InvisibleBtn" Margin="7" Click="Clear_Click">
                         <Border Background="#05FFFFFF" CornerRadius="12">
-                            <TextBlock Text="CLEAR" Foreground="#E7E6DC" FontSize="20" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="CANCELLA" Foreground="#E7E6DC" FontSize="20" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </Button>
                     <Button Classes="InvisibleBtn" Margin="7" Tag="0" Click="Num_Click">

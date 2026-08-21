@@ -20,9 +20,11 @@ public partial class ContainerCleanPage : UserControl
         _bottles =
         [
             Bottle1, Bottle2, Bottle3, Bottle4, Bottle5,
-            Bottle6, Bottle7, Bottle8, Bottle9, Bottle10
+            Bottle6, Bottle7, Bottle8, Bottle9, Bottle10,
+            Keg1, Keg2, Keg3, Keg4
         ];
         ApplyLiquidAssignments();
+        ApplyKegAvailability();
     }
 
     protected override void OnLoaded(RoutedEventArgs e)
@@ -39,7 +41,7 @@ public partial class ContainerCleanPage : UserControl
 
     private void ApplyLiquidAssignments()
     {
-        var assignments = AppConfigService.Instance.Config.LiquidAssignments;
+        var assignments = AppConfigService.Instance.Config.GetActiveLiquidAssignments();
 
         for (int i = 0; i < _bottles.Length; i++)
         {
@@ -137,7 +139,7 @@ public partial class ContainerCleanPage : UserControl
 
     private async Task FinishClean(int delayMs, List<int> cleanedChannels)
     {
-        await Task.Delay(delayMs);
+        await ShowCleanProgress(delayMs, cleanedChannels);
         foreach (int ch in cleanedChannels)
         {
             int idx = ch - 1;
@@ -149,5 +151,47 @@ public partial class ContainerCleanPage : UserControl
             }
         }
         CleanBtn.IsEnabled = true;
+    }
+
+    /// <summary>
+    /// Marks the kegs as unusable while the machine runs as a small event: they stay
+    /// visible, crossed out, so it is clear they exist but are not connected right now.
+    /// </summary>
+    private void ApplyKegAvailability()
+    {
+        bool large = AppConfigService.Instance.Config.IsLargeEvent;
+        Keg1Blocked.IsVisible = !large;
+        Keg2Blocked.IsVisible = !large;
+        Keg3Blocked.IsVisible = !large;
+        Keg4Blocked.IsVisible = !large;
+    }
+
+    /// <summary>Runs the wait as a visible progress bar rather than a frozen screen.</summary>
+    private async Task ShowCleanProgress(int durationMs, List<int> channels)
+    {
+        var assignments = AppConfigService.Instance.Config.GetActiveLiquidAssignments();
+        var names = channels
+            .Select(ch => ch - 1 < assignments.Length && !string.IsNullOrWhiteSpace(assignments[ch - 1])
+                ? assignments[ch - 1]
+                : $"Line {ch}");
+        CleanProgressDetail.Text = string.Join("   ·   ", names);
+
+        CleanProgress.Value = 0;
+        CleanProgressOverlay.IsVisible = true;
+        try
+        {
+            const int updateIntervalMs = 50;
+            int elapsed = 0;
+            while (elapsed < durationMs)
+            {
+                await Task.Delay(updateIntervalMs);
+                elapsed += updateIntervalMs;
+                CleanProgress.Value = Math.Min(100.0 * elapsed / durationMs, 100);
+            }
+        }
+        finally
+        {
+            CleanProgressOverlay.IsVisible = false;
+        }
     }
 }

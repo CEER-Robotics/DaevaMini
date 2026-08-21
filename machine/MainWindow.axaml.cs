@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using DaevaMini.Config;
 using DaevaMini.Controls;
 using DaevaMini.Models;
@@ -16,14 +20,25 @@ public partial class MainWindow : Window
     private UserControl? _cocktailMenuView;
     private bool _isDispensing;
 
+    // The machine's panel. Pages position everything with absolute Canvas
+    // coordinates against this size, so it must not change.
+    private const double DesignWidth = 1920;
+    private const double DesignHeight = 1080;
+
     public MainWindow()
     {
         InitializeComponent();
 #if DEBUG
-        Width = 1920;
-        Height = 1080;
+        // Dev preview: keep the 1920x1080 design and scale the window down to fit,
+        // rather than letting a smaller screen crop it. The screen is only known
+        // once the window is open, so the sizing happens in OnOpened.
+        Width = DesignWidth;
+        Height = DesignHeight;
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
 #else
+        // On the machine the window is exactly 1920x1080, so scaling would be a
+        // no-op anyway - disable it and keep the original rendering path.
+        RootScaler.Stretch = Stretch.None;
         WindowState = WindowState.FullScreen;
         SystemDecorations = SystemDecorations.None;
         ExtendClientAreaToDecorationsHint = true;
@@ -31,6 +46,44 @@ public partial class MainWindow : Window
         _pageContainer = this.FindControl<ContentControl>("PageContainer");
         ShowSplash();
     }
+
+#if DEBUG
+    protected override void OnOpened(EventArgs e)
+    {
+        base.OnOpened(e);
+        FitPreviewToScreen();
+    }
+
+    // Shrink the window until the whole 1920x1080 design fits on this screen, so the
+    // preview shows the same framing as the machine's panel instead of a crop.
+    // RootScaler does the actual scaling; no design coordinate is touched.
+    private void FitPreviewToScreen()
+    {
+        var screen = Screens.ScreenFromWindow(this) ?? Screens.Primary;
+        if (screen is null) return;
+
+        // WorkingArea is in physical pixels; Width/Height are logical units.
+        double availableWidth = screen.WorkingArea.Width / screen.Scaling;
+        double availableHeight = screen.WorkingArea.Height / screen.Scaling;
+
+        // Width/Height cover the whole window, so keep the frame out of the maths.
+        double frameWidth = Width - ClientSize.Width;
+        double frameHeight = Height - ClientSize.Height;
+
+        double scale = Math.Min(
+            (availableWidth - frameWidth) / DesignWidth,
+            (availableHeight - frameHeight) / DesignHeight);
+
+        if (scale >= 1 || scale <= 0) return;
+
+        Width = Math.Floor(DesignWidth * scale) + frameWidth;
+        Height = Math.Floor(DesignHeight * scale) + frameHeight;
+
+        Position = new PixelPoint(
+            screen.WorkingArea.X + (int)((screen.WorkingArea.Width - Width * screen.Scaling) / 2),
+            screen.WorkingArea.Y + (int)((screen.WorkingArea.Height - Height * screen.Scaling) / 2));
+    }
+#endif
 
     public void ShowSplash()
     {
@@ -55,6 +108,7 @@ public partial class MainWindow : Window
             DataContext = menuViewModel
         };
         menu.BackClicked += OnCocktailMenuBackClicked;
+        menu.PourHandler = DispenseAsync;
         _cocktailMenuView = menu;
         _pageContainer.Content = menu;
     }
@@ -94,7 +148,40 @@ public partial class MainWindow : Window
     {
         if (sender is not CocktailCard card || card.DataContext is not Cocktail cocktail)
             return;
-        if (_isDispensing) return;
+
+        await DispenseAsync(cocktail, card.StartDispensing);
+    }
+
+    /// <summary>
+    /// Runs a dispense for the given cocktail. <paramref name="showProgress"/> renders the
+    /// progress for the requested duration, so the caller decides where it appears: the
+    /// detail card or a card in the menu grid.
+    /// </summary>
+    /// <summary>Subtracts the poured millilitres from the bottle on each line.</summary>
+    private static void RecordBottleUsage(Cocktail cocktail, AppConfig config)
+    {
+        var perChannel = new Dictionary<int, int>();
+        var assignments = config.GetActiveLiquidAssignments();
+        foreach (var ingredient in cocktail.Ingredients)
+        {
+            for (int index = 0; index < assignments.Length; index++)
+            {
+                if (!assignments[index].Equals(ingredient.Name, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                int channel = index + 1;
+                perChannel[channel] = perChannel.GetValueOrDefault(channel) + ingredient.Milliliters;
+                break;
+            }
+        }
+
+        MachineWarningService.Instance.RecordConsumption(perChannel);
+    }
+
+    /// <returns>True when the drink was actually poured, so the caller can confirm it to the guest.</returns>
+    private async Task<bool> DispenseAsync(Cocktail cocktail, Func<int, Task> showProgress)
+    {
+        if (_isDispensing) return false;
 
         string profileKey = AppConfigService.Instance.CurrentProfileKey;
         using var runtimeOperation = MachineRuntimeState.Instance.BeginOperation("dispense");
@@ -106,7 +193,7 @@ public partial class MainWindow : Window
             {
                 reason = "no-ingredients"
             });
-            return;
+            return false;
         }
 
         _isDispensing = true;
@@ -116,7 +203,7 @@ public partial class MainWindow : Window
 
             var config = AppConfigService.Instance.Config;
             var channelDurations = ArduinoProtocolHelper.MapIngredientsToChannels(
-                cocktail.Ingredients, config.LiquidAssignments, config.FlowRate.MillisecondsPerMilliliter);
+                cocktail.Ingredients, config.GetActiveLiquidAssignments(), config.GetFlowRateMsPerMl);
             if (channelDurations.Count == 0)
             {
                 Console.WriteLine($"[MainWindow] No matching ingredients for {cocktail.Title}");
@@ -124,7 +211,7 @@ public partial class MainWindow : Window
                 {
                     reason = "no-channel-mapping"
                 });
-                return;
+                return false;
             }
 
             string command = cocktail.LedRgb is { } rgb
@@ -140,7 +227,7 @@ public partial class MainWindow : Window
                 foreach (var ms in channelDurations.Values)
                     if (ms > totalDurationDebug) totalDurationDebug = ms;
                 Console.WriteLine($"[MainWindow] DEBUG: simulating dispense for {totalDurationDebug}ms");
-                await card.StartDispensing(totalDurationDebug);
+                await showProgress(totalDurationDebug);
                 MachineTelemetryService.Instance.RecordDispenseEvent(
                     profileKey,
                     "completed",
@@ -153,8 +240,9 @@ public partial class MainWindow : Window
                 {
                     reason = "arduino-not-connected"
                 });
+                return false;
 #endif
-                return;
+                return true;
             }
 
             if (!manager.TrySendActive(command, out ActivateResponse response))
@@ -164,7 +252,7 @@ public partial class MainWindow : Window
                 {
                     reason = "send-failed"
                 });
-                return;
+                return false;
             }
 
             Console.WriteLine($"[MainWindow] Arduino response: {response}");
@@ -172,7 +260,7 @@ public partial class MainWindow : Window
             int totalDuration = 0;
             foreach (var ms in channelDurations.Values)
                 if (ms > totalDuration) totalDuration = ms;
-            var dispensingTask = card.StartDispensing(totalDuration);
+            var dispensingTask = showProgress(totalDuration);
             if (response != ActivateResponse.Success)
             {
                 await dispensingTask;
@@ -181,11 +269,13 @@ public partial class MainWindow : Window
                     reason = "arduino-response",
                     response = response.ToString()
                 });
-                return;
+                return false;
             }
 
             await dispensingTask;
             MachineTelemetryService.Instance.RecordDispenseEvent(profileKey, "completed", cocktail, null, channelDurations);
+            RecordBottleUsage(cocktail, config);
+            return true;
         }
         catch (Exception ex)
         {
@@ -200,6 +290,20 @@ public partial class MainWindow : Window
         {
             _isDispensing = false;
         }
+
+        return false;
+    }
+
+    public void ShowDosesPage()
+    {
+        if (_pageContainer != null)
+            _pageContainer.Content = new DosesPage();
+    }
+
+    public void ShowFlowRatePage()
+    {
+        if (_pageContainer != null)
+            _pageContainer.Content = new FlowRatePage();
     }
 
     public void ShowSettingsPage()

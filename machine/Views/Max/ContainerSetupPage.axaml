@@ -75,7 +75,7 @@
                             VerticalAlignment="Center"
                             Spacing="20"
                             Margin="30,0">
-                    <TextBlock Text="Insert the correct liquids"
+                    <TextBlock Text="Inserisci i liquidi corretti"
                                Foreground="White"
                                FontSize="32"
                                FontWeight="SemiBold"
@@ -137,7 +137,7 @@
                     CornerRadius="20"
                     Background="#539CA8"
                     Click="OnDone">
-                <TextBlock Text="Done"
+                <TextBlock Text="Fatto"
                            Foreground="#000000"
                            FontSize="28"
                            FontWeight="SemiBold"/>

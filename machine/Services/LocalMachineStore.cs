@@ -93,6 +93,14 @@ public sealed class LocalMachineStore
                     updated_at_utc TEXT NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS line_levels (
+                    profile_key TEXT NOT NULL,
+                    channel INTEGER NOT NULL,
+                    consumed_ml INTEGER NOT NULL DEFAULT 0,
+                    updated_at_utc TEXT NOT NULL,
+                    PRIMARY KEY (profile_key, channel)
+                );
+
                 CREATE INDEX IF NOT EXISTS idx_machine_events_operation
                     ON machine_events(operation_type, status, occurred_at_utc);
 
@@ -495,6 +503,71 @@ public sealed class LocalMachineStore
         var connection = new SqliteConnection(_connectionString);
         connection.Open();
         return connection;
+    }
+
+    /// <summary>Millilitres poured per line since the bottle was last marked as replaced.</summary>
+    public Dictionary<int, int> GetLineConsumption(string profileKey)
+    {
+        Initialize();
+
+        var result = new Dictionary<int, int>();
+        using var connection = OpenConnection();
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT channel, consumed_ml FROM line_levels WHERE profile_key = $profile_key;";
+        command.Parameters.AddWithValue("$profile_key", profileKey);
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+            result[reader.GetInt32(0)] = reader.GetInt32(1);
+        return result;
+    }
+
+    /// <summary>Adds what a pour took out of each line.</summary>
+    public void AddLineConsumption(string profileKey, IReadOnlyDictionary<int, int> millilitresPerChannel)
+    {
+        if (millilitresPerChannel.Count == 0) return;
+        Initialize();
+
+        using var connection = OpenConnection();
+        foreach (var pair in millilitresPerChannel)
+        {
+            if (pair.Value <= 0) continue;
+
+            using var command = connection.CreateCommand();
+            command.CommandText =
+                """
+                INSERT INTO line_levels (profile_key, channel, consumed_ml, updated_at_utc)
+                VALUES ($profile_key, $channel, $consumed_ml, $updated_at_utc)
+                ON CONFLICT(profile_key, channel) DO UPDATE SET
+                    consumed_ml = consumed_ml + excluded.consumed_ml,
+                    updated_at_utc = excluded.updated_at_utc;
+                """;
+            command.Parameters.AddWithValue("$profile_key", profileKey);
+            command.Parameters.AddWithValue("$channel", pair.Key);
+            command.Parameters.AddWithValue("$consumed_ml", pair.Value);
+            command.Parameters.AddWithValue("$updated_at_utc", DateTime.UtcNow.ToString("O"));
+            command.ExecuteNonQuery();
+        }
+    }
+
+    /// <summary>Called when a bottle is swapped: the line starts counting from zero again.</summary>
+    public void ResetLineConsumption(string profileKey, int channel)
+    {
+        Initialize();
+
+        using var connection = OpenConnection();
+        using var command = connection.CreateCommand();
+        command.CommandText =
+            """
+            INSERT INTO line_levels (profile_key, channel, consumed_ml, updated_at_utc)
+            VALUES ($profile_key, $channel, 0, $updated_at_utc)
+            ON CONFLICT(profile_key, channel) DO UPDATE SET
+                consumed_ml = 0,
+                updated_at_utc = excluded.updated_at_utc;
+            """;
+        command.Parameters.AddWithValue("$profile_key", profileKey);
+        command.Parameters.AddWithValue("$channel", channel);
+        command.Parameters.AddWithValue("$updated_at_utc", DateTime.UtcNow.ToString("O"));
+        command.ExecuteNonQuery();
     }
 }
 

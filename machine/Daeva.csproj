@@ -36,6 +36,7 @@
       <AvaloniaResource Include="Assets\gear.svg" />
       <AvaloniaResource Include="Assets\DaevaDark.png" />
       <AvaloniaResource Include="Assets\camparispritz.png" />
+      <AvaloniaResource Include="Assets\spritz.png" />
       <AvaloniaResource Include="Assets\DaevaMiniLogo.png" />
       <AvaloniaResource Include="Assets\DaevaWhite.png" />
     </ItemGroup>

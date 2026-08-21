@@ -38,7 +38,7 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
                 <PathIcon Width="20" Height="20" Foreground="#E7E6DC" Margin="0,0,12,0"
                           Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
-                <TextBlock Text="BACK" Foreground="#E7E6DC" FontSize="16" FontFamily="Space Grotesk"
+                <TextBlock Text="INDIETRO" Foreground="#E7E6DC" FontSize="16" FontFamily="Space Grotesk"
                            FontWeight="Bold" LetterSpacing="2" VerticalAlignment="Center"/>
             </StackPanel>
         </Button>
@@ -47,9 +47,31 @@
                    FontSize="28" FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="4"
                    HorizontalAlignment="Center" TextAlignment="Center"/>
 
-        <Border Canvas.Left="260" Canvas.Top="260" Width="1400" Height="460" CornerRadius="32"
+        <Border Canvas.Left="260" Canvas.Top="110" Width="1400" Height="880" CornerRadius="32"
                 Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1">
-            <StackPanel VerticalAlignment="Center" Margin="60" Spacing="25">
+            <StackPanel VerticalAlignment="Center" Margin="60,40" Spacing="18">
+
+                <Border Height="140" CornerRadius="24" Background="#0CFFFFFF" Padding="30,0">
+                    <Grid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="24">
+                            <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
+                                <PathIcon Width="24" Height="24" Foreground="#E7E6DC"
+                                          Data="M3,2H21V4H20V8A4,4 0 0,1 16,12H14V20H17V22H7V20H10V12H8A4,4 0 0,1 4,8V4H3V2M6,4V8A2,2 0 0,0 8,10H16A2,2 0 0,0 18,8V4H6Z"/>
+                            </Border>
+                            <TextBlock Text="Dosi dei cocktail" Foreground="#E7E6DC" FontSize="24"
+                                       FontFamily="Space Grotesk" FontWeight="Medium" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <Button Classes="InvisibleBtn" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Click="OnDosesClick" Width="160" Height="54">
+                            <Border Background="#CAF0F8" CornerRadius="27">
+                                <TextBlock Text="APRI" Foreground="#131818" FontWeight="Bold" FontSize="18"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
+                            </Border>
+                        </Button>
+                    </Grid>
+                </Border>
+
 
                 <Border Height="140" CornerRadius="24" Background="#0CFFFFFF" Padding="30,0">
                     <Grid>
@@ -65,7 +87,7 @@
                         <Button Classes="InvisibleBtn" HorizontalAlignment="Right" VerticalAlignment="Center"
                                 Click="OnFillingClick" Width="160" Height="54">
                             <Border Background="#CAF0F8" CornerRadius="27">
-                                <TextBlock Text="START" Foreground="#131818" FontWeight="Bold" FontSize="18"
+                                <TextBlock Text="AVVIA" Foreground="#131818" FontWeight="Bold" FontSize="18"
                                            HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
                             </Border>
                         </Button>
@@ -86,10 +108,71 @@
                         <Button Classes="InvisibleBtn" HorizontalAlignment="Right" VerticalAlignment="Center"
                                 Click="OnCleaningClick" Width="160" Height="54">
                             <Border Background="#CAF0F8" CornerRadius="27">
-                                <TextBlock Text="START" Foreground="#131818" FontWeight="Bold" FontSize="18"
+                                <TextBlock Text="AVVIA" Foreground="#131818" FontWeight="Bold" FontSize="18"
                                            HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
                             </Border>
                         </Button>
+                    </Grid>
+                </Border>
+
+                <Border Height="140" CornerRadius="24" Background="#0CFFFFFF" Padding="30,0">
+                    <Grid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="24">
+                            <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
+                                <PathIcon Width="24" Height="24" Foreground="#E7E6DC"
+                                          Data="M12,2A3,3 0 0,0 9,5C9,6.31 9.83,7.42 11,7.83V10H8A2,2 0 0,0 6,12V13H4V19H8V13H6V12H11V19H13V12H18V13H16V19H20V13H18V12A2,2 0 0,0 16,10H13V7.83C14.17,7.42 15,6.31 15,5A3,3 0 0,0 12,2Z"/>
+                            </Border>
+                            <TextBlock Text="Portata dei fusti" Foreground="#E7E6DC" FontSize="24"
+                                       FontFamily="Space Grotesk" FontWeight="Medium" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <Button Classes="InvisibleBtn" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                Click="OnFlowRateClick" Width="160" Height="54">
+                            <Border Background="#CAF0F8" CornerRadius="27">
+                                <TextBlock Text="APRI" Foreground="#131818" FontWeight="Bold" FontSize="18"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
+                            </Border>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <Border Height="140" CornerRadius="24" Background="#0CFFFFFF" Padding="30,0">
+                    <Grid>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="24">
+                            <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
+                                <PathIcon Width="24" Height="24" Foreground="#E7E6DC"
+                                          Data="M5,4H19A2,2 0 0,1 21,6V18A2,2 0 0,1 19,20H5A2,2 0 0,1 3,18V6A2,2 0 0,1 5,4M7,8V16H11V8H7M13,8V16H17V8H13Z"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center" Spacing="4">
+                                <TextBlock Text="Tipo di evento" Foreground="#E7E6DC" FontSize="24"
+                                           FontFamily="Space Grotesk" FontWeight="Medium"/>
+                                <TextBlock Name="EventModeDetail"
+                                           Text="" Foreground="#8A8F80" FontSize="15"
+                                           FontFamily="Space Grotesk"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Spacing="12"
+                                    HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Button Name="SmallEventBtn" Classes="InvisibleBtn" Click="OnSmallEventClick"
+                                    Width="180" Height="54">
+                                <Border Name="SmallEventBg" Background="#15FFFFFF" CornerRadius="27"
+                                        BorderBrush="#2A2C22" BorderThickness="1">
+                                    <TextBlock Name="SmallEventText" Text="PICCOLO" Foreground="#8A8F80"
+                                               FontWeight="Bold" FontSize="16"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
+                                </Border>
+                            </Button>
+                            <Button Name="LargeEventBtn" Classes="InvisibleBtn" Click="OnLargeEventClick"
+                                    Width="180" Height="54">
+                                <Border Name="LargeEventBg" Background="#15FFFFFF" CornerRadius="27"
+                                        BorderBrush="#2A2C22" BorderThickness="1">
+                                    <TextBlock Name="LargeEventText" Text="GRANDE" Foreground="#8A8F80"
+                                               FontWeight="Bold" FontSize="16"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
+                                </Border>
+                            </Button>
+                        </StackPanel>
                     </Grid>
                 </Border>
 

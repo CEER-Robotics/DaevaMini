@@ -76,7 +76,7 @@
                 <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
                           Foreground="White" Width="28" Height="28"/>
             </Button>
-            <TextBlock Text="Filling" Foreground="White" FontSize="32" FontWeight="Bold"
+            <TextBlock Text="Riempimento" Foreground="White" FontSize="32" FontWeight="Bold"
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
 
@@ -98,7 +98,7 @@
             <ToggleButton x:Name="Bottle3" Grid.Row="2" Grid.Column="0" Classes="BottleToggle" Tag="3"/>
 
             <TextBlock Grid.Row="0" Grid.Column="2"
-                       Text="Select containers&#x0a;to fill"
+                       Text="Seleziona i contenitori&#x0a;da riempire"
                        TextAlignment="Center" Foreground="#D0F0F8"
                        FontSize="24" FontWeight="SemiBold"
                        VerticalAlignment="Center" Margin="0,0,0,15"/>
@@ -115,7 +115,7 @@
             <ToggleButton x:Name="Bottle4" Grid.Row="2" Grid.Column="4" Classes="BottleToggle" Tag="4"/>
         </Grid>
 
-        <Button x:Name="FillBtn" Grid.Row="2" Content="Fill" Classes="FillBtn" Margin="0,0,0,25"/>
+        <Button x:Name="FillBtn" Grid.Row="2" Content="Avvia" Classes="FillBtn" Margin="0,0,0,25"/>
 
     </Grid>
 </UserControl>

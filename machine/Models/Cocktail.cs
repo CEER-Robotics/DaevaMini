@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Avalonia.Media;
 
 namespace DaevaMini.Models;
@@ -43,6 +44,19 @@ public class Cocktail
     /// <summary>When false the card is greyed out and non-selectable in the menu.</summary>
     public bool IsActive { get; init; } = true;
     public bool IsInactive => !IsActive;
+
+    /// <summary>When true the menu card renders <see cref="ImageSource"/> instead of the plain gradient.</summary>
+    public bool ShowImage { get; init; }
+
+    /// <summary>Family used by the Max menu filter bar. Empty means the cocktail only shows under Home.</summary>
+    public string Category { get; init; } = string.Empty;
+
+    /// <summary>Short tasting note shown while the guest confirms the pour.</summary>
+    public string Description { get; init; } = string.Empty;
+
+    /// <summary>Doses as one line, e.g. "Gin 40ml · Tonic 120ml". Kept compact so three
+    /// long ingredient names still fit on a single line of the menu card.</summary>
+    public string DoseSummary => string.Join(" · ", Ingredients.Select(i => $"{i.Name} {i.Milliliters}ml"));
 
     public bool IsBurgundyTheme => Theme == CocktailTheme.Burgundy;
     public bool IsTealTheme => Theme == CocktailTheme.Teal;

@@ -6,6 +6,7 @@
              xmlns:models="clr-namespace:DaevaMini.Models"
              xmlns:vm="clr-namespace:DaevaMini.ViewModels"
              xmlns:max="clr-namespace:DaevaMini.Views.Max"
+             xmlns:services="clr-namespace:DaevaMini.Services"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
              x:Class="DaevaMini.Views.Max.CocktailMenu"
              x:Name="MenuHost"
@@ -53,6 +54,174 @@
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
         </Style>
+
+        <Style Selector="TextBlock.PourDone">
+            <Setter Property="FontSize" Value="64"/>
+            <Setter Property="LetterSpacing" Value="0"/>
+            <Setter Property="Foreground" Value="#E7E6DC"/>
+        </Style>
+
+        <Style Selector="StackPanel.GlassPrompt">
+            <Style.Animations>
+                <Animation Duration="0:0:1.1" IterationCount="INFINITE">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="1.0"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="50%">
+                        <Setter Property="Opacity" Value="0.3"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="1.0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <Style Selector="TextBlock.PourBlink">
+            <Setter Property="FontSize" Value="34"/>
+            <Setter Property="LetterSpacing" Value="6"/>
+        </Style>
+
+        <Style Selector="StackPanel.PourPulse">
+            <Style.Animations>
+                <Animation Duration="0:0:1.1" IterationCount="INFINITE">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="1.0"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="50%">
+                        <Setter Property="Opacity" Value="0.2"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="1.0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <Style Selector="PathIcon.CollectArrow">
+            <Style.Animations>
+                <Animation Duration="0:0:1.4" IterationCount="INFINITE">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Margin" Value="0,0,0,0"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="50%">
+                        <Setter Property="Margin" Value="0,26,0,0"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Margin" Value="0,0,0,0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <!-- The warning badge pulses so it is noticeable from across the bar. -->
+        <Style Selector="Button.WarningBadge Ellipse">
+            <Style.Animations>
+                <Animation Duration="0:0:1.2" IterationCount="INFINITE">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="1.0"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="50%">
+                        <Setter Property="Opacity" Value="0.25"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="1.0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <!-- Confirming slides the artwork to the left edge and frees the right half
+             for the tasting note. -->
+        <Style Selector="Image.Art">
+            <Setter Property="Width" Value="215"/>
+            <Setter Property="Height" Value="215"/>
+            <Setter Property="RenderTransform" Value="none"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3" Easing="CubicEaseOut"/>
+                    <DoubleTransition Property="Width" Duration="0:0:0.3" Easing="CubicEaseOut"/>
+                    <DoubleTransition Property="Height" Duration="0:0:0.3" Easing="CubicEaseOut"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border.Card.confirming Image.Art">
+            <Setter Property="Width" Value="160"/>
+            <Setter Property="Height" Value="160"/>
+            <Setter Property="RenderTransform" Value="translateX(-114px)"/>
+        </Style>
+
+        <Style Selector="Button.MiniConfirmBtn">
+            <Setter Property="Background" Value="#CAF0F8"/>
+            <Setter Property="CornerRadius" Value="19"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.MiniConfirmBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#B0E5F0"/>
+        </Style>
+        <Style Selector="Button.MiniCancelBtn">
+            <Setter Property="Background" Value="#26FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#4DFFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="19"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.MiniCancelBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#3DFFFFFF"/>
+        </Style>
+
+        <Style Selector="Button.QuickPourBtn">
+            <Setter Property="Background" Value="#CAF0F8"/>
+            <Setter Property="CornerRadius" Value="21"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.QuickPourBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#B0E5F0"/>
+        </Style>
+        <Style Selector="Button.QuickPourBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#A0D8E5"/>
+        </Style>
+
+        <Style Selector="Button.ConfirmYesBtn">
+            <Setter Property="Background" Value="#CAF0F8"/>
+            <Setter Property="CornerRadius" Value="26"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.ConfirmYesBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#B0E5F0"/>
+        </Style>
+
+        <Style Selector="Button.ConfirmNoBtn">
+            <Setter Property="Background" Value="#26FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#4DFFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="26"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.ConfirmNoBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#3DFFFFFF"/>
+        </Style>
+
+        <Style Selector="ProgressBar.CardDispenseProgress">
+            <Setter Property="Foreground" Value="#CAF0F8"/>
+            <Setter Property="Background" Value="#24FFFFFF"/>
+            <Setter Property="CornerRadius" Value="21"/>
+        </Style>
     </UserControl.Styles>
 
     <Canvas x:Name="PageSurface" Width="1920" Height="1080">
@@ -89,6 +258,22 @@
             </Image.Effect>
         </Image>
 
+        <Button Name="WarningButton"
+                Classes="InvisibleBtn WarningBadge"
+                Canvas.Left="1790"
+                Canvas.Top="42"
+                Width="52"
+                Height="52"
+                Cursor="Hand"
+                IsVisible="{Binding HasWarnings, ElementName=MenuHost}"
+                Click="OnWarningClick">
+            <Ellipse Width="16"
+                     Height="16"
+                     Fill="{Binding WarningAccent, ElementName=MenuHost}"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"/>
+        </Button>
+
         <Border Canvas.Left="660"
                 Canvas.Top="120"
                 Width="600"
@@ -98,23 +283,24 @@
                 BorderBrush="#2A2C22"
                 BorderThickness="1"
                 Padding="4">
-            <UniformGrid Columns="5">
-                <Border Background="#2A3030" CornerRadius="24">
-                    <TextBlock Text="Home" Foreground="#E7E6DC" FontFamily="Space Grotesk" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-                <Border Background="Transparent" CornerRadius="24">
-                    <TextBlock Text="Gin" Foreground="#888888" FontFamily="Space Grotesk" FontWeight="Medium" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-                <Border Background="Transparent" CornerRadius="24">
-                    <TextBlock Text="Vodka" Foreground="#888888" FontFamily="Space Grotesk" FontWeight="Medium" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-                <Border Background="Transparent" CornerRadius="24">
-                    <TextBlock Text="Spritz" Foreground="#888888" FontFamily="Space Grotesk" FontWeight="Medium" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-                <Border Background="Transparent" CornerRadius="24">
-                    <TextBlock Text="Negroni" Foreground="#888888" FontFamily="Space Grotesk" FontWeight="Medium" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                </Border>
-            </UniformGrid>
+            <ItemsControl ItemsSource="{Binding Filters, ElementName=MenuHost}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Rows="1"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="max:FilterTab">
+                        <Button Classes="InvisibleBtn" Click="OnFilterClick" CommandParameter="{Binding}">
+                            <Border Background="{Binding Background}" CornerRadius="24">
+                                <TextBlock Text="{Binding Name}" Foreground="{Binding Foreground}"
+                                           FontFamily="Space Grotesk" FontWeight="{Binding FontWeight}" FontSize="16"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </Border>
 
         <ItemsControl Canvas.Left="100"
@@ -128,25 +314,30 @@
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="models:Cocktail">
-                    <Button Classes="InvisibleBtn"
+                <DataTemplate x:DataType="max:CocktailCardItem">
+                    <Border Width="400"
+                            Height="360"
                             Margin="15"
-                            IsEnabled="{Binding IsActive}"
-                            Command="{Binding DataContext.SelectCocktailCommand, ElementName=MenuHost}"
-                            CommandParameter="{Binding}">
-                        <Border Width="400"
-                                Height="360"
-                                CornerRadius="24"
-                                ClipToBounds="True"
-                                Background="#1B1C16">
+                            CornerRadius="24"
+                            ClipToBounds="True"
+                            Background="#1B1C16"
+                            Classes="Card"
+                            Classes.confirming="{Binding IsConfirming}">
                             <Grid>
-                                <!-- Cocktail images temporarily hidden for the restyle pass.
-                                <Image Source="{Binding ImageSource, Converter={StaticResource BitmapAssetConverter}}"
-                                       Stretch="UniformToFill"
-                                       Opacity="0.92"/>
-                                -->
+                                <!-- Artwork is opt-in per cocktail (ShowImage in appsettings)
+                                     while the restyle pass is in progress. The artwork PNGs carry
+                                     their own black background, so the card matches it and skips
+                                     the gradient. -->
+                                <Border Background="#020202" IsVisible="{Binding Cocktail.ShowImage}"/>
 
-                                <Border>
+                                <Image Classes="Art"
+                                       Source="{Binding Cocktail.ImageSource, Converter={StaticResource BitmapAssetConverter}}"
+                                       IsVisible="{Binding Cocktail.ShowImage}"
+                                       Stretch="Uniform"
+                                       VerticalAlignment="Top"
+                                       Margin="0,26,0,0"/>
+
+                                <Border IsVisible="{Binding !Cocktail.ShowImage}">
                                     <Border.Background>
                                         <LinearGradientBrush StartPoint="0%,30%" EndPoint="0%,100%">
                                             <GradientStop Color="Transparent" Offset="0"/>
@@ -155,14 +346,17 @@
                                     </Border.Background>
                                 </Border>
 
-                                <StackPanel VerticalAlignment="Bottom" Margin="24">
-                                    <TextBlock Text="{Binding Title}"
+                                <StackPanel VerticalAlignment="Bottom" Margin="24"
+                                            HorizontalAlignment="Left"
+                                            Width="224"
+                                            IsVisible="{Binding !IsConfirming}">
+                                    <TextBlock Text="{Binding Cocktail.Title}"
                                                Foreground="#E7E6DC"
                                                FontSize="28"
                                                FontWeight="Bold"
                                                FontFamily="Space Grotesk"
                                                TextWrapping="Wrap"/>
-                                    <TextBlock Text="{Binding Subtitle}"
+                                    <TextBlock Text="{Binding Cocktail.Subtitle}"
                                                Foreground="#A0A0A0"
                                                FontSize="14"
                                                FontFamily="Space Grotesk"
@@ -170,12 +364,104 @@
                                                TextWrapping="Wrap"/>
                                 </StackPanel>
 
-                                <Border Background="#BB121212"
-                                        IsHitTestVisible="False"
-                                        IsVisible="{Binding IsInactive}"/>
-                            </Grid>
-                        </Border>
-                    </Button>
+                                <!-- Quick pour: tapping asks for confirmation first, then the
+                                     progress bar replaces the button in place. -->
+                                <Button Classes="QuickPourBtn"
+                                        IsVisible="{Binding IsPourButtonVisible}"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom"
+                                        Margin="0,0,20,20"
+                                        Width="132"
+                                        Height="42"
+                                        Click="OnPourClick"
+                                        CommandParameter="{Binding}">
+                                    <TextBlock Text="EROGA" Foreground="#000000" FontSize="13"
+                                               FontWeight="Bold" FontFamily="Space Grotesk" LetterSpacing="1"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Button>
+
+                                <ProgressBar Classes="CardDispenseProgress"
+                                             IsVisible="{Binding IsPouring}"
+                                             HorizontalAlignment="Right"
+                                             VerticalAlignment="Bottom"
+                                             Margin="0,0,20,20"
+                                             Width="132"
+                                             Height="42"
+                                             Minimum="0" Maximum="100"
+                                             Value="{Binding Progress}"/>
+
+                                <!-- Shown for a few seconds once the pour completes. -->
+                                <Border Background="#E6000000" IsVisible="{Binding IsCompleted}">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="14">
+                                        <PathIcon Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M10,17L5,12L6.41,10.59L10,14.17L17.59,6.58L19,8L10,17Z"
+                                                  Foreground="#CAF0F8" Width="46" Height="46"
+                                                  HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Ritira il tuo cocktail"
+                                                   Foreground="#E7E6DC" FontSize="22" FontWeight="Bold"
+                                                   FontFamily="Space Grotesk" TextWrapping="Wrap"
+                                                   TextAlignment="Center" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Tasting note, revealed by the artwork sliding aside. -->
+                                <StackPanel Width="196"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Top"
+                                            Margin="0,24,20,0"
+                                            Spacing="10"
+                                            IsVisible="{Binding IsConfirming}">
+                                    <TextBlock Text="{Binding Cocktail.Title}"
+                                               Foreground="#E7E6DC" FontSize="24" FontWeight="Bold"
+                                               FontFamily="Space Grotesk" TextWrapping="Wrap"
+                                               TextAlignment="Left"/>
+                                    <TextBlock Text="{Binding Cocktail.Description}"
+                                               Foreground="#A0A0A0" FontSize="15" LineHeight="21"
+                                               FontFamily="Space Grotesk" TextWrapping="Wrap"
+                                               TextAlignment="Left"/>
+                                </StackPanel>
+
+                                <!-- Confirmation sits where START POUR was. -->
+                                <StackPanel Spacing="10"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Bottom"
+                                            Margin="0,0,0,22"
+                                            IsVisible="{Binding IsConfirming}">
+                                    <TextBlock Text="{Binding Cocktail.DoseSummary}"
+                                               Width="380"
+                                               Foreground="#FFFFFF" FontSize="15" FontWeight="Bold"
+                                               FontFamily="Space Grotesk"
+                                               TextWrapping="NoWrap"
+                                               TextAlignment="Center"
+                                               Margin="0,0,0,6"/>
+                                    <StackPanel Classes="GlassPrompt"
+                                                Orientation="Horizontal"
+                                                Spacing="8"
+                                                HorizontalAlignment="Center">
+                                        <TextBlock Text="Posiziona il bicchiere qui sotto"
+                                                   Foreground="#CAF0F8" FontSize="18" FontWeight="Bold"
+                                                   FontFamily="Space Grotesk"
+                                                   VerticalAlignment="Center"/>
+                                        <PathIcon Data="M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z"
+                                                  Foreground="#CAF0F8"
+                                                  Width="20" Height="20"
+                                                  VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <Button Classes="QuickPourBtn"
+                                            Width="132"
+                                            Height="42"
+                                            HorizontalAlignment="Center"
+                                            Click="OnPourConfirmClick" CommandParameter="{Binding}">
+                                        <TextBlock Text="EROGA" Foreground="#000000" FontSize="13"
+                                                   FontWeight="Bold" FontFamily="Space Grotesk" LetterSpacing="1"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Button>
+                                </StackPanel>
+
+                        <Border Background="#BB121212"
+                                IsHitTestVisible="False"
+                                IsVisible="{Binding Cocktail.IsInactive}"/>
+                    </Grid>
+                    </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
@@ -211,6 +497,137 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+        </Border>
+        <!-- Pour theatre: the drink under a closing progress ring, then the collect message. -->
+        <Border Canvas.Left="0"
+                Canvas.Top="0"
+                Width="1920"
+                Height="1080"
+                Background="#F2000000"
+                IsVisible="{Binding IsPourOverlayOpen, ElementName=MenuHost}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="34">
+                <Grid Width="520" Height="520" HorizontalAlignment="Center">
+                    <Ellipse Width="500" Height="500"
+                             Stroke="#1FFFFFFF" StrokeThickness="16"
+                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                    <Arc Width="500" Height="500"
+                         StartAngle="-90"
+                         SweepAngle="{Binding PourSweepAngle, ElementName=MenuHost}"
+                         IsVisible="{Binding !IsPourDone, ElementName=MenuHost}"
+                         Stroke="#CAF0F8" StrokeThickness="16" StrokeLineCap="Round"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                    <Ellipse Width="500" Height="500"
+                             IsVisible="{Binding IsPourDone, ElementName=MenuHost}"
+                             Stroke="#CAF0F8" StrokeThickness="16"
+                             HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                    <Image Source="{Binding PourImage, ElementName=MenuHost, Converter={StaticResource BitmapAssetConverter}}"
+                           Width="300" Height="300"
+                           Stretch="Uniform"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+
+                <Grid Height="126">
+                    <TextBlock Text="{Binding PourTitle, ElementName=MenuHost}"
+                               IsVisible="{Binding !IsPourDone, ElementName=MenuHost}"
+                               Foreground="#E7E6DC" FontSize="96" FontWeight="Bold"
+                               FontFamily="Space Grotesk"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+
+                <Grid Height="92" Margin="0,-34,0,0">
+                <StackPanel Classes="PourPulse"
+                            Orientation="Horizontal" Spacing="20"
+                            HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                    <TextBlock Text="{Binding PourMessage, ElementName=MenuHost}"
+                               Classes.PourBlink="{Binding !IsPourDone, ElementName=MenuHost}"
+                               Classes.PourDone="{Binding IsPourDone, ElementName=MenuHost}"
+                               Foreground="#CAF0F8" FontWeight="Bold"
+                               FontFamily="Space Grotesk"
+                               VerticalAlignment="Bottom"/>
+                    <TextBlock Text="{Binding PourBigName, ElementName=MenuHost}"
+                               IsVisible="{Binding IsPourDone, ElementName=MenuHost}"
+                               Foreground="#FFFFFF" FontSize="64" FontWeight="Bold"
+                               FontFamily="Space Grotesk"
+                               VerticalAlignment="Bottom"/>
+                </StackPanel>
+                </Grid>
+
+                <!-- Points down at the glass once the pour is finished. -->
+                <Grid Height="104" Width="120" HorizontalAlignment="Center">
+                    <PathIcon Classes="CollectArrow"
+                              Data="M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z"
+                              Foreground="#CAF0F8"
+                              Width="72" Height="72"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Top"
+                              IsVisible="{Binding IsPourDone, ElementName=MenuHost}"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Border Canvas.Left="0"
+                Canvas.Top="0"
+                Width="1920"
+                Height="1080"
+                Background="#E6000000"
+                IsVisible="{Binding IsWarningPanelOpen, ElementName=MenuHost}">
+            <Border Width="900"
+                    MaxHeight="700"
+                    Background="#161816"
+                    BorderBrush="#2A2C22"
+                    BorderThickness="1"
+                    CornerRadius="32"
+                    Padding="48"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                <DockPanel LastChildFill="True">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="16" Margin="0,0,0,28">
+                        <Ellipse Width="16" Height="16"
+                                 Fill="{Binding WarningAccent, ElementName=MenuHost}"
+                                 VerticalAlignment="Center"/>
+                        <TextBlock Text="Avvisi"
+                                   Foreground="#E7E6DC" FontSize="30" FontWeight="Bold"
+                                   FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <Button DockPanel.Dock="Bottom"
+                            Classes="ConfirmNoBtn"
+                            Width="200" Height="56"
+                            Margin="0,28,0,0"
+                            HorizontalAlignment="Center"
+                            Click="OnWarningPanelClose">
+                        <TextBlock Text="CHIUDI" Foreground="#E7E6DC" FontSize="18" FontWeight="Bold"
+                                   FontFamily="Space Grotesk"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+
+                    <ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding Warnings, ElementName=MenuHost}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="services:MachineWarning">
+                                    <Border Background="#1F211C" CornerRadius="16" Padding="24,18" Margin="0,0,0,12">
+                                        <StackPanel Spacing="6">
+                                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                                <Ellipse Width="12" Height="12" Fill="{Binding Accent}"
+                                                         VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding Title}"
+                                                           Foreground="{Binding Accent}" FontSize="20" FontWeight="Bold"
+                                                           FontFamily="Space Grotesk" TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Detail}"
+                                                       Foreground="#A0A0A0" FontSize="15"
+                                                       FontFamily="Space Grotesk" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
         </Border>
     </Canvas>
 </UserControl>

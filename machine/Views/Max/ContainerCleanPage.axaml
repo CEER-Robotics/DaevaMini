@@ -69,11 +69,15 @@
         <Style Selector="ToggleButton.JerryCanBtn">
             <Setter Property="Width" Value="280"/>
             <Setter Property="Height" Value="300"/>
-            <Setter Property="Cursor" Value="Arrow"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <ControlTemplate>
-                    <StackPanel Spacing="0">
+                    <StackPanel Spacing="0" Background="Transparent">
                         <Grid Width="280" Height="250" Background="Transparent">
+                            <Border Name="KegGlow" Width="200" Height="200" CornerRadius="28"
+                                    BorderThickness="4" BorderBrush="#CAF0F8" Opacity="0"
+                                    BoxShadow="0 0 25 0 #CAF0F8"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <Border Width="200" Height="200" CornerRadius="28" BorderBrush="#2A2C22"
                                     BorderThickness="1" ClipToBounds="True"
                                     HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -82,19 +86,32 @@
                                         <RowDefinition Height="*"/>
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
-                                    <Border Grid.Row="0" Background="#1B1C16"/>
-                                    <Border Grid.Row="1" Background="#161816"/>
+                                    <Border Name="KegTop" Grid.Row="0" Background="#1B1C16"/>
+                                    <Border Name="KegBottom" Grid.Row="1" Background="#161816"/>
                                     <ContentPresenter Grid.RowSpan="2" HorizontalAlignment="Center"
                                                       VerticalAlignment="Center" Content="{TemplateBinding Content}"/>
                                 </Grid>
                             </Border>
                         </Grid>
-                        <TextBlock Text="{TemplateBinding Tag}" Foreground="#E7E6DC" FontFamily="Space Grotesk"
+                        <TextBlock Name="KegText" Text="{TemplateBinding Tag}" Foreground="#E7E6DC" FontFamily="Space Grotesk"
                                    FontSize="26" FontWeight="Bold" HorizontalAlignment="Center"
-                                   Margin="0,-35,0,0"/>
+                                   Margin="0,4,0,0"/>
                     </StackPanel>
                 </ControlTemplate>
             </Setter>
+        </Style>
+
+        <Style Selector="ToggleButton.JerryCanBtn:checked /template/ Border#KegGlow">
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+        <Style Selector="ToggleButton.JerryCanBtn:checked /template/ Border#KegTop">
+            <Setter Property="Background" Value="#2A3030"/>
+        </Style>
+        <Style Selector="ToggleButton.JerryCanBtn:checked /template/ Border#KegBottom">
+            <Setter Property="Background" Value="#243033"/>
+        </Style>
+        <Style Selector="ToggleButton.JerryCanBtn:checked /template/ TextBlock#KegText">
+            <Setter Property="Foreground" Value="#CAF0F8"/>
         </Style>
         <Style Selector="ToggleButton.JerryCanBtn:disabled">
             <Setter Property="Opacity" Value="0.45"/>
@@ -137,7 +154,7 @@
             <StackPanel Orientation="Horizontal" Spacing="12">
                 <PathIcon Width="24" Height="24" Foreground="#E7E6DC"
                           Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
-                <TextBlock Text="BACK TO MENU" Foreground="#E7E6DC" FontFamily="Space Grotesk"
+                <TextBlock Text="TORNA AL MENU" Foreground="#E7E6DC" FontFamily="Space Grotesk"
                            FontWeight="Bold" FontSize="18" VerticalAlignment="Center"/>
             </StackPanel>
         </Button>
@@ -146,20 +163,20 @@
                    FontSize="28" FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="4"
                    TextAlignment="Center"/>
 
-        <ToggleButton Classes="JerryCanBtn" Tag="Empty" Canvas.Left="120" Canvas.Top="240" IsEnabled="False">
+        <ToggleButton x:Name="Keg1" Classes="JerryCanBtn" Tag="11" Canvas.Left="120" Canvas.Top="240">
             <PathIcon Width="62" Height="62" Foreground="#E7E6DC"
                       Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
         </ToggleButton>
-        <ToggleButton Classes="JerryCanBtn" Tag="Empty" Canvas.Left="120" Canvas.Top="540" IsEnabled="False">
+        <ToggleButton x:Name="Keg2" Classes="JerryCanBtn" Tag="12" Canvas.Left="120" Canvas.Top="540">
             <PathIcon Width="62" Height="62" Foreground="#E7E6DC"
                       Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
         </ToggleButton>
 
-        <ToggleButton Classes="JerryCanBtn" Tag="Empty" Canvas.Left="1520" Canvas.Top="240" IsEnabled="False">
+        <ToggleButton x:Name="Keg3" Classes="JerryCanBtn" Tag="13" Canvas.Left="1520" Canvas.Top="240">
             <PathIcon Width="62" Height="62" Foreground="#E7E6DC"
                       Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
         </ToggleButton>
-        <ToggleButton Classes="JerryCanBtn" Tag="Empty" Canvas.Left="1520" Canvas.Top="540" IsEnabled="False">
+        <ToggleButton x:Name="Keg4" Classes="JerryCanBtn" Tag="14" Canvas.Left="1520" Canvas.Top="540">
             <PathIcon Width="62" Height="62" Foreground="#E7E6DC"
                       Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
         </ToggleButton>
@@ -219,7 +236,7 @@
         </ToggleButton>
 
         <StackPanel Canvas.Left="760" Canvas.Top="346" Width="400" HorizontalAlignment="Center">
-            <TextBlock Text="Select the containers to clean, then press clean to start."
+            <TextBlock Text="Seleziona la linea, collega una bottiglia d'acqua e premi avvia."
                        Foreground="#CAF0F8" FontSize="24" FontWeight="Bold" FontFamily="Space Grotesk"
                        TextAlignment="Center" TextWrapping="Wrap"/>
             <Image Source="avares://Daeva/Assets/DaevaWhite.png" Width="270" Height="82"
@@ -231,7 +248,94 @@
         </StackPanel>
 
         <Button x:Name="CleanBtn" Classes="DoneButtonStyle" Canvas.Left="780" Canvas.Top="920"
-                Content="Clean" Click="OnClean"/>
+                Content="Avvia" Click="OnClean"/>
 
+        <Grid Name="Keg1Blocked"
+              Canvas.Left="120"
+              Canvas.Top="240"
+              Width="280"
+              Height="300"
+              IsHitTestVisible="False"
+              IsVisible="False">
+            <Line StartPoint="46,32" EndPoint="234,218"
+                  Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
+            <TextBlock Text="Non disponibili in questa modalità"
+                       Foreground="#E5484D" FontSize="15" FontWeight="Bold"
+                       FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
+                       Width="240"
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Margin="0,0,0,6"/>
+        </Grid>
+        <Grid Name="Keg2Blocked"
+              Canvas.Left="120"
+              Canvas.Top="540"
+              Width="280"
+              Height="300"
+              IsHitTestVisible="False"
+              IsVisible="False">
+            <Line StartPoint="46,32" EndPoint="234,218"
+                  Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
+            <TextBlock Text="Non disponibili in questa modalità"
+                       Foreground="#E5484D" FontSize="15" FontWeight="Bold"
+                       FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
+                       Width="240"
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Margin="0,0,0,6"/>
+        </Grid>
+        <Grid Name="Keg3Blocked"
+              Canvas.Left="1520"
+              Canvas.Top="240"
+              Width="280"
+              Height="300"
+              IsHitTestVisible="False"
+              IsVisible="False">
+            <Line StartPoint="46,32" EndPoint="234,218"
+                  Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
+            <TextBlock Text="Non disponibili in questa modalità"
+                       Foreground="#E5484D" FontSize="15" FontWeight="Bold"
+                       FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
+                       Width="240"
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Margin="0,0,0,6"/>
+        </Grid>
+        <Grid Name="Keg4Blocked"
+              Canvas.Left="1520"
+              Canvas.Top="540"
+              Width="280"
+              Height="300"
+              IsHitTestVisible="False"
+              IsVisible="False">
+            <Line StartPoint="46,32" EndPoint="234,218"
+                  Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
+            <TextBlock Text="Non disponibili in questa modalità"
+                       Foreground="#E5484D" FontSize="15" FontWeight="Bold"
+                       FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
+                       Width="240"
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Margin="0,0,0,6"/>
+        </Grid>
+        <!-- Same feedback as the container change: the wait is visible, not a frozen screen. -->
+        <Border Name="CleanProgressOverlay"
+                Canvas.Left="0"
+                Canvas.Top="0"
+                Width="1920"
+                Height="1080"
+                Background="#E6000000"
+                IsVisible="False">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="28">
+                <TextBlock Text="Risciacquo in corso"
+                           Foreground="#E7E6DC" FontSize="34" FontWeight="Bold"
+                           FontFamily="Space Grotesk" HorizontalAlignment="Center"/>
+                <TextBlock Name="CleanProgressDetail"
+                           Text=""
+                           Foreground="#CAF0F8" FontSize="20"
+                           FontFamily="Space Grotesk" HorizontalAlignment="Center"/>
+                <ProgressBar Name="CleanProgress"
+                             Width="760" Height="42"
+                             Minimum="0" Maximum="100" Value="0"
+                             Foreground="#CAF0F8" Background="#24FFFFFF"
+                             CornerRadius="21"/>
+            </StackPanel>
+        </Border>
     </Canvas>
 </UserControl>

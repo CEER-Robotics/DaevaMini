@@ -11,12 +11,12 @@ Modes:
     LiquidAssignments:
       - "Gin"
       - "Tonic"
-      - "Lemon"
+      - "Limone"
       - ""
     Cocktails:
       - Id: "gintonic"
         Name: "Gin Tonic"
-        Subtitle: "Gin, tonica"
+        Subtitle: "Gin, Tonica"
         Image: "gintonic"
         Theme: "Teal"
         IsActive: true
@@ -25,12 +25,12 @@ Modes:
         LedB: 255
         Ingredients:
           - Name: "Gin"
-            Milliliters: 50
+            Milliliters: 40
           - Name: "Tonic"
-            Milliliters: 150
+            Milliliters: 130
       - Id: "ginlemon"
         Name: "Gin Lemon"
-        Subtitle: "Gin, lemon"
+        Subtitle: "Gin, Limone"
         Image: "ginlemon"
         Theme: "Teal"
         IsActive: false
@@ -39,9 +39,9 @@ Modes:
         LedB: 0
         Ingredients:
           - Name: "Gin"
-            Milliliters: 50
-          - Name: "Lemon"
-            Milliliters: 150
+            Milliliters: 40
+          - Name: "Limone"
+            Milliliters: 130
 
   - Name: "Vodka Mode"
     Color: "#F7940A"
@@ -49,12 +49,12 @@ Modes:
     LiquidAssignments:
       - "Vodka"
       - "Tonic"
-      - "Lemon"
+      - "Limone"
       - ""
     Cocktails:
       - Id: "vodkalemon"
         Name: "Vodka Lemon"
-        Subtitle: "Vodka, lemon"
+        Subtitle: "Vodka, Limone"
         Image: "vodkalemon"
         Theme: "Orange"
         IsActive: false
@@ -63,12 +63,12 @@ Modes:
         LedB: 0
         Ingredients:
           - Name: "Vodka"
-            Milliliters: 50
-          - Name: "Lemon"
-            Milliliters: 150
+            Milliliters: 40
+          - Name: "Limone"
+            Milliliters: 130
       - Id: "vodkaredbull"
-        Name: "Vodka Red Bull"
-        Subtitle: "Vodka, red bull"
+        Name: "Vodka Energy"
+        Subtitle: "Vodka, Energy drink"
         Image: "vodkaredbull"
         Theme: "Orange"
         IsActive: false
@@ -77,12 +77,12 @@ Modes:
         LedB: 0
         Ingredients:
           - Name: "Vodka"
-            Milliliters: 50
-          - Name: "Red-bull"
-            Milliliters: 150
+            Milliliters: 40
+          - Name: "Energy"
+            Milliliters: 130
       - Id: "vodkatonic"
         Name: "Vodka Tonic"
-        Subtitle: "Vodka, tonic"
+        Subtitle: "Vodka, Tonica"
         Image: "vodkatonic"
         Theme: "Orange"
         IsActive: false
@@ -91,9 +91,9 @@ Modes:
         LedB: 255
         Ingredients:
           - Name: "Vodka"
-            Milliliters: 50
+            Milliliters: 40
           - Name: "Tonic"
-            Milliliters: 150
+            Milliliters: 130
 
   - Name: "OG Mode"
     Color: "#F46036"
@@ -131,11 +131,11 @@ Modes:
         LedB: 0
         Ingredients:
           - Name: "Campari"
-            Milliliters: 50
+            Milliliters: 30
           - Name: "Vermouth"
-            Milliliters: 80
+            Milliliters: 30
           - Name: "Prosecco"
-            Milliliters: 80
+            Milliliters: 60
       - Id: "americano"
         Name: "Americano"
         Subtitle: "Campari, Vermouth"
@@ -150,6 +150,8 @@ Modes:
             Milliliters: 30
           - Name: "Vermouth"
             Milliliters: 30
+          - Name: "Tonic"
+            Milliliters: 60
       - Id: "camparispritz"
         Name: "Campari Spritz"
         Subtitle: "Campari, Prosecco"
@@ -161,6 +163,8 @@ Modes:
         LedB: 0
         Ingredients:
           - Name: "Campari"
-            Milliliters: 50
+            Milliliters: 40
           - Name: "Prosecco"
             Milliliters: 80
+          - Name: "Tonic"
+            Milliliters: 20

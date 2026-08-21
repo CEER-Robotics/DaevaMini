@@ -1,29 +1,91 @@
+# "Small" usa solo le pompe; "Large" accende i fusti e spegne le pompe con lo stesso liquido.
+EventMode: "Small"
+
 FlowRate:
   MillisecondsPerMilliliter: 117
 
-FillDurationMs: 3000
-CleanDurationMs: 10000
+FillDurationMs: 5000
+CleanDurationMs: 15000
 SettingsPin: "1234"
 
 LiquidAssignments:
-  - "Aperol"
-  - "Prosecco"
-  - ""
-  - ""
-  - "Gin"
   - "Tonic"
+  - "Prosecco"
+  - "Limone"
+  - "Campari"
+  - "Vermouth"
+  - "Vodka"
+  - "Energy"
   - ""
-  - ""
-  - ""
-  - ""
+  - "Aperol"
+  - "Gin"
+  # Lines 11-14: pressurised kegs
+  - "Tonic"
+  - "Prosecco"
+  - "Birra"
+  - "Cola"
+
+BottleCapacitiesMl:
+  - 1000   # Line 1 Tonic (bottiglia, eventi piccoli)
+  - 750    # Line 2 Prosecco
+  - 1000   # Line 3 Limone
+  - 700    # Line 4 Campari
+  - 1000   # Line 5 Vermouth
+  - 700    # Line 6 Vodka
+  - 1000   # Line 7 Energy
+  - 0      # Line 8 libera
+  - 700    # Line 9 Aperol
+  - 700    # Line 10 Gin
+  - 20000  # Line 11 Tonic (keg)
+  - 20000  # Line 12 Prosecco (keg)
+  - 30000  # Line 13 Birra (keg)
+  - 20000  # Line 14 Cola (keg)
+
+# Portata misurata per linea, in millilitri al secondo. 0 = usa FlowRate globale.
+# Misura: eroga per 10 secondi, pesa il liquido raccolto, dividi per 10.
+FlowRatesMlPerSecond:
+  - 0      # Line 1 Tonic
+  - 0      # Line 2 Prosecco
+  - 0      # Line 3 Limone
+  - 0      # Line 4 Campari
+  - 0      # Line 5 Vermouth
+  - 0      # Line 6 Vodka
+  - 0      # Line 7 Energy
+  - 0      # Line 8 free
+  - 0      # Line 9 Aperol
+  - 0      # Line 10 Gin
+  - 55     # Line 11 Tonic (keg)
+  - 55     # Line 12 Prosecco (keg)
+  - 55     # Line 13 Birra (keg) - 330 ml in 6 s
+  - 55     # Line 14 Cola (keg)
+
+
 
 Cocktails:
+  - Id: "beer"
+    Name: "Birra"
+    Subtitle: "Birra alla spina"
+    Description: "Spillata direttamente dal fusto, nient'altro. Fredda, con la sua schiuma, la cosa piu semplice del menu."
+    Image: "beer"
+    Theme: "Orange"
+    IsActive: true
+    Category: "Birra"
+    LargeEventOnly: true
+    LedR: 255
+    LedG: 200
+    LedB: 40
+    Ingredients:
+      - Name: "Birra"
+        Milliliters: 400
   - Id: "gintonic"
     Name: "Gin Tonic"
-    Subtitle: "Gin, tonica"
+    Subtitle: "Gin, Tonica"
+    Description: "Il long drink piu bevuto al mondo: gin e acqua tonica su ghiaccio. Secco, frizzante, con la nota amara del chinino."
     Image: "gintonic"
     Theme: "Teal"
     IsActive: true
+    ShowImage: true
+    Category: "Gin"
     LedR: 255
     LedG: 255
     LedB: 255
@@ -31,13 +93,16 @@ Cocktails:
       - Name: "Gin"
         Milliliters: 40
       - Name: "Tonic"
-        Milliliters: 120
+        Milliliters: 130
   - Id: "aperolspritz"
     Name: "Aperol Spritz"
     Subtitle: "Aperol, Prosecco"
-    Image: "camparispritz"
+    Description: "L'aperitivo italiano per eccellenza. Amaro leggero e agrumato, alleggerito dalle bollicine del prosecco."
+    Image: "spritz"
     Theme: "Burgundy"
     IsActive: true
+    ShowImage: true
+    Category: "Spritz"
     LedR: 40
     LedG: 255
     LedB: 0
@@ -50,66 +115,81 @@ Cocktails:
         Milliliters: 90
   - Id: "ginlemon"
     Name: "Gin Lemon"
-    Subtitle: "Gin, lemon"
+    Subtitle: "Gin, Limone"
+    Description: "Gin allungato con succo di limone. Fresco e diretto, piu acidulo e meno amaro del gin tonic."
     Image: "ginlemon"
     Theme: "Teal"
-    IsActive: false
+    IsActive: true
+    ShowImage: true
+    Category: "Gin"
     LedR: 50
     LedG: 255
     LedB: 0
     Ingredients:
       - Name: "Gin"
-        Milliliters: 50
-      - Name: "Lemon"
-        Milliliters: 150
+        Milliliters: 40
+      - Name: "Limone"
+        Milliliters: 130
   - Id: "vodkalemon"
     Name: "Vodka Lemon"
-    Subtitle: "Vodka, lemon"
+    Subtitle: "Vodka, Limone"
+    Description: "Vodka e limone, semplice e dissetante. Neutro alla base, con un finale asprigno."
     Image: "vodkalemon"
     Theme: "Orange"
-    IsActive: false
+    IsActive: true
+    ShowImage: true
+    Category: "Vodka"
     LedR: 50
     LedG: 255
     LedB: 0
     Ingredients:
       - Name: "Vodka"
-        Milliliters: 50
-      - Name: "Lemon"
-        Milliliters: 150
+        Milliliters: 40
+      - Name: "Limone"
+        Milliliters: 130
   - Id: "vodkaredbull"
-    Name: "Vodka Red Bull"
-    Subtitle: "Vodka, red bull"
+    Name: "Vodka Energy"
+    Subtitle: "Vodka, Energy drink"
+    Description: "Vodka ed energy drink. Dolce, molto carbonato, il piu zuccherino del menu."
     Image: "vodkaredbull"
     Theme: "Orange"
-    IsActive: false
+    IsActive: true
+    ShowImage: true
+    Category: "Vodka"
     LedR: 30
     LedG: 255
     LedB: 0
     Ingredients:
       - Name: "Vodka"
-        Milliliters: 50
-      - Name: "Red-bull"
-        Milliliters: 150
+        Milliliters: 40
+      - Name: "Energy"
+        Milliliters: 130
   - Id: "vodkatonic"
     Name: "Vodka Tonic"
-    Subtitle: "Vodka, tonic"
+    Subtitle: "Vodka, Tonica"
+    Description: "Come un gin tonic ma con vodka: piu pulito e neutro, lascia parlare la tonica."
     Image: "vodkatonic"
     Theme: "Orange"
-    IsActive: false
+    IsActive: true
+    ShowImage: true
+    Category: "Vodka"
     LedR: 255
     LedG: 255
     LedB: 255
     Ingredients:
       - Name: "Vodka"
-        Milliliters: 50
+        Milliliters: 40
       - Name: "Tonic"
-        Milliliters: 150
+        Milliliters: 130
   - Id: "negroni"
     Name: "Negroni"
     Subtitle: "Campari, Vermouth, Gin"
+    Description: "Il classico torinese in parti uguali: gin, campari e vermouth rosso. Amaro, corposo, di grande carattere."
     Image: "negroni"
     Theme: "Burgundy"
-    IsActive: false
+    IsActive: true
+    ShowImage: true
+    Category: "Negroni"
     LedR: 0
     LedG: 255
     LedB: 0
@@ -123,25 +203,31 @@ Cocktails:
   - Id: "negronisbagliato"
     Name: "Negroni Sbagliato"
     Subtitle: "Campari, Vermouth, Prosecco"
+    Description: "Nato per errore al Bar Basso: al posto del gin il prosecco. Piu leggero e beverino del negroni."
     Image: "negronisbagliato"
     Theme: "Burgundy"
-    IsActive: false
+    IsActive: true
+    ShowImage: true
+    Category: "Negroni"
     LedR: 10
     LedG: 255
     LedB: 0
     Ingredients:
       - Name: "Campari"
-        Milliliters: 50
+        Milliliters: 30
       - Name: "Vermouth"
-        Milliliters: 80
+        Milliliters: 30
       - Name: "Prosecco"
-        Milliliters: 80
+        Milliliters: 60
   - Id: "americano"
     Name: "Americano"
     Subtitle: "Campari, Vermouth"
+    Description: "Campari e vermouth rosso, senza gin. Amaro ma delicato, ottimo come aperitivo."
     Image: "americano"
     Theme: "Burgundy"
-    IsActive: false
+    IsActive: true
+    ShowImage: true
+    Category: "Negroni"
     LedR: 0
     LedG: 255
     LedB: 0
@@ -150,17 +236,24 @@ Cocktails:
         Milliliters: 30
       - Name: "Vermouth"
         Milliliters: 30
+      - Name: "Tonic"
+        Milliliters: 60
   - Id: "camparispritz"
     Name: "Campari Spritz"
     Subtitle: "Campari, Prosecco"
+    Description: "Campari allungato con prosecco. Piu amaro e deciso dell'aperol spritz."
     Image: "camparispritz"
     Theme: "Burgundy"
-    IsActive: false
+    IsActive: true
+    ShowImage: true
+    Category: "Spritz"
     LedR: 10
     LedG: 255
     LedB: 0
     Ingredients:
       - Name: "Campari"
-        Milliliters: 50
+        Milliliters: 40
       - Name: "Prosecco"
         Milliliters: 80
+      - Name: "Tonic"
+        Milliliters: 20

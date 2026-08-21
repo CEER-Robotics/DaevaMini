@@ -126,7 +126,7 @@
                 <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
                           Foreground="White" Width="28" Height="28"/>
             </Button>
-            <TextBlock Text="Settings" Foreground="White" FontSize="38" FontWeight="Bold" 
+            <TextBlock Text="Impostazioni" Foreground="White" FontSize="38" FontWeight="Bold" 
                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
 
@@ -134,7 +134,7 @@
             
             <StackPanel Spacing="15">
                 <Grid>
-                    <TextBlock Text="Mode:" Foreground="White" FontSize="22" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <TextBlock Text="Modalità:" Foreground="White" FontSize="22" FontWeight="Bold" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     <Button x:Name="EditModesBtn" Classes="EditBtn" Content="Edit" HorizontalAlignment="Right"/>
                 </Grid>
                 <Border Background="#404040" CornerRadius="25" Height="55">
@@ -147,7 +147,7 @@
             </StackPanel>
 
             <StackPanel Spacing="15">
-                <TextBlock Text="Led colors:" Foreground="White" FontSize="22" FontWeight="Bold"/>
+                <TextBlock Text="Colori LED:" Foreground="White" FontSize="22" FontWeight="Bold"/>
                 
                 <StackPanel Orientation="Horizontal" Spacing="25">
                     <RadioButton Classes="LedColor" Background="#FF0D0D" IsChecked="True"/> 
@@ -165,13 +165,13 @@
             <StackPanel Orientation="Horizontal" Spacing="80" HorizontalAlignment="Left">
                 
                 <StackPanel Spacing="15">
-                    <TextBlock Text="Filling:" Foreground="White" FontSize="22" FontWeight="Bold"/>
-                    <Button x:Name="FillStartBtn" Classes="StartRedBtn" Content="Start"/>
+                    <TextBlock Text="Riempimento:" Foreground="White" FontSize="22" FontWeight="Bold"/>
+                    <Button x:Name="FillStartBtn" Classes="StartRedBtn" Content="Avvia"/>
                 </StackPanel>
 
                 <StackPanel Spacing="15">
-                    <TextBlock Text="Cleaning:" Foreground="White" FontSize="22" FontWeight="Bold"/>
-                    <Button x:Name="CleanStartBtn" Classes="StartBtn" Content="Start"/>
+                    <TextBlock Text="Risciacquo:" Foreground="White" FontSize="22" FontWeight="Bold"/>
+                    <Button x:Name="CleanStartBtn" Classes="StartBtn" Content="Avvia"/>
                 </StackPanel>
 
             </StackPanel>

@@ -13,7 +13,10 @@ public sealed class MaxCocktailRepository : ICocktailRepository
     public IReadOnlyList<Cocktail> GetAll()
     {
         var config = AppConfigService.Instance.Config;
-        return config.Cocktails.Select(MapCocktail).ToList();
+        return config.Cocktails
+            .Where(c => !c.LargeEventOnly || config.IsLargeEvent)
+            .Select(MapCocktail)
+            .ToList();
     }
 
     public IReadOnlyList<Cocktail> GetByMode(string modeName) =>
@@ -28,6 +31,9 @@ public sealed class MaxCocktailRepository : ICocktailRepository
         Theme = Enum.TryParse<CocktailTheme>(c.Theme, ignoreCase: true, out var theme) ? theme : CocktailTheme.Burgundy,
         ModeName = string.Empty,
         IsActive = c.IsActive,
+        ShowImage = c.ShowImage,
+        Category = c.Category,
+        Description = c.Description,
         LedRgb = c.LedR.HasValue && c.LedG.HasValue && c.LedB.HasValue
             ? ((byte)Math.Clamp(c.LedR.Value, 0, 255),
                (byte)Math.Clamp(c.LedG.Value, 0, 255),

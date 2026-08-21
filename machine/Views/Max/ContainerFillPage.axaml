@@ -69,12 +69,16 @@
         <Style Selector="ToggleButton.JerryCanBtn">
             <Setter Property="Width" Value="280"/>
             <Setter Property="Height" Value="300"/>
-            <Setter Property="Cursor" Value="Arrow"/>
+            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <ControlTemplate>
-                    <StackPanel Spacing="0">
+                    <StackPanel Spacing="0" Background="Transparent">
                         <Grid Width="280" Height="250" Background="Transparent">
-                            <Border Width="200" Height="200" CornerRadius="28" BorderBrush="#2A2C22"
+                            <Border Name="KegGlow" Width="200" Height="200" CornerRadius="28"
+                                    BorderThickness="4" BorderBrush="#CAF0F8" Opacity="0"
+                                    BoxShadow="0 0 25 0 #CAF0F8"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Name="KegFrame" Width="200" Height="200" CornerRadius="28" BorderBrush="#2A2C22"
                                     BorderThickness="1" ClipToBounds="True"
                                     HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <Grid>
@@ -82,22 +86,43 @@
                                         <RowDefinition Height="*"/>
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
-                                    <Border Grid.Row="0" Background="#1B1C16"/>
-                                    <Border Grid.Row="1" Background="#161816"/>
+                                    <Border Name="KegTop" Grid.Row="0" Background="#1B1C16"/>
+                                    <Border Name="KegBottom" Grid.Row="1" Background="#161816"/>
                                     <ContentPresenter Grid.RowSpan="2" HorizontalAlignment="Center"
                                                       VerticalAlignment="Center" Content="{TemplateBinding Content}"/>
                                 </Grid>
                             </Border>
                         </Grid>
-                        <TextBlock Text="{TemplateBinding Tag}" Foreground="#E7E6DC" FontFamily="Space Grotesk"
+                        <TextBlock Name="KegText" Text="{TemplateBinding Tag}" Foreground="#E7E6DC"
+                                   FontFamily="Space Grotesk"
                                    FontSize="26" FontWeight="Bold" HorizontalAlignment="Center"
-                                   Margin="0,-35,0,0"/>
+                                   Margin="0,4,0,0"/>
                     </StackPanel>
                 </ControlTemplate>
             </Setter>
         </Style>
+
+        <Style Selector="ToggleButton.JerryCanBtn:checked /template/ Border#KegGlow">
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+        <Style Selector="ToggleButton.JerryCanBtn:checked /template/ Border#KegTop">
+            <Setter Property="Background" Value="#2A3030"/>
+        </Style>
+        <Style Selector="ToggleButton.JerryCanBtn:checked /template/ Border#KegBottom">
+            <Setter Property="Background" Value="#243033"/>
+        </Style>
+        <Style Selector="ToggleButton.JerryCanBtn:checked /template/ TextBlock#KegText">
+            <Setter Property="Foreground" Value="#CAF0F8"/>
+        </Style>
+        <Style Selector="ToggleButton.JerryCanBtn.Filled /template/ Border#KegTop">
+            <Setter Property="Background" Value="#223033"/>
+        </Style>
+        <Style Selector="ToggleButton.JerryCanBtn.Filled /template/ TextBlock#KegText">
+            <Setter Property="Foreground" Value="#CAF0F8"/>
+        </Style>
         <Style Selector="ToggleButton.JerryCanBtn:disabled">
             <Setter Property="Opacity" Value="0.45"/>
+            <Setter Property="Cursor" Value="Arrow"/>
         </Style>
 
         <Style Selector="Button.DoneButtonStyle">
@@ -125,6 +150,43 @@
         </Style>
     </UserControl.Styles>
 
+    <UserControl.Styles>
+        <Style Selector="Button.SizeBtn">
+            <Setter Property="Background" Value="#1F211C"/>
+            <Setter Property="BorderBrush" Value="#3A3D33"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.SizeBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#2A3030"/>
+            <Setter Property="BorderBrush" Value="#CAF0F8"/>
+        </Style>
+        <Style Selector="Button.SizeBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#CAF0F8"/>
+        </Style>
+        <Style Selector="TextBlock.SizeLabel">
+            <Setter Property="Foreground" Value="#E7E6DC"/>
+            <Setter Property="FontSize" Value="30"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="Space Grotesk"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.SizeCancelBtn">
+            <Setter Property="Background" Value="#26FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#4DFFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="28"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.SizeCancelBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#3DFFFFFF"/>
+        </Style>
+    </UserControl.Styles>
+
     <Canvas Width="1920" Height="1080">
         <Canvas.Background>
             <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%" RadiusX="80%" RadiusY="80%">
@@ -137,7 +199,7 @@
             <StackPanel Orientation="Horizontal" Spacing="12">
                 <PathIcon Width="24" Height="24" Foreground="#E7E6DC"
                           Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
-                <TextBlock Text="BACK TO MENU" Foreground="#E7E6DC" FontFamily="Space Grotesk"
+                <TextBlock Text="TORNA AL MENU" Foreground="#E7E6DC" FontFamily="Space Grotesk"
                            FontWeight="Bold" FontSize="18" VerticalAlignment="Center"/>
             </StackPanel>
         </Button>
@@ -146,19 +208,19 @@
                    FontSize="28" FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="4"
                    TextAlignment="Center"/>
 
-        <ToggleButton Classes="JerryCanBtn" Tag="Empty" Canvas.Left="120" Canvas.Top="240" IsEnabled="False">
+        <ToggleButton x:Name="Keg1" Classes="JerryCanBtn" Tag="11" Canvas.Left="120" Canvas.Top="240">
             <PathIcon Width="62" Height="62" Foreground="#E7E6DC"
                       Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
         </ToggleButton>
-        <ToggleButton Classes="JerryCanBtn" Tag="Empty" Canvas.Left="120" Canvas.Top="540" IsEnabled="False">
+        <ToggleButton x:Name="Keg2" Classes="JerryCanBtn" Tag="12" Canvas.Left="120" Canvas.Top="540">
             <PathIcon Width="62" Height="62" Foreground="#E7E6DC"
                       Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
         </ToggleButton>
-        <ToggleButton Classes="JerryCanBtn" Tag="Empty" Canvas.Left="1520" Canvas.Top="240" IsEnabled="False">
+        <ToggleButton x:Name="Keg3" Classes="JerryCanBtn" Tag="13" Canvas.Left="1520" Canvas.Top="240">
             <PathIcon Width="62" Height="62" Foreground="#E7E6DC"
                       Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
         </ToggleButton>
-        <ToggleButton Classes="JerryCanBtn" Tag="Empty" Canvas.Left="1520" Canvas.Top="540" IsEnabled="False">
+        <ToggleButton x:Name="Keg4" Classes="JerryCanBtn" Tag="14" Canvas.Left="1520" Canvas.Top="540">
             <PathIcon Width="62" Height="62" Foreground="#E7E6DC"
                       Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
         </ToggleButton>
@@ -216,7 +278,7 @@
         </ToggleButton>
 
         <StackPanel Canvas.Left="760" Canvas.Top="346" Width="400" HorizontalAlignment="Center">
-            <TextBlock Text="Select the containers to fill, then press fill to start."
+            <TextBlock Text="Seleziona i contenitori da riempire, poi premi avvia."
                        Foreground="#CAF0F8" FontSize="24" FontWeight="Bold" FontFamily="Space Grotesk"
                        TextAlignment="Center" TextWrapping="Wrap"/>
             <Image Source="avares://Daeva/Assets/DaevaWhite.png" Width="270" Height="82"
@@ -228,7 +290,182 @@
         </StackPanel>
 
         <Button x:Name="FillBtn" Classes="DoneButtonStyle" Canvas.Left="780" Canvas.Top="920"
-                Content="Fill" Click="OnFill"/>
+                Content="Avvia" Click="OnFill"/>
 
+        <Grid Name="Keg1Blocked"
+              Canvas.Left="120"
+              Canvas.Top="240"
+              Width="280"
+              Height="300"
+              IsHitTestVisible="False"
+              IsVisible="False">
+            <Line StartPoint="46,32" EndPoint="234,218"
+                  Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
+            <TextBlock Text="Non disponibili in questa modalità"
+                       Foreground="#E5484D" FontSize="15" FontWeight="Bold"
+                       FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
+                       Width="240"
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Margin="0,0,0,6"/>
+        </Grid>
+        <Grid Name="Keg2Blocked"
+              Canvas.Left="120"
+              Canvas.Top="540"
+              Width="280"
+              Height="300"
+              IsHitTestVisible="False"
+              IsVisible="False">
+            <Line StartPoint="46,32" EndPoint="234,218"
+                  Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
+            <TextBlock Text="Non disponibili in questa modalità"
+                       Foreground="#E5484D" FontSize="15" FontWeight="Bold"
+                       FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
+                       Width="240"
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Margin="0,0,0,6"/>
+        </Grid>
+        <Grid Name="Keg3Blocked"
+              Canvas.Left="1520"
+              Canvas.Top="240"
+              Width="280"
+              Height="300"
+              IsHitTestVisible="False"
+              IsVisible="False">
+            <Line StartPoint="46,32" EndPoint="234,218"
+                  Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
+            <TextBlock Text="Non disponibili in questa modalità"
+                       Foreground="#E5484D" FontSize="15" FontWeight="Bold"
+                       FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
+                       Width="240"
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Margin="0,0,0,6"/>
+        </Grid>
+        <Grid Name="Keg4Blocked"
+              Canvas.Left="1520"
+              Canvas.Top="540"
+              Width="280"
+              Height="300"
+              IsHitTestVisible="False"
+              IsVisible="False">
+            <Line StartPoint="46,32" EndPoint="234,218"
+                  Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
+            <TextBlock Text="Non disponibili in questa modalità"
+                       Foreground="#E5484D" FontSize="15" FontWeight="Bold"
+                       FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
+                       Width="240"
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Margin="0,0,0,6"/>
+        </Grid>
+
+        <!-- Shown while the pumps prime the lines, so the wait is not a frozen screen. -->
+        <Border Name="FillProgressOverlay"
+                Canvas.Left="0"
+                Canvas.Top="0"
+                Width="1920"
+                Height="1080"
+                Background="#E6000000"
+                IsVisible="False">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="28">
+                <TextBlock Text="Riempimento dei tubi in corso"
+                           Foreground="#E7E6DC" FontSize="34" FontWeight="Bold"
+                           FontFamily="Space Grotesk" HorizontalAlignment="Center"/>
+                <TextBlock Name="FillProgressDetail"
+                           Text=""
+                           Foreground="#CAF0F8" FontSize="20"
+                           FontFamily="Space Grotesk" HorizontalAlignment="Center"/>
+                <ProgressBar Name="FillProgress"
+                             Width="760" Height="42"
+                             Minimum="0" Maximum="100" Value="0"
+                             Foreground="#CAF0F8" Background="#24FFFFFF"
+                             CornerRadius="21"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Asked before the pumps run: the chosen size is what the level warnings count down from. -->
+        <Border Name="SizeOverlay"
+                Canvas.Left="0"
+                Canvas.Top="0"
+                Width="1920"
+                Height="1080"
+                Background="#E6000000"
+                IsVisible="False">
+            <Border Width="1100"
+                    Background="#161816"
+                    BorderBrush="#2A2C22"
+                    BorderThickness="1"
+                    CornerRadius="32"
+                    Padding="56"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                <StackPanel Spacing="14">
+                    <TextBlock Name="SizeOverlayTitle"
+                               Text="Da quanti litri è la bottiglia che hai inserito?"
+                               Foreground="#E7E6DC" FontSize="34" FontWeight="Bold"
+                               FontFamily="Space Grotesk" HorizontalAlignment="Center"/>
+                    <StackPanel Name="KegSizes"
+                                Orientation="Horizontal"
+                                Spacing="16"
+                                HorizontalAlignment="Center"
+                                Margin="0,24,0,0"
+                                IsVisible="False">
+                        <Button Classes="SizeBtn" Tag="5000" Width="170" Height="110" Click="OnBottleSizeChosen">
+                            <TextBlock Text="5 L" Classes="SizeLabel"/>
+                        </Button>
+                        <Button Classes="SizeBtn" Tag="10000" Width="170" Height="110" Click="OnBottleSizeChosen">
+                            <TextBlock Text="10 L" Classes="SizeLabel"/>
+                        </Button>
+                        <Button Classes="SizeBtn" Tag="20000" Width="170" Height="110" Click="OnBottleSizeChosen">
+                            <TextBlock Text="20 L" Classes="SizeLabel"/>
+                        </Button>
+                        <Button Classes="SizeBtn" Tag="24000" Width="170" Height="110" Click="OnBottleSizeChosen">
+                            <TextBlock Text="24 L" Classes="SizeLabel"/>
+                        </Button>
+                        <Button Classes="SizeBtn" Tag="30000" Width="170" Height="110" Click="OnBottleSizeChosen">
+                            <TextBlock Text="30 L" Classes="SizeLabel"/>
+                        </Button>
+                    </StackPanel>
+
+                    <TextBlock Name="MixedSelectionNote"
+                               Text="Seleziona fusti e bottiglie separatamente: la capacità vale per tutte le linee scelte."
+                               Foreground="#F5C518" FontSize="18"
+                               FontFamily="Space Grotesk" TextWrapping="Wrap"
+                               TextAlignment="Center" HorizontalAlignment="Center"
+                               Margin="0,24,0,0"
+                               IsVisible="False"/>
+
+                    <StackPanel Name="BottleSizes"
+                                Orientation="Horizontal"
+                                Spacing="16"
+                                HorizontalAlignment="Center"
+                                Margin="0,24,0,0">
+                        <Button Classes="SizeBtn" Tag="500" Width="170" Height="110" Click="OnBottleSizeChosen">
+                            <TextBlock Text="0.5 L" Classes="SizeLabel"/>
+                        </Button>
+                        <Button Classes="SizeBtn" Tag="750" Width="170" Height="110" Click="OnBottleSizeChosen">
+                            <TextBlock Text="0.75 L" Classes="SizeLabel"/>
+                        </Button>
+                        <Button Classes="SizeBtn" Tag="1000" Width="170" Height="110" Click="OnBottleSizeChosen">
+                            <TextBlock Text="1 L" Classes="SizeLabel"/>
+                        </Button>
+                        <Button Classes="SizeBtn" Tag="1500" Width="170" Height="110" Click="OnBottleSizeChosen">
+                            <TextBlock Text="1.5 L" Classes="SizeLabel"/>
+                        </Button>
+                        <Button Classes="SizeBtn" Tag="2000" Width="170" Height="110" Click="OnBottleSizeChosen">
+                            <TextBlock Text="2 L" Classes="SizeLabel"/>
+                        </Button>
+                    </StackPanel>
+
+                    <Button Classes="SizeCancelBtn"
+                            Width="220" Height="56"
+                            Margin="0,24,0,0"
+                            HorizontalAlignment="Center"
+                            Click="OnBottleSizeCancel">
+                        <TextBlock Text="ANNULLA" Foreground="#E7E6DC" FontSize="18" FontWeight="Bold"
+                                   FontFamily="Space Grotesk"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Border>
     </Canvas>
 </UserControl>

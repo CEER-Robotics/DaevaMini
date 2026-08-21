@@ -1,0 +1,138 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:max="clr-namespace:DaevaMini.Views.Max"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+             x:Class="DaevaMini.Views.Max.FlowRatePage"
+             x:Name="PageHost">
+
+    <UserControl.Styles>
+        <Style Selector="Button.InvisibleBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.InvisibleBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="Button.StepBtn">
+            <Setter Property="Background" Value="#1F211C"/>
+            <Setter Property="BorderBrush" Value="#3A3D33"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="22"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.StepBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#2A3030"/>
+        </Style>
+
+        <Style Selector="Button.TestBtn">
+            <Setter Property="Background" Value="#26FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#4DFFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="22"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.TestBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#3DFFFFFF"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Canvas Width="1920" Height="1080">
+        <Canvas.Background>
+            <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%" RadiusX="80%" RadiusY="80%">
+                <GradientStop Color="#1A2222" Offset="0"/>
+                <GradientStop Color="#0B0D0D" Offset="1"/>
+            </RadialGradientBrush>
+        </Canvas.Background>
+
+        <Button Canvas.Left="60" Canvas.Top="40" Classes="InvisibleBtn" Click="OnBackClick" Width="220" Height="48">
+            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                <PathIcon Width="22" Height="22" Foreground="#E7E6DC"
+                          Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                <TextBlock Text="INDIETRO" Foreground="#E7E6DC" FontSize="16" FontFamily="Space Grotesk"
+                           FontWeight="Bold" VerticalAlignment="Center" LetterSpacing="1"/>
+            </StackPanel>
+        </Button>
+
+        <TextBlock Canvas.Top="40" Width="1920" Text="PORTATA DEI FUSTI" Foreground="#E7E6DC"
+                   FontSize="28" FontWeight="Bold" FontFamily="Space Grotesk"
+                   TextAlignment="Center" LetterSpacing="3"/>
+
+        <StackPanel Canvas.Top="86" Width="1920" Spacing="4">
+            <TextBlock Text="Le pompe hanno una portata fissa. I fusti no, quindi si misura qui."
+                       Foreground="#8A8F80" FontSize="17" FontFamily="Space Grotesk" TextAlignment="Center"/>
+            <TextBlock Text="Premi EROGA 10 s, pesa il liquido raccolto, dividi i grammi per 10 e imposta quel numero con - e +."
+                       Foreground="#CAF0F8" FontSize="17" FontFamily="Space Grotesk" TextAlignment="Center"/>
+        </StackPanel>
+
+        <Border Canvas.Left="210" Canvas.Top="150" Width="1500" Height="820" CornerRadius="32"
+                Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1" Padding="30,24">
+            <ScrollViewer>
+                <ItemsControl ItemsSource="{Binding Lines, ElementName=PageHost}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="max:LineFlowRate">
+                            <Border Height="88" CornerRadius="20" Background="#0CFFFFFF" Padding="26,0" Margin="0,0,0,10">
+                                <Grid ColumnDefinitions="150,*,220,Auto">
+                                    <TextBlock Grid.Column="0" Text="{Binding ChannelLabel}"
+                                               Foreground="#CAF0F8" FontSize="20" FontWeight="Bold"
+                                               FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+
+                                    <TextBlock Grid.Column="1" Text="{Binding Liquid}"
+                                               Foreground="#E7E6DC" FontSize="22" FontWeight="Medium"
+                                               FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+
+                                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding RateLabel}"
+                                                   Foreground="#E7E6DC" FontSize="20" FontWeight="Bold"
+                                                   FontFamily="Space Grotesk"/>
+                                        <TextBlock Text="{Binding SourceLabel}"
+                                                   Foreground="#8A8F80" FontSize="13"
+                                                   FontFamily="Space Grotesk"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="10"
+                                                VerticalAlignment="Center">
+                                        <Button Classes="TestBtn" Width="150" Height="44"
+                                                Click="OnTestClick" CommandParameter="{Binding}">
+                                            <TextBlock Text="EROGA 10 s" Foreground="#E7E6DC" FontSize="15"
+                                                       FontWeight="Bold" FontFamily="Space Grotesk"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Button>
+                                        <Button Classes="StepBtn" Width="44" Height="44"
+                                                Click="OnDecreaseClick" CommandParameter="{Binding}">
+                                            <TextBlock Text="-" Foreground="#E7E6DC" FontSize="24" FontWeight="Bold"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Button>
+                                        <Button Classes="StepBtn" Width="44" Height="44"
+                                                Click="OnIncreaseClick" CommandParameter="{Binding}">
+                                            <TextBlock Text="+" Foreground="#E7E6DC" FontSize="24" FontWeight="Bold"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Button>
+                                        <Button Classes="StepBtn" Width="90" Height="44"
+                                                Click="OnResetClick" CommandParameter="{Binding}">
+                                            <TextBlock Text="AUTO" Foreground="#8A8F80" FontSize="14" FontWeight="Bold"
+                                                       FontFamily="Space Grotesk"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <TextBlock Name="StatusLine"
+                   Canvas.Top="990" Width="1920" Text=""
+                   Foreground="#CAF0F8" FontSize="18" FontFamily="Space Grotesk" TextAlignment="Center"/>
+    </Canvas>
+</UserControl>

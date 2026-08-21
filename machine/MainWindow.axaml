@@ -6,5 +6,12 @@
         x:Class="DaevaMini.MainWindow"
         Title="DaevaMini"
         Background="#131818">
-    <ContentControl Name="PageContainer"/>
+    <!-- Pages are authored against the machine's fixed 1920x1080 panel using absolute
+         Canvas coordinates, so PageContainer is pinned to that size and RootScaler
+         scales it. On the machine the window is exactly 1920x1080 and the code-behind
+         sets Stretch=None, making this a no-op; in DEBUG it shrinks the preview to fit
+         a smaller dev screen without touching a single design coordinate. -->
+    <Viewbox x:Name="RootScaler" Stretch="Uniform">
+        <ContentControl Name="PageContainer" Width="1920" Height="1080"/>
+    </Viewbox>
 </Window>
