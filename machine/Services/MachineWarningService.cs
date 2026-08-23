@@ -136,9 +136,7 @@ public sealed class MachineWarningService
 
     private static IEnumerable<MachineWarning> BuildMissingLineWarnings(AppConfig config)
     {
-        var assigned = config.GetActiveLiquidAssignments()
-            .Where(a => !string.IsNullOrWhiteSpace(a))
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var assigned = CocktailAvailability.LoadedLiquids(config);
 
         foreach (var cocktail in EnumerateCocktails(config))
         {
@@ -149,10 +147,7 @@ public sealed class MachineWarningService
             if (cocktail.LargeEventOnly && !config.IsLargeEvent)
                 continue;
 
-            var missing = cocktail.Ingredients
-                .Where(i => !assigned.Contains(i.Name))
-                .Select(i => i.Name)
-                .ToList();
+            var missing = CocktailAvailability.MissingLiquids(cocktail, assigned);
 
             if (missing.Count == 0)
                 continue;
@@ -160,7 +155,7 @@ public sealed class MachineWarningService
             yield return new MachineWarning(
                 WarningLevel.Critical,
                 $"{cocktail.Name}: manca una linea",
-                $"Nessuna pompa assegnata a {string.Join(", ", missing)}.");
+                $"Nessuna pompa assegnata a {string.Join(", ", missing)}. Il drink resta fuori dal menu.");
         }
     }
 

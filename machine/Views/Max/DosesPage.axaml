@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:max="clr-namespace:DaevaMini.Views.Max"
+             xmlns:controls="clr-namespace:DaevaMini.Controls"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
              x:Class="DaevaMini.Views.Max.DosesPage"
              x:Name="PageHost">
@@ -44,6 +45,23 @@
         <Style Selector="Button.StepBtn:pointerover /template/ ContentPresenter">
             <Setter Property="Background" Value="#2A3030"/>
         </Style>
+
+        <!-- Switches a drink on and off. A disabled drink stays on the menu but loses
+             its pour button, so this reads as "orderable" rather than "listed". -->
+        <Style Selector="Button.ToggleBtn">
+            <Setter Property="Background" Value="#141712"/>
+            <Setter Property="BorderBrush" Value="#3A3D33"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="18"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.ToggleBtn.on">
+            <Setter Property="Background" Value="#16301F"/>
+            <Setter Property="BorderBrush" Value="#3FBF7F"/>
+        </Style>
+
     </UserControl.Styles>
 
     <Canvas Width="1920" Height="1080">
@@ -74,22 +92,51 @@
         <!-- cocktail list -->
         <Border Canvas.Left="150" Canvas.Top="150" Width="560" Height="830" CornerRadius="32"
                 Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1" Padding="22">
-            <ScrollViewer>
-                <ItemsControl ItemsSource="{Binding Cocktails, ElementName=PageHost}">
+            <!-- Dragged with a finger, not with the scrollbar. The bar is left on its
+                 default auto-hiding behaviour, so it only shows up briefly while the
+                 list is moving and is not sitting there the rest of the time.
+                 Horizontal scrolling is off so the buttons size to the viewport. -->
+            <ScrollViewer controls:DragScroll.Enabled="True"
+                          HorizontalScrollBarVisibility="Disabled">
+                <!-- Right margin keeps the ON/OFF pill clear of the scrollbar, which
+                     floats over the content rather than taking a column of its own. -->
+                <ItemsControl ItemsSource="{Binding Cocktails, ElementName=PageHost}"
+                              Margin="0,0,18,0">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="max:DoseCocktail">
-                            <Button Classes="PickBtn" Height="72" Margin="0,0,0,8"
-                                    HorizontalAlignment="Stretch"
-                                    Click="OnSelectCocktail" CommandParameter="{Binding}">
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <TextBlock Grid.Column="0" Text="{Binding Name}"
-                                               Foreground="{Binding NameBrush}" FontSize="{StaticResource FontLabel}" FontWeight="Bold"
-                                               FontFamily="Space Grotesk" VerticalAlignment="Center"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding TotalLabel}"
-                                               Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
-                                               FontFamily="Space Grotesk" VerticalAlignment="Center"/>
-                                </Grid>
-                            </Button>
+                            <!-- The on/off pill is a sibling of the select button, not a
+                                 button inside a button: nesting would have made one tap
+                                 both toggle the drink and select it. -->
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                                <Button Grid.Column="0" Classes="PickBtn" Height="72"
+                                        HorizontalAlignment="Stretch"
+                                        Opacity="{Binding RowOpacity}"
+                                        Click="OnSelectCocktail" CommandParameter="{Binding}">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="{Binding Name}"
+                                                   Foreground="{Binding NameBrush}" FontSize="{StaticResource FontLabel}" FontWeight="Bold"
+                                                   FontFamily="Space Grotesk" VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <!-- Kept clear of the name: long names used to run
+                                             straight into the millilitres. -->
+                                        <TextBlock Grid.Column="1" Text="{Binding TotalLabel}"
+                                                   Margin="24,0,0,0"
+                                                   Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
+                                                   FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Button>
+
+                                <Button Grid.Column="1" Classes="ToggleBtn"
+                                        Classes.on="{Binding IsActive}"
+                                        Width="86" Height="72" Margin="10,0,0,0"
+                                        Click="OnToggleActive" CommandParameter="{Binding}">
+                                    <TextBlock Text="{Binding ActiveLabel}"
+                                               Foreground="{Binding ActiveBrush}"
+                                               FontSize="{StaticResource FontBody}" FontWeight="Bold"
+                                               FontFamily="Space Grotesk"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Button>
+                            </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -109,7 +156,9 @@
                                FontFamily="Space Grotesk"/>
                 </StackPanel>
 
-                <ScrollViewer>
+                <!-- Same treatment: it is the same defect on the same page. -->
+                <ScrollViewer controls:DragScroll.Enabled="True"
+                              HorizontalScrollBarVisibility="Disabled">
                     <ItemsControl ItemsSource="{Binding Ingredients, ElementName=PageHost}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="max:DoseIngredient">

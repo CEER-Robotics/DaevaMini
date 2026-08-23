@@ -13,8 +13,16 @@ public sealed class MaxCocktailRepository : ICocktailRepository
     public IReadOnlyList<Cocktail> GetAll()
     {
         var config = AppConfigService.Instance.Config;
+        var loaded = CocktailAvailability.LoadedLiquids(config);
+
         return config.Cocktails
+            // Switched off in the doses settings: off the menu entirely, not shown
+            // greyed out. A drink nobody can order has no business taking a card.
+            .Where(c => c.IsActive)
             .Where(c => !c.LargeEventOnly || config.IsLargeEvent)
+            // And nothing whose ingredients are not loaded on some line: the menu
+            // follows whatever the containers actually hold.
+            .Where(c => CocktailAvailability.CanBeMade(c, loaded))
             .Select(MapCocktail)
             .ToList();
     }

@@ -68,6 +68,23 @@ public partial class DosesPage : UserControl
             Ingredients.Add(new DoseIngredient(ingredient));
     }
 
+    /// <summary>
+    /// Turns a drink on or off. It stays on the menu either way; what changes is
+    /// whether guests can order it, so this is the switch to use when a bottle runs
+    /// out mid-service.
+    /// </summary>
+    private void OnToggleActive(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { CommandParameter: DoseCocktail cocktail }) return;
+
+        cocktail.IsActive = !cocktail.IsActive;
+        AppConfigService.Instance.SaveConfig("doses");
+
+        StatusLine.Text = cocktail.IsActive
+            ? $"{cocktail.Name}: attivo"
+            : $"{cocktail.Name}: disattivato, non ordinabile";
+    }
+
     private void OnIncreaseClick(object? sender, RoutedEventArgs e) => Adjust(sender, +StepMl);
 
     private void OnDecreaseClick(object? sender, RoutedEventArgs e) => Adjust(sender, -StepMl);
@@ -92,6 +109,8 @@ public sealed class DoseCocktail : INotifyPropertyChanged
 {
     private static readonly IBrush SelectedBrush = new SolidColorBrush(Color.Parse("#CAF0F8"));
     private static readonly IBrush IdleBrush = new SolidColorBrush(Color.Parse("#E7E6DC"));
+    private static readonly IBrush OnBrush = new SolidColorBrush(Color.Parse("#7FE0A8"));
+    private static readonly IBrush OffBrush = new SolidColorBrush(Color.Parse("#8A8F80"));
 
     private bool _isSelected;
 
@@ -115,6 +134,31 @@ public sealed class DoseCocktail : INotifyPropertyChanged
     }
 
     public IBrush NameBrush => _isSelected ? SelectedBrush : IdleBrush;
+
+    /// <summary>
+    /// Writes straight through to the stored recipe, like the doses do. The caller
+    /// saves, so a burst of toggles is one write rather than one each.
+    /// </summary>
+    public bool IsActive
+    {
+        get => Config.IsActive;
+        set
+        {
+            if (Config.IsActive == value) return;
+            Config.IsActive = value;
+            OnPropertyChanged(nameof(IsActive));
+            OnPropertyChanged(nameof(ActiveLabel));
+            OnPropertyChanged(nameof(ActiveBrush));
+            OnPropertyChanged(nameof(RowOpacity));
+        }
+    }
+
+    public string ActiveLabel => Config.IsActive ? "ON" : "OFF";
+
+    public IBrush ActiveBrush => Config.IsActive ? OnBrush : OffBrush;
+
+    /// <summary>Dims the row when the drink is off, so the state reads at a glance.</summary>
+    public double RowOpacity => Config.IsActive ? 1.0 : 0.45;
 
     public void RefreshTotal() => OnPropertyChanged(nameof(TotalLabel));
 

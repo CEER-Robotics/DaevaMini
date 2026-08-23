@@ -123,10 +123,6 @@
                                                FontFamily="Space Grotesk"
                                                HorizontalAlignment="Center"/>
                                 </StackPanel>
-
-                                <Border Background="#BB121212"
-                                        IsHitTestVisible="False"
-                                        IsVisible="{Binding Cocktail.IsInactive}"/>
                             </Grid>
                         </Border>
                     </Button>
