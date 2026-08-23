@@ -57,8 +57,8 @@ constexpr uint32_t kToxicPatternDurationMs = 1800;
 }  // namespace Timing
 
 namespace Animation {
-// Active animation selector: 1 chase, 2 dual-breathe, 3 bounce.
-constexpr uint8_t kActiveAnim = 3;
+// Active animation selector: 1 chase, 2 dual-breathe, 3 bounce, 4 slow pulse.
+constexpr uint8_t kActiveAnim = 4;
 // Global strip brightness applied at LED driver level (0-255).
 constexpr uint8_t kGlobalBrightness = 255;
 // Accent brightness used by active animation 1 (0-255).
@@ -69,6 +69,12 @@ constexpr int16_t kWaitBreatheStep = 10;
 constexpr int16_t kMaintenanceBreatheStep = 10;
 // Half-period of bounce motion in active animation 3.
 constexpr uint32_t kBounceHalfPeriodMs = 1000;
+// Full breath cycle (dim -> bright -> dim) of active animation 4.
+constexpr uint32_t kActivePulsePeriodMs = 2600;
+// Brightness floor of the active pulse, so the drink color never goes black.
+constexpr uint8_t kActivePulseMinBrightness = 25;
+// Brightness ceiling of the active pulse.
+constexpr uint8_t kActivePulseMaxBrightness = 255;
 // Half-period for TOXIC strobe blink.
 constexpr uint32_t kToxicStrobeHalfPeriodMs = 120;
 // Half-period for TOXIC alternate checker pattern.

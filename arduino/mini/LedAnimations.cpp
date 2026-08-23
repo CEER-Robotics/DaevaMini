@@ -50,6 +50,7 @@ static uint32_t upCol = 0;
 static uint32_t dnCol = 0;
 static uint32_t endAnimStartMs = 0;
 static uint32_t startupAnimStartMs = 0;
+static uint32_t activePulseStartMs = 0;
 
 enum ToxicPattern : uint8_t {
   TOXIC_STROBE = 0,
@@ -166,6 +167,35 @@ static void activeAnim2Step(uint32_t color) {
 
   strip1.show();
   strip2.show();
+}
+
+// Slow breath over the whole rig in the drink color. Driven by wall time, not
+// by a per-frame counter, so the cadence stays the same whatever kFrameActiveMs
+// is set to and a dropped frame does not slow the breath down.
+static uint8_t activePulseBrightness(uint32_t now) {
+  const uint32_t periodMs = (ProjectConfig::Animation::kActivePulsePeriodMs == 0)
+                                ? 1
+                                : ProjectConfig::Animation::kActivePulsePeriodMs;
+  const uint32_t phaseMs = (now - activePulseStartMs) % periodMs;
+  const uint32_t halfMs = (periodMs / 2 == 0) ? 1 : (periodMs / 2);
+
+  // Triangle 0..1..0 across the period, then smoothstep so the turnaround at
+  // full and at minimum is soft instead of a visible corner.
+  const float tri = (phaseMs < halfMs)
+                        ? ((float)phaseMs / (float)halfMs)
+                        : ((float)(periodMs - phaseMs) / (float)(periodMs - halfMs));
+  const float eased = tri * tri * (3.0f - 2.0f * tri);
+
+  const uint8_t lo = ProjectConfig::Animation::kActivePulseMinBrightness;
+  const uint8_t hi = ProjectConfig::Animation::kActivePulseMaxBrightness;
+  if (hi <= lo) {
+    return hi;
+  }
+  return (uint8_t)(lo + (uint8_t)(((float)(hi - lo) * eased) + 0.5f));
+}
+
+static void activeAnim4Step(uint32_t color, uint32_t now) {
+  staticFill(scaleColor(strip1, color, activePulseBrightness(now)));
 }
 
 static void endFlashStep(uint32_t now) {
@@ -435,6 +465,8 @@ static void enterActiveState() {
   chasePos = 0;
   breathePhase = 0;
   breatheStep = abs(breatheStep);
+  // Start every pour at the dim end so the first breath swells in.
+  activePulseStartMs = millis();
 
   if (ProjectConfig::Animation::kActiveAnim == 3) {
     uint32_t durMs = (uint32_t)(LedStateMachine::activeUntilMs() - millis());
@@ -679,6 +711,8 @@ bool update() {
       activeAnim2Step(color);
     } else if (ProjectConfig::Animation::kActiveAnim == 3) {
       bounceAnimStep();
+    } else if (ProjectConfig::Animation::kActiveAnim == 4) {
+      activeAnim4Step(color, now);
     }
 
     nextFrameAt = now + ProjectConfig::Animation::kFrameActiveMs;
