@@ -30,6 +30,12 @@ public class Cocktail
     public (byte R, byte G, byte B)? LedRgb { get; init; }
 
     /// <summary>
+    /// True for drinks drawn from a tap rather than measured out: the guest opens the
+    /// valve and closes it when the glass looks right.
+    /// </summary>
+    public bool IsTap { get; init; }
+
+    /// <summary>
     /// Ingredient doses for this cocktail (from appsettings for current mode).
     /// Empty when the cocktail is not defined for the current mode.
     /// </summary>

@@ -34,6 +34,7 @@ public sealed class MaxCocktailRepository : ICocktailRepository
         ShowImage = c.ShowImage,
         Category = c.Category,
         Description = c.Description,
+        IsTap = c.IsTap,
         LedRgb = c.LedR.HasValue && c.LedG.HasValue && c.LedB.HasValue
             ? ((byte)Math.Clamp(c.LedR.Value, 0, 255),
                (byte)Math.Clamp(c.LedG.Value, 0, 255),

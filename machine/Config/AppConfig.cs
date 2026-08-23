@@ -173,6 +173,14 @@ public sealed class CocktailConfig
     [YamlMember(Alias = "LargeEventOnly")]
     public bool LargeEventOnly { get; set; }
 
+    /// <summary>
+    /// When true the drink is not poured by dose but drawn like a tap: the guest opens
+    /// and closes the valve themselves. Ingredient volumes are then indicative only,
+    /// since the guest decides how much comes out.
+    /// </summary>
+    [YamlMember(Alias = "IsTap")]
+    public bool IsTap { get; set; }
+
     [YamlMember(Alias = "LedR")]
     public int? LedR { get; set; }
 

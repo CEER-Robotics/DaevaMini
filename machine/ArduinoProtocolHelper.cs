@@ -65,6 +65,29 @@ public static class ArduinoProtocolHelper
     }
 
     /// <summary>
+    /// Command that recolors the idle strips: TINT, RGB:&lt;r&gt;,&lt;g&gt;,&lt;b&gt;. Used to show
+    /// which part of the machine is on screen. The firmware applies it only in WAIT,
+    /// and holding a tint does not stop ACTIVE from working.
+    /// </summary>
+    public static string BuildTintCommand((byte R, byte G, byte B) ledRgb)
+        => $"TINT, RGB:{ledRgb.R},{ledRgb.G},{ledRgb.B}";
+
+    /// <summary>Drops the tint and returns the strips to the default idle color.</summary>
+    public const string TintOffCommand = "TINT OFF";
+
+    /// <summary>
+    /// Opens a tap channel, or keeps one already open alive: TAP, RGB:&lt;r&gt;,&lt;g&gt;,&lt;b&gt;, P&lt;n&gt;.
+    /// Deliberately carries no duration. The firmware only holds the valve open for a
+    /// short window and expects this to be repeated, so that a host which stops
+    /// running cannot leave a valve open behind it.
+    /// </summary>
+    public static string BuildTapCommand((byte R, byte G, byte B) ledRgb, int channel)
+        => $"TAP, RGB:{ledRgb.R},{ledRgb.G},{ledRgb.B}, P{channel}";
+
+    /// <summary>Closes the tap now and runs the normal end-of-pour LED sequence.</summary>
+    public const string TapOffCommand = "TAP OFF";
+
+    /// <summary>
     /// Parses the firmware response after sending ACTIVE. Returns NoResponse for null/empty or unknown lines.
     /// </summary>
     public static ActivateResponse ParseActivateResponse(string? line)

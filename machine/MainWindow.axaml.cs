@@ -89,7 +89,7 @@ public partial class MainWindow : Window
     {
         if (_pageContainer != null)
         {
-            _pageContainer.Content = new SplashPage();
+            SetPage(new SplashPage());
         }
     }
 
@@ -109,8 +109,9 @@ public partial class MainWindow : Window
         };
         menu.BackClicked += OnCocktailMenuBackClicked;
         menu.PourHandler = DispenseAsync;
+        menu.TapHandler = OpenTap;
         _cocktailMenuView = menu;
-        _pageContainer.Content = menu;
+        SetPage(menu);
     }
 
     private void OnCocktailMenuBackClicked(object? sender, RoutedEventArgs e)
@@ -130,7 +131,7 @@ public partial class MainWindow : Window
         card.CloseClicked += OnCardCloseClicked;
         card.DaleClicked += OnCardDaleClicked;
         if (_pageContainer != null)
-            _pageContainer.Content = card;
+            SetPage(card);
     }
 
     private void OnCardCloseClicked(object? sender, RoutedEventArgs e)
@@ -141,7 +142,7 @@ public partial class MainWindow : Window
             card.DaleClicked -= OnCardDaleClicked;
         }
         if (_cocktailMenuView != null && _pageContainer != null)
-            _pageContainer.Content = _cocktailMenuView;
+            SetPage(_cocktailMenuView);
     }
 
     private async void OnCardDaleClicked(object? sender, RoutedEventArgs e)
@@ -294,23 +295,77 @@ public partial class MainWindow : Window
         return false;
     }
 
+    // Orange while the settings screens are open, per the machine's visual language.
+    private static readonly (byte R, byte G, byte B) SettingsTint = (255, 120, 0);
+
+    /// <summary>
+    /// Swaps the visible page and tells the strips which part of the machine we are
+    /// in. Every navigation goes through here, so no screen can forget to do it.
+    /// </summary>
+    private void SetPage(object page)
+    {
+        if (_pageContainer == null) return;
+
+        _pageContainer.Content = page;
+        ApplyIdleTint(page);
+    }
+
+    /// <summary>
+    /// Holds an orange tint for the whole settings area and the default idle color
+    /// everywhere else. Fire-and-forget on a worker thread: the tint is decoration and
+    /// the UI must not wait on the serial port to change page. The firmware's "OK TINT"
+    /// is left on the wire for <see cref="ArduinoSerialManager"/> to skip, which it
+    /// already does for unsolicited lines.
+    /// </summary>
+    private static void ApplyIdleTint(object page)
+    {
+        bool isSettings = page is SettingsDaevaMax or NumberPadPage or DosesPage
+            or FlowRatePage or ContainerSetupPage or ContainerFillPage
+            or ContainerCleanPage;
+
+        string command = isSettings
+            ? ArduinoProtocolHelper.BuildTintCommand(SettingsTint)
+            : ArduinoProtocolHelper.TintOffCommand;
+
+        Task.Run(() => ArduinoSerialManager.Instance.Send(command));
+    }
+
+    /// <summary>
+    /// Opens the tap for a drink and hands back the live session, or null when it
+    /// cannot start. The caller owns the session and must dispose it to close.
+    /// </summary>
+    private static TapSession? OpenTap(Cocktail cocktail)
+    {
+        var config = AppConfigService.Instance.Config;
+        var channels = ArduinoProtocolHelper.MapIngredientsToChannels(
+            cocktail.Ingredients, config.GetActiveLiquidAssignments(), config.GetFlowRateMsPerMl);
+
+        // A tap drink is one ingredient on one line; the dose in the config is only
+        // there to describe the drink, since the guest decides how much to draw.
+        foreach (int channel in channels.Keys)
+            return TapSession.TryOpen(cocktail, channel);
+
+        Console.WriteLine($"[MainWindow] No channel mapped for tap drink {cocktail.Title}");
+        return null;
+    }
+
     public void ShowDosesPage()
     {
         if (_pageContainer != null)
-            _pageContainer.Content = new DosesPage();
+            SetPage(new DosesPage());
     }
 
     public void ShowFlowRatePage()
     {
         if (_pageContainer != null)
-            _pageContainer.Content = new FlowRatePage();
+            SetPage(new FlowRatePage());
     }
 
     public void ShowSettingsPage()
     {
         if (_pageContainer != null)
         {
-            _pageContainer.Content = new SettingsDaevaMax();
+            SetPage(new SettingsDaevaMax());
         }
     }
 
@@ -318,7 +373,7 @@ public partial class MainWindow : Window
     {
         if (_pageContainer != null)
         {
-            _pageContainer.Content = new NumberPadPage();
+            SetPage(new NumberPadPage());
         }
     }
 
@@ -326,7 +381,7 @@ public partial class MainWindow : Window
     {
         if (_pageContainer != null)
         {
-            _pageContainer.Content = new ContainerSetupPage();
+            SetPage(new ContainerSetupPage());
         }
     }
 
@@ -334,7 +389,7 @@ public partial class MainWindow : Window
     {
         if (_pageContainer != null)
         {
-            _pageContainer.Content = new ContainerFillPage();
+            SetPage(new ContainerFillPage());
         }
     }
 
@@ -342,7 +397,7 @@ public partial class MainWindow : Window
     {
         if (_pageContainer != null)
         {
-            _pageContainer.Content = new ContainerCleanPage();
+            SetPage(new ContainerCleanPage());
         }
     }
 }

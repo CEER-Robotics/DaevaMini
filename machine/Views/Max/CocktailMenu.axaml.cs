@@ -6,6 +6,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
+using Avalonia.Layout;
+using Avalonia.Styling;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
@@ -20,10 +24,16 @@ namespace DaevaMini.Views.Max;
 public partial class CocktailMenu : UserControl, INotifyPropertyChanged
 {
     private const int PageSize = 8;
+
+    /// <summary>Four cards of 400 plus their 15 px margins: one screenful of the strip.</summary>
+    private const double PageWidth = 1720;
     private const int CollectMessageMs = 6000;
 
     /// <summary>How long the "place your glass" prompt waits before giving up.</summary>
     private const int ConfirmTimeoutMs = 15000;
+
+    /// <summary>Track width: the thread of light reaches the end exactly when the pour does.</summary>
+    private const double ProgressTrackWidth = 900;
     private const double SwipeThreshold = 140;
     private const double SwipeAxisBias = 1.4;
     private CocktailMenuViewModel? _viewModel;
@@ -35,7 +45,8 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
     private bool _isWarningPanelOpen;
     private int _confirmToken;
     private CocktailCardItem? _pourOverlayItem;
-    private double _pourSweepAngle;
+    private CocktailCardItem? _tapItem;
+    private TapSession? _tapSession;
     private string _pourMessage = string.Empty;
     private bool _isPourDone;
 
@@ -57,7 +68,13 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
     /// </summary>
     public Func<Cocktail, Func<int, Task>, Task<bool>>? PourHandler { get; set; }
 
+    /// <summary>Opens the valve for a tap drink. Returns null when it cannot start.</summary>
+    public Func<Cocktail, TapSession?>? TapHandler { get; set; }
+
     public ObservableCollection<CocktailCardItem> VisibleCocktails { get; } = new();
+
+    /// <summary>The menu split into screenfuls; the strip shows them side by side.</summary>
+    public ObservableCollection<CocktailPage> Pages { get; } = new();
     public ObservableCollection<PageIndicator> PageIndicators { get; } = new();
     public ObservableCollection<FilterTab> Filters { get; } = new();
     public ObservableCollection<MachineWarning> Warnings { get; } = new();
@@ -65,9 +82,18 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
     public bool HasWarnings => Warnings.Count > 0;
 
     public bool IsPourOverlayOpen => _pourOverlayItem != null;
+
+    public bool IsTapOverlayOpen => _tapItem != null;
+    public string TapTitle => _tapItem?.Cocktail.Title ?? string.Empty;
+    public string TapImage => _tapItem?.Cocktail.ImageSource ?? string.Empty;
+    public bool IsTapFlowing => _tapSession != null;
+    /// <summary>The single word on the button: it names what pressing will do.</summary>
+    public string TapButtonLabel => _tapSession == null ? "APRI" : "CHIUDI";
+    public string TapHint => _tapSession == null
+        ? "Metti il bicchiere sotto al rubinetto"
+        : "Premi di nuovo per chiudere";
     public string PourImage => _pourOverlayItem?.Cocktail.ImageSource ?? string.Empty;
     public string PourTitle => _pourOverlayItem?.Cocktail.Title ?? string.Empty;
-    public double PourSweepAngle => _pourSweepAngle;
     public string PourMessage => _pourMessage;
 
     /// <summary>The drink name closing the "Enjoy Your ..." line, set larger than the rest.</summary>
@@ -121,6 +147,13 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
+        // The screen going away must not outlive an open valve.
+        if (_tapSession is { } open)
+        {
+            _tapSession = null;
+            _ = open.DisposeAsync();
+        }
+
         MachineWarningService.Instance.WarningsChanged -= OnWarningsChanged;
         UnsubscribeFromViewModel();
         base.OnDetachedFromVisualTree(e);
@@ -266,6 +299,9 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
         foreach (var other in VisibleCocktails)
             other.IsConfirming = ReferenceEquals(other, item);
 
+        // The strips stay on the idle color while the guest is choosing: the drink's
+        // own color only arrives when the pour actually starts.
+
         // Nothing cancels the prompt, so it steps back on its own if nobody confirms.
         int token = ++_confirmToken;
         await Task.Delay(ConfirmTimeoutMs);
@@ -287,6 +323,15 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
 
         item.IsConfirming = false;
         _confirmToken++;
+
+        // A tap drink is not poured by dose: it gets its own screen where the guest
+        // works the valve.
+        if (item.Cocktail.IsTap)
+        {
+            OpenTapOverlay(item);
+            return;
+        }
+
         if (PourHandler == null) return;
 
         _isPouring = true;
@@ -310,11 +355,62 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
         ClosePourOverlay();
     }
 
+    private void OpenTapOverlay(CocktailCardItem item)
+    {
+        _tapItem = item;
+        NotifyTap();
+    }
+
+    /// <summary>
+    /// The one button: opens the valve if closed, closes it if open. Disposing the
+    /// session is what actually shuts the valve.
+    /// </summary>
+    private async void OnTapToggleClick(object? sender, RoutedEventArgs e)
+    {
+        if (_tapItem is not { } item) return;
+
+        if (_tapSession is { } open)
+        {
+            _tapSession = null;
+            NotifyTap();
+            await open.DisposeAsync();
+            return;
+        }
+
+        if (TapHandler == null) return;
+
+        _tapSession = TapHandler(item.Cocktail);
+        if (_tapSession == null)
+            SetTapError();
+        NotifyTap();
+    }
+
+    /// <summary>
+    /// Leaves the tap screen. Closes the valve first if it is still open, so walking
+    /// away from the screen can never leave beer running.
+    /// </summary>
+    private async void OnTapDoneClick(object? sender, RoutedEventArgs e)
+    {
+        var open = _tapSession;
+        _tapSession = null;
+        _tapItem = null;
+        NotifyTap();
+
+        if (open != null)
+            await open.DisposeAsync();
+    }
+
+    private void SetTapError()
+        => Console.WriteLine("[CocktailMenu] The board refused to open the tap");
+
+    private void NotifyTap()
+        => Notify(nameof(IsTapOverlayOpen), nameof(TapTitle), nameof(TapImage),
+                  nameof(IsTapFlowing), nameof(TapButtonLabel), nameof(TapHint));
+
     /// <summary>Tells the guest to take the glass before the overlay goes away.</summary>
     private async Task ShowCollectMessage()
     {
-        SetPourMessage("Goditi il tuo");
-        SetPourSweep(360);
+        SetPourMessage($"Goditi il tuo {_pourOverlayItem?.Cocktail.Title}!");
         _isPourDone = true;
         Notify(nameof(IsPourDone));
         await Task.Delay(CollectMessageMs);
@@ -323,29 +419,21 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
     private void OpenPourOverlay(CocktailCardItem item)
     {
         _pourOverlayItem = item;
-        _pourSweepAngle = 0;
         _isPourDone = false;
-        _pourMessage = "Erogazione in corso";
+        _pourMessage = "EROGAZIONE";
+        ProgressFill.Width = 0;
         Notify(nameof(IsPourOverlayOpen), nameof(PourImage), nameof(PourTitle),
-               nameof(PourSweepAngle), nameof(PourMessage), nameof(IsPourDone),
-               nameof(PourBigName));
+               nameof(PourMessage), nameof(IsPourDone), nameof(PourBigName));
     }
 
     private void ClosePourOverlay()
     {
         _pourOverlayItem = null;
-        _pourSweepAngle = 0;
+        ProgressFill.Width = 0;
         _isPourDone = false;
         _pourMessage = string.Empty;
         Notify(nameof(IsPourOverlayOpen), nameof(PourImage), nameof(PourTitle),
-               nameof(PourSweepAngle), nameof(PourMessage), nameof(IsPourDone),
-               nameof(PourBigName));
-    }
-
-    private void SetPourSweep(double degrees)
-    {
-        _pourSweepAngle = degrees;
-        Notify(nameof(PourSweepAngle));
+               nameof(PourMessage), nameof(IsPourDone), nameof(PourBigName));
     }
 
     private void SetPourMessage(string message)
@@ -360,20 +448,63 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 
+    /// <summary>
+    /// Runs the thread of light for the length of the pour. Avalonia interpolates the width
+    /// on its own clock: no per-frame property storm, and only a thin strip is repainted.
+    /// </summary>
     private async Task AnimateProgress(CocktailCardItem item, int durationMs)
     {
-        const int updateIntervalMs = 50;
-        int elapsed = 0;
-        item.Progress = 0;
-        SetPourSweep(0);
-        while (elapsed < durationMs)
+        ProgressFill.Width = 0;
+
+        var animation = new Animation
         {
-            await Task.Delay(updateIntervalMs);
-            elapsed += updateIntervalMs;
-            double percent = Math.Min(100.0 * elapsed / durationMs, 100);
-            item.Progress = percent;
-            SetPourSweep(percent * 3.6);
+            Duration = TimeSpan.FromMilliseconds(Math.Max(durationMs, 1)),
+            FillMode = FillMode.Forward,
+            Easing = new LinearEasing(),
+            Children =
+            {
+                new KeyFrame
+                {
+                    Cue = new Cue(0d),
+                    Setters = { new Setter(Layoutable.WidthProperty, 0d) }
+                },
+                new KeyFrame
+                {
+                    Cue = new Cue(1d),
+                    Setters = { new Setter(Layoutable.WidthProperty, ProgressTrackWidth) }
+                }
+            }
+        };
+
+        await animation.RunAsync(ProgressFill);
+        ProgressFill.Width = ProgressTrackWidth;
+    }
+
+    /// <summary>True when the strip already shows exactly these drinks, in this order.</summary>
+    private bool SameCocktails(IReadOnlyList<Cocktail> cocktails)
+    {
+        if (VisibleCocktails.Count != cocktails.Count)
+            return false;
+
+        for (int i = 0; i < cocktails.Count; i++)
+        {
+            if (!ReferenceEquals(VisibleCocktails[i].Cocktail, cocktails[i]))
+                return false;
         }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Slides the strip so the current page fills the viewport. The Margin transition on
+    /// the control turns the jump into a glide, which is why paging feels continuous.
+    /// </summary>
+    private void ApplyStripOffset()
+    {
+        // Without an explicit width the strip measures to zero and nothing is drawn:
+        // it has to be as wide as all the pages it carries.
+        MenuStrip.Width = Math.Max(Pages.Count, 1) * PageWidth;
+        MenuStrip.Margin = new Thickness(-_currentPage * PageWidth, 0, 0, 0);
     }
 
     private void OnPageIndicatorClick(object? sender, RoutedEventArgs e)
@@ -442,10 +573,25 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
         int totalPages = TotalPages;
         _currentPage = Math.Clamp(_currentPage, 0, totalPages - 1);
 
-        VisibleCocktails.Clear();
-        foreach (var cocktail in cocktails.Skip(_currentPage * PageSize).Take(PageSize))
-            VisibleCocktails.Add(new CocktailCardItem(cocktail));
+        // Cards are rebuilt only when the menu itself changes, so turning a page slides
+        // existing cards instead of recreating them.
+        if (!SameCocktails(cocktails))
+        {
+            VisibleCocktails.Clear();
+            foreach (var cocktail in cocktails)
+                VisibleCocktails.Add(new CocktailCardItem(cocktail));
 
+            Pages.Clear();
+            for (int start = 0; start < VisibleCocktails.Count; start += PageSize)
+            {
+                var page = new CocktailPage(Pages.Count);
+                foreach (var item in VisibleCocktails.Skip(start).Take(PageSize))
+                    page.Items.Add(item);
+                Pages.Add(page);
+            }
+        }
+
+        ApplyStripOffset();
         PageIndicators.Clear();
         for (int i = 0; i < totalPages; i++)
             PageIndicators.Add(new PageIndicator(i, i == _currentPage));
@@ -530,7 +676,7 @@ public sealed class FilterTab : INotifyPropertyChanged
 {
     private static readonly IBrush SelectedBackground = new SolidColorBrush(Color.Parse("#2A3030"));
     private static readonly IBrush SelectedForeground = new SolidColorBrush(Color.Parse("#E7E6DC"));
-    private static readonly IBrush IdleForeground = new SolidColorBrush(Color.Parse("#888888"));
+    private static readonly IBrush IdleForeground = new SolidColorBrush(Color.Parse("#8A8F80"));
 
     private bool _isSelected;
 
@@ -564,6 +710,17 @@ public sealed class FilterTab : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
     private void OnPropertyChanged(string name)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+}
+
+/// <summary>One screenful of the menu: four cards across, two rows.</summary>
+public sealed class CocktailPage
+{
+    public CocktailPage(int index) => Offset = index * 1720d;
+
+    /// <summary>Where this page sits on the strip, in design pixels.</summary>
+    public double Offset { get; }
+
+    public ObservableCollection<CocktailCardItem> Items { get; } = new();
 }
 
 public sealed class PageIndicator
