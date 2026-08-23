@@ -39,18 +39,26 @@ public partial class ContainerCleanPage : UserControl
         base.OnUnloaded(e);
     }
 
+    /// <summary>
+    /// Rinsing is about the plumbing, not the recipe: a line is flushed with the bottle
+    /// already pulled and its tube in water, so what used to be in it is beside the
+    /// point and its name would be actively misleading. Lines are labelled by number,
+    /// and all of them can be rinsed whether or not a liquid is assigned - an empty
+    /// line is the normal thing to want to rinse.
+    /// </summary>
     private void ApplyLiquidAssignments()
     {
-        var assignments = AppConfigService.Instance.Config.GetActiveLiquidAssignments();
-
         for (int i = 0; i < _bottles.Length; i++)
         {
             if (_bottles[i] == null) continue;
-            bool hasLiquid = i < assignments.Length && !string.IsNullOrWhiteSpace(assignments[i]);
-            _bottles[i]!.Tag = hasLiquid ? assignments[i] : $"Slot {i + 1}";
-            _bottles[i]!.IsEnabled = hasLiquid;
+            _bottles[i]!.Tag = LineName(i + 1);
+            _bottles[i]!.IsEnabled = true;
         }
     }
+
+    /// <summary>Channels 1-10 are the bottle pumps, 11-14 the pressurised kegs.</summary>
+    private static string LineName(int channel)
+        => channel > AppConfig.PumpChannelCount ? $"Fusto {channel}" : $"Linea {channel}";
 
     private void OnConfigChanged(object? sender, AppConfigChangedEventArgs e)
     {
@@ -169,12 +177,7 @@ public partial class ContainerCleanPage : UserControl
     /// <summary>Runs the wait as a visible progress bar rather than a frozen screen.</summary>
     private async Task ShowCleanProgress(int durationMs, List<int> channels)
     {
-        var assignments = AppConfigService.Instance.Config.GetActiveLiquidAssignments();
-        var names = channels
-            .Select(ch => ch - 1 < assignments.Length && !string.IsNullOrWhiteSpace(assignments[ch - 1])
-                ? assignments[ch - 1]
-                : $"Line {ch}");
-        CleanProgressDetail.Text = string.Join("   ·   ", names);
+        CleanProgressDetail.Text = string.Join("   ·   ", channels.Select(LineName));
 
         CleanProgress.Value = 0;
         CleanProgressOverlay.IsVisible = true;

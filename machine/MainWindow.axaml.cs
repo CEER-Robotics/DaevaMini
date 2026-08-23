@@ -321,7 +321,7 @@ public partial class MainWindow : Window
     {
         bool isSettings = page is SettingsDaevaMax or NumberPadPage or DosesPage
             or FlowRatePage or ContainerSetupPage or ContainerFillPage
-            or ContainerCleanPage;
+            or ContainerCleanPage or LiquidSetupPage;
 
         string command = isSettings
             ? ArduinoProtocolHelper.BuildTintCommand(SettingsTint)
@@ -375,6 +375,11 @@ public partial class MainWindow : Window
         {
             SetPage(new NumberPadPage());
         }
+    }
+
+    public void ShowLiquidSetupPage()
+    {
+        SetPage(new LiquidSetupPage());
     }
 
     public void ShowContainerSetupPage()

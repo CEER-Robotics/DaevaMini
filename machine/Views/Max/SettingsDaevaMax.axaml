@@ -24,6 +24,23 @@
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Opacity" Value="0.6"/>
         </Style>
+        <Style Selector="Button.SettingsTile">
+            <Setter Property="Background" Value="#0CFFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="24"/>
+            <Setter Property="Padding" Value="30,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.SettingsTile:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1AFFFFFF"/>
+        </Style>
+        <Style Selector="Button.SettingsTile:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#24FFFFFF"/>
+        </Style>
     </UserControl.Styles>
 
     <Canvas Width="1920" Height="1080">
@@ -49,94 +66,97 @@
 
         <Border Canvas.Left="260" Canvas.Top="110" Width="1400" Height="880" CornerRadius="32"
                 Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1">
-            <StackPanel VerticalAlignment="Center" Margin="60,40" Spacing="18">
-
-                <Border Height="140" CornerRadius="24" Background="#0CFFFFFF" Padding="30,0">
-                    <Grid>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="24">
-                            <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
-                                <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
-                                          Data="M3,2H21V4H20V8A4,4 0 0,1 16,12H14V20H17V22H7V20H10V12H8A4,4 0 0,1 4,8V4H3V2M6,4V8A2,2 0 0,0 8,10H16A2,2 0 0,0 18,8V4H6Z"/>
-                            </Border>
-                            <TextBlock Text="Dosi dei cocktail" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontTitle}"
-                                       FontFamily="Space Grotesk" FontWeight="Medium" VerticalAlignment="Center"/>
+            <!-- Two columns rather than one stack: six full-width rows overflowed the
+                 panel. Every tile is itself the button - the old APRI / AVVIA pills put
+                 a small second target inside a row that was already the thing to press. -->
+            <Grid Margin="60,50" ColumnDefinitions="*,24,*" RowDefinitions="150,24,150,24,150,24,150"
+                  VerticalAlignment="Center">
+                <Button Grid.Row="0" Grid.Column="0" Classes="SettingsTile" Click="OnDosesClick">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
+                        <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
+                            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                                      Data="M3,2H21V4H20V8A4,4 0 0,1 16,12H14V20H17V22H7V20H10V12H8A4,4 0 0,1 4,8V4H3V2M6,4V8A2,2 0 0,0 8,10H16A2,2 0 0,0 18,8V4H6Z"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Spacing="4">
+                            <TextBlock Text="Dosi dei cocktail" Foreground="{StaticResource TextPrimary}"
+                                       FontSize="{StaticResource FontTitle}"
+                                       FontFamily="Space Grotesk" FontWeight="Medium"/>
+                            <TextBlock Text="Ritocca le ricette" Foreground="{StaticResource TextMuted}"
+                                       FontSize="{StaticResource FontCaption}"
+                                       FontFamily="Space Grotesk"/>
                         </StackPanel>
+                    </StackPanel>
+                </Button>
 
-                        <Button Classes="InvisibleBtn" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Click="OnDosesClick" Width="160" Height="54">
-                            <Border Background="#CAF0F8" CornerRadius="27">
-                                <TextBlock Text="APRI" Foreground="{StaticResource OnAccent}" FontWeight="Bold" FontSize="{StaticResource FontBody}"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
-                            </Border>
-                        </Button>
-                    </Grid>
-                </Border>
-
-
-                <Border Height="140" CornerRadius="24" Background="#0CFFFFFF" Padding="30,0">
-                    <Grid>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="24">
-                            <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
-                                <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
-                                          Data="M16,10H14V17H11L15,21L19,17H16V10M8,14H10V7H13L9,3L5,7H8V14Z"/>
-                            </Border>
-                            <TextBlock Text="Cambio contenitori" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontTitle}"
-                                       FontFamily="Space Grotesk" FontWeight="Medium" VerticalAlignment="Center"/>
+                <Button Grid.Row="0" Grid.Column="2" Classes="SettingsTile" Click="OnLiquidsClick">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
+                        <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
+                            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                                      Data="M12,3.25C12,3.25 6,10 6,14C6,17.32 8.69,20 12,20A6,6 0 0,0 18,14C18,10 12,3.25 12,3.25M14.47,9.97L15.53,11.03L9.53,17.03L8.47,15.97M9.75,10A1.25,1.25 0 0,1 11,11.25A1.25,1.25 0 0,1 9.75,12.5A1.25,1.25 0 0,1 8.5,11.25A1.25,1.25 0 0,1 9.75,10M14.25,14.5A1.25,1.25 0 0,1 15.5,15.75A1.25,1.25 0 0,1 14.25,17A1.25,1.25 0 0,1 13,15.75A1.25,1.25 0 0,1 14.25,14.5Z"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Spacing="4">
+                            <TextBlock Text="Selezione liquidi" Foreground="{StaticResource TextPrimary}"
+                                       FontSize="{StaticResource FontTitle}"
+                                       FontFamily="Space Grotesk" FontWeight="Medium"/>
+                            <TextBlock Text="Cosa contiene ogni linea" Foreground="{StaticResource TextMuted}"
+                                       FontSize="{StaticResource FontCaption}"
+                                       FontFamily="Space Grotesk"/>
                         </StackPanel>
+                    </StackPanel>
+                </Button>
 
-                        <Button Classes="InvisibleBtn" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Click="OnFillingClick" Width="160" Height="54">
-                            <Border Background="#CAF0F8" CornerRadius="27">
-                                <TextBlock Text="AVVIA" Foreground="{StaticResource OnAccent}" FontWeight="Bold" FontSize="{StaticResource FontBody}"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
-                            </Border>
-                        </Button>
-                    </Grid>
-                </Border>
-
-                <Border Height="140" CornerRadius="24" Background="#0CFFFFFF" Padding="30,0">
-                    <Grid>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="24">
-                            <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
-                                <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
-                                          Data="M12,20A6,6 0 0,1 6,14C6,10 12,3.25 12,3.25C12,3.25 18,10 18,14A6,6 0 0,1 12,20Z"/>
-                            </Border>
-                            <TextBlock Text="Risciacquo" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontTitle}"
-                                       FontFamily="Space Grotesk" FontWeight="Medium" VerticalAlignment="Center"/>
+                <Button Grid.Row="2" Grid.Column="0" Classes="SettingsTile" Click="OnFillingClick">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
+                        <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
+                            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                                      Data="M16,10H14V17H11L15,21L19,17H16V10M8,14H10V7H13L9,3L5,7H8V14Z"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Spacing="4">
+                            <TextBlock Text="Cambio contenitori" Foreground="{StaticResource TextPrimary}"
+                                       FontSize="{StaticResource FontTitle}"
+                                       FontFamily="Space Grotesk" FontWeight="Medium"/>
+                            <TextBlock Text="Riempi bottiglie e fusti" Foreground="{StaticResource TextMuted}"
+                                       FontSize="{StaticResource FontCaption}"
+                                       FontFamily="Space Grotesk"/>
                         </StackPanel>
+                    </StackPanel>
+                </Button>
 
-                        <Button Classes="InvisibleBtn" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Click="OnCleaningClick" Width="160" Height="54">
-                            <Border Background="#CAF0F8" CornerRadius="27">
-                                <TextBlock Text="AVVIA" Foreground="{StaticResource OnAccent}" FontWeight="Bold" FontSize="{StaticResource FontBody}"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
-                            </Border>
-                        </Button>
-                    </Grid>
-                </Border>
-
-                <Border Height="140" CornerRadius="24" Background="#0CFFFFFF" Padding="30,0">
-                    <Grid>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="24">
-                            <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
-                                <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
-                                          Data="M12,2A3,3 0 0,0 9,5C9,6.31 9.83,7.42 11,7.83V10H8A2,2 0 0,0 6,12V13H4V19H8V13H6V12H11V19H13V12H18V13H16V19H20V13H18V12A2,2 0 0,0 16,10H13V7.83C14.17,7.42 15,6.31 15,5A3,3 0 0,0 12,2Z"/>
-                            </Border>
-                            <TextBlock Text="Portata dei fusti" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontTitle}"
-                                       FontFamily="Space Grotesk" FontWeight="Medium" VerticalAlignment="Center"/>
+                <Button Grid.Row="2" Grid.Column="2" Classes="SettingsTile" Click="OnCleaningClick">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
+                        <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
+                            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                                      Data="M12,20A6,6 0 0,1 6,14C6,10 12,3.25 12,3.25C12,3.25 18,10 18,14A6,6 0 0,1 12,20Z"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Spacing="4">
+                            <TextBlock Text="Risciacquo" Foreground="{StaticResource TextPrimary}"
+                                       FontSize="{StaticResource FontTitle}"
+                                       FontFamily="Space Grotesk" FontWeight="Medium"/>
+                            <TextBlock Text="Lava le linee" Foreground="{StaticResource TextMuted}"
+                                       FontSize="{StaticResource FontCaption}"
+                                       FontFamily="Space Grotesk"/>
                         </StackPanel>
+                    </StackPanel>
+                </Button>
 
-                        <Button Classes="InvisibleBtn" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                Click="OnFlowRateClick" Width="160" Height="54">
-                            <Border Background="#CAF0F8" CornerRadius="27">
-                                <TextBlock Text="APRI" Foreground="{StaticResource OnAccent}" FontWeight="Bold" FontSize="{StaticResource FontBody}"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
-                            </Border>
-                        </Button>
-                    </Grid>
-                </Border>
+                <Button Grid.Row="4" Grid.Column="0" Classes="SettingsTile" Click="OnFlowRateClick">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
+                        <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
+                            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                                      Data="M12,2A3,3 0 0,0 9,5C9,6.31 9.83,7.42 11,7.83V10H8A2,2 0 0,0 6,12V13H4V19H8V13H6V12H11V19H13V12H18V13H16V19H20V13H18V12A2,2 0 0,0 16,10H13V7.83C14.17,7.42 15,6.31 15,5A3,3 0 0,0 12,2Z"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Spacing="4">
+                            <TextBlock Text="Portata dei fusti" Foreground="{StaticResource TextPrimary}"
+                                       FontSize="{StaticResource FontTitle}"
+                                       FontFamily="Space Grotesk" FontWeight="Medium"/>
+                            <TextBlock Text="Calibra la resa" Foreground="{StaticResource TextMuted}"
+                                       FontSize="{StaticResource FontCaption}"
+                                       FontFamily="Space Grotesk"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Button>
 
-                <Border Height="140" CornerRadius="24" Background="#0CFFFFFF" Padding="30,0">
+                <Border Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" CornerRadius="24" Background="#0CFFFFFF" Padding="30,0">
                     <Grid>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="24">
                             <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
@@ -144,7 +164,7 @@
                                           Data="M5,4H19A2,2 0 0,1 21,6V18A2,2 0 0,1 19,20H5A2,2 0 0,1 3,18V6A2,2 0 0,1 5,4M7,8V16H11V8H7M13,8V16H17V8H13Z"/>
                             </Border>
                             <StackPanel VerticalAlignment="Center" Spacing="4">
-                                <TextBlock Text="Tipo di evento" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontTitle}"
+                                <TextBlock Text="Attiva fusti" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontTitle}"
                                            FontFamily="Space Grotesk" FontWeight="Medium"/>
                                 <TextBlock Name="EventModeDetail"
                                            Text="" Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontCaption}"
@@ -155,19 +175,19 @@
                         <StackPanel Orientation="Horizontal" Spacing="12"
                                     HorizontalAlignment="Right" VerticalAlignment="Center">
                             <Button Name="SmallEventBtn" Classes="InvisibleBtn" Click="OnSmallEventClick"
-                                    Width="180" Height="54">
+                                    Width="120" Height="54">
                                 <Border Name="SmallEventBg" Background="#15FFFFFF" CornerRadius="27"
                                         BorderBrush="#2A2C22" BorderThickness="1">
-                                    <TextBlock Name="SmallEventText" Text="PICCOLO" Foreground="{StaticResource TextMuted}"
+                                    <TextBlock Name="SmallEventText" Text="NO" Foreground="{StaticResource TextMuted}"
                                                FontWeight="Bold" FontSize="{StaticResource FontBody}"
                                                HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
                                 </Border>
                             </Button>
                             <Button Name="LargeEventBtn" Classes="InvisibleBtn" Click="OnLargeEventClick"
-                                    Width="180" Height="54">
+                                    Width="120" Height="54">
                                 <Border Name="LargeEventBg" Background="#15FFFFFF" CornerRadius="27"
                                         BorderBrush="#2A2C22" BorderThickness="1">
-                                    <TextBlock Name="LargeEventText" Text="GRANDE" Foreground="{StaticResource TextMuted}"
+                                    <TextBlock Name="LargeEventText" Text="SI" Foreground="{StaticResource TextMuted}"
                                                FontWeight="Bold" FontSize="{StaticResource FontBody}"
                                                HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
                                 </Border>
@@ -175,8 +195,7 @@
                         </StackPanel>
                     </Grid>
                 </Border>
-
-            </StackPanel>
+            </Grid>
         </Border>
 
     </Canvas>

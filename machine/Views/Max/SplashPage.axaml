@@ -74,6 +74,17 @@
     </UserControl.Styles>
 
     <Canvas Width="1920" Height="1080">
+        <!-- Unlocking should not require finding a 520px strip at the bottom of a
+             1920x1080 panel. This covers everything below the top chrome, so a tap
+             almost anywhere opens the machine. It is declared first so it sits behind
+             the clock, the status badge and the settings gear, which stay clickable;
+             the visible "TOCCA PER SBLOCCARE" prompt is left exactly where it was,
+             since enlarging that button would have re-centred its label over the logo. -->
+        <Button Canvas.Left="0" Canvas.Top="110" Width="1920" Height="970"
+                Background="Transparent" BorderThickness="0" Padding="0"
+                Classes="ChromeButton UnlockButton"
+                Click="OnTouchToStart"/>
+
         <Canvas.Background>
             <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%" RadiusX="80%" RadiusY="80%">
                 <GradientStop Color="#1A2222" Offset="0"/>

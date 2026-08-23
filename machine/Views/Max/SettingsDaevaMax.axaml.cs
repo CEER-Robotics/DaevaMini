@@ -26,6 +26,12 @@ public partial class SettingsDaevaMax : UserControl
             mainWindow.ShowSplash();
     }
 
+    private void OnLiquidsClick(object? sender, RoutedEventArgs e)
+    {
+        if (VisualRoot is MainWindow mainWindow)
+            mainWindow.ShowLiquidSetupPage();
+    }
+
     private void OnFillingClick(object? sender, RoutedEventArgs e)
     {
         if (VisualRoot is MainWindow mainWindow)
@@ -79,8 +85,10 @@ public partial class SettingsDaevaMax : UserControl
         LargeEventBg.Background = large ? SelectedBackground : IdleBackground;
         LargeEventText.Foreground = large ? SelectedForeground : IdleForeground;
 
+        // Same switch as before under a plainer name: "large event" only ever meant
+        // "the kegs are plugged in", and saying so directly saves explaining it.
         EventModeDetail.Text = large
-            ? "Fusti attivi: le pompe con lo stesso liquido sono disattivate."
-            : "Solo pompe a bottiglia, fusti scollegati.";
+            ? "Fusti collegati: le pompe con lo stesso liquido restano ferme."
+            : "Fusti scollegati: si usano solo le bottiglie.";
     }
 }
