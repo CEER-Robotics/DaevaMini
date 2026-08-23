@@ -93,8 +93,27 @@ static uint16_t dnA = ProjectConfig::Strips::kStrip2Start;
 static uint16_t dnB = ProjectConfig::Strips::kStrip2End;
 static uint32_t upCol = 0;
 static uint32_t dnCol = 0;
-static uint32_t endAnimStartMs = 0;
 static uint32_t startupAnimStartMs = 0;
+static uint32_t endAnimStartMs = 0;
+
+// WAIT is normally one flat color, but the host can tint it with the color of a
+// drink the guest is about to confirm. Both ends of the crossfade are kept so a
+// second preview arriving mid-fade starts from what is actually on the strips.
+static uint32_t waitColorFrom = 0;
+static uint32_t waitColorTarget = 0;
+static uint32_t waitFadeStartMs = 0;
+static bool waitFading = false;
+// True while the host is holding a non-default idle color. The attract beat
+// stays out of the way then: a tinted machine is a machine somebody is using.
+static bool idleTinted = false;
+// Last time the machine did something on purpose. Drives the attract delay.
+static uint32_t lastActivityMs = 0;
+
+// Start of the crossfade from the idle color into the drink's color, and the
+// color it started from.
+static uint32_t activeFadeStartMs = 0;
+static uint32_t activeFadeFromColor = 0;
+static uint32_t activePulseStartMs = 0;
 
 enum ToxicPattern : uint8_t {
   TOXIC_STROBE = 0,
@@ -108,12 +127,9 @@ static int16_t toxicBreathePhase = 0;
 static int16_t toxicBreatheStep = ProjectConfig::Animation::kToxicBreatheStep;
 
 static uint32_t endStatusDurationMs() {
-  if (ProjectConfig::Timing::kEndFlashCount == 0 ||
-      ProjectConfig::Timing::kEndFlashPeriodMs == 0) {
-    return 1;
-  }
-  return (uint32_t)ProjectConfig::Timing::kEndFlashCount *
-         ProjectConfig::Timing::kEndFlashPeriodMs;
+  const uint32_t total = ProjectConfig::Timing::kEndHoldDurationMs +
+                         ProjectConfig::Timing::kEndFadeDurationMs;
+  return (total == 0) ? 1 : total;
 }
 
 static uint32_t scaleColor(Adafruit_NeoPixel& s, uint32_t c, uint8_t b) {
@@ -179,8 +195,120 @@ static void staticFill(uint32_t color) {
   staticFrameValid = true;
 }
 
-static void waitAnimStep(uint32_t color) {
-  staticFill(color);
+// Mixes two packed colors channel by channel. t is 0..255, 0 = a, 255 = b.
+static uint32_t lerpColor(Adafruit_NeoPixel& s, uint32_t a, uint32_t b, uint8_t t) {
+  const uint16_t inv = (uint16_t)(255 - t);
+  const uint8_t r = (uint8_t)(((uint16_t)(uint8_t)(a >> 16) * inv +
+                               (uint16_t)(uint8_t)(b >> 16) * t) / 255);
+  const uint8_t g = (uint8_t)(((uint16_t)(uint8_t)(a >> 8) * inv +
+                               (uint16_t)(uint8_t)(b >> 8) * t) / 255);
+  const uint8_t bl = (uint8_t)(((uint16_t)(uint8_t)a * inv +
+                                (uint16_t)(uint8_t)b * t) / 255);
+  return s.Color(r, g, bl);
+}
+
+// Brightness of the attract beat: two quick thumps and then a long rest, so it
+// reads as a heartbeat rather than as a blink or an alarm. Returns full
+// brightness outside the thumps, which lets the resting part of the cycle go
+// through the frame cache untouched.
+static uint8_t attractBrightness(uint32_t phaseMs) {
+  const uint8_t lo = ProjectConfig::Animation::kAttractMinBrightness;
+  const uint8_t hi = ProjectConfig::Animation::kAttractMaxBrightness;
+  if (hi <= lo) {
+    return hi;
+  }
+
+  const uint32_t thumpMs = (ProjectConfig::Animation::kAttractThumpMs == 0)
+                               ? 1
+                               : ProjectConfig::Animation::kAttractThumpMs;
+  const uint32_t secondAt = thumpMs + ProjectConfig::Animation::kAttractGapMs;
+
+  // Where we are inside whichever thump we are in, if any.
+  uint32_t into = 0;
+  if (phaseMs < thumpMs) {
+    into = phaseMs;
+  } else if (phaseMs >= secondAt && phaseMs < secondAt + thumpMs) {
+    into = phaseMs - secondAt;
+  } else {
+    return hi;  // resting between beats
+  }
+
+  // A thump dips away from full brightness and comes straight back, so the
+  // strips look like they are pulsing rather than flickering off.
+  const float x = (float)into / (float)thumpMs;
+  const float dip = 1.0f - (4.0f * x * (1.0f - x));
+  return (uint8_t)(lo + (uint8_t)((float)(hi - lo) * dip + 0.5f));
+}
+
+// Renders WAIT, easing into a new color whenever the host changes it. Once the
+// fade lands this settles back to a single staticFill, which the frame cache
+// then stops re-transmitting.
+static void waitAnimStep(uint32_t now) {
+  if (!waitFading) {
+    // Untouched for long enough, and not tinted: start beating to be noticed.
+    const bool attract =
+        !idleTinted &&
+        (uint32_t)(now - lastActivityMs) >=
+            ProjectConfig::Animation::kIdleAttractDelayMs;
+    if (attract) {
+      const uint32_t cycleMs = (ProjectConfig::Animation::kAttractCycleMs == 0)
+                                   ? 1
+                                   : ProjectConfig::Animation::kAttractCycleMs;
+      const uint8_t b = attractBrightness((now - lastActivityMs) % cycleMs);
+      staticFill(scaleColor(strip1, waitColorTarget, b));
+      return;
+    }
+
+    staticFill(waitColorTarget);
+    return;
+  }
+
+  const uint32_t fadeMs = (ProjectConfig::Animation::kIdleTintFadeMs == 0)
+                              ? 1
+                              : ProjectConfig::Animation::kIdleTintFadeMs;
+  uint32_t elapsed = now - waitFadeStartMs;
+  if (elapsed >= fadeMs) {
+    waitFading = false;
+    waitColorFrom = waitColorTarget;
+    staticFill(waitColorTarget);
+    return;
+  }
+
+  const float x = (float)elapsed / (float)fadeMs;
+  const float eased = x * x * (3.0f - 2.0f * x);
+  const uint8_t t = (uint8_t)(eased * 255.0f + 0.5f);
+  staticFill(lerpColor(strip1, waitColorFrom, waitColorTarget, t));
+}
+
+// The color WAIT is showing right now, fade included: the starting point for
+// any new crossfade.
+static uint32_t currentWaitColor(uint32_t now) {
+  if (!waitFading) {
+    return waitColorTarget;
+  }
+  const uint32_t fadeMs = (ProjectConfig::Animation::kIdleTintFadeMs == 0)
+                              ? 1
+                              : ProjectConfig::Animation::kIdleTintFadeMs;
+  uint32_t elapsed = now - waitFadeStartMs;
+  if (elapsed >= fadeMs) {
+    return waitColorTarget;
+  }
+  const float x = (float)elapsed / (float)fadeMs;
+  const float eased = x * x * (3.0f - 2.0f * x);
+  return lerpColor(strip1, waitColorFrom, waitColorTarget,
+                   (uint8_t)(eased * 255.0f + 0.5f));
+}
+
+static void beginWaitFadeTo(uint32_t color) {
+  const uint32_t now = millis();
+  lastActivityMs = now;
+  if (!waitFading && color == waitColorTarget) {
+    return;
+  }
+  waitColorFrom = currentWaitColor(now);
+  waitColorTarget = color;
+  waitFadeStartMs = now;
+  waitFading = true;
 }
 
 static uint32_t currentActiveColor() {
@@ -225,20 +353,78 @@ static void activeAnim2Step(uint32_t color) {
   strip2.show();
 }
 
-static void endFlashStep(uint32_t now) {
-  const uint32_t periodMs = (ProjectConfig::Timing::kEndFlashPeriodMs == 0)
+// Slow breath over both strips in the drink color. Driven by wall time rather
+// than by a per-frame counter, so the cadence stays the same whatever
+// kFrameActiveMs is set to and a dropped frame does not stretch the breath.
+static uint8_t activePulseBrightness(uint32_t now) {
+  const uint32_t periodMs = (ProjectConfig::Animation::kActivePulsePeriodMs == 0)
                                 ? 1
-                                : ProjectConfig::Timing::kEndFlashPeriodMs;
-  const uint16_t ratioTotal = (uint16_t)ProjectConfig::Timing::kEndFlashOnPart +
-                              (uint16_t)ProjectConfig::Timing::kEndFlashOffPart;
-  const uint32_t onMs =
-      (ratioTotal == 0)
-          ? 0
-          : (periodMs * (uint32_t)ProjectConfig::Timing::kEndFlashOnPart) /
-                ratioTotal;
-  const uint32_t phaseMs = (now - endAnimStartMs) % periodMs;
-  const bool isOn = (onMs > 0) && (phaseMs < onMs);
-  staticFill(isOn ? endingColor : 0);
+                                : ProjectConfig::Animation::kActivePulsePeriodMs;
+  const uint32_t phaseMs = (now - activePulseStartMs) % periodMs;
+  const uint32_t halfMs = (periodMs / 2 == 0) ? 1 : (periodMs / 2);
+
+  // Triangle 0..1..0 across the period, then smoothstep so the turnaround at
+  // full and at minimum is soft instead of a visible corner.
+  const float tri = (phaseMs < halfMs)
+                        ? ((float)phaseMs / (float)halfMs)
+                        : ((float)(periodMs - phaseMs) / (float)(periodMs - halfMs));
+  const float eased = tri * tri * (3.0f - 2.0f * tri);
+
+  const uint8_t lo = ProjectConfig::Animation::kActivePulseMinBrightness;
+  const uint8_t hi = ProjectConfig::Animation::kActivePulseMaxBrightness;
+  if (hi <= lo) {
+    return hi;
+  }
+  return (uint8_t)(lo + (uint8_t)(((float)(hi - lo) * eased) + 0.5f));
+}
+
+// Goes through staticFill rather than painting pixels itself, so it inherits
+// the frame cache: near the top and bottom of the breath consecutive frames
+// scale to the same color and are not re-transmitted, which is exactly where
+// the unshifted data line is most likely to latch a corrupted bit.
+static void activeAnim4Step(uint32_t color, uint32_t now) {
+  const uint32_t fadeMs = ProjectConfig::Animation::kActiveFadeInMs;
+  const uint32_t elapsed = now - activeFadeStartMs;
+  if (elapsed < fadeMs) {
+    // Carry the idle color over into the drink's color at full brightness. The
+    // breathing only starts once the color has arrived.
+    const float x = (float)elapsed / (float)fadeMs;
+    const float eased = x * x * (3.0f - 2.0f * x);
+    staticFill(lerpColor(strip1, activeFadeFromColor, color,
+                         (uint8_t)(eased * 255.0f + 0.5f)));
+    return;
+  }
+
+  staticFill(scaleColor(strip1, color, activePulseBrightness(now)));
+}
+
+// Holds the drink's color steady, then eases it into the WAIT color. The fade
+// is timed to finish exactly when ENDING expires, so entering WAIT paints the
+// color the strips are already showing and the transition is seamless.
+// Going through staticFill means the steady part transmits once, not every
+// frame, and the fade only transmits when the mixed color actually changes.
+static void endHoldStep(uint32_t now) {
+  const uint32_t elapsed = now - endAnimStartMs;
+  const uint32_t holdMs = ProjectConfig::Timing::kEndHoldDurationMs;
+  if (elapsed < holdMs) {
+    staticFill(endingColor);
+    return;
+  }
+
+  const uint32_t fadeMs = (ProjectConfig::Timing::kEndFadeDurationMs == 0)
+                              ? 1
+                              : ProjectConfig::Timing::kEndFadeDurationMs;
+  uint32_t into = elapsed - holdMs;
+  if (into > fadeMs) {
+    into = fadeMs;
+  }
+
+  // Smoothstep so the fade leaves the drink color and settles into white
+  // gently at both ends, instead of starting and stopping abruptly.
+  const float x = (float)into / (float)fadeMs;
+  const float eased = x * x * (3.0f - 2.0f * x);
+  const uint8_t t = (uint8_t)(eased * 255.0f + 0.5f);
+  staticFill(lerpColor(strip1, endingColor, waitColorTarget, t));
 }
 
 static uint16_t clampU16(int32_t v, uint16_t lo, uint16_t hi) {
@@ -490,6 +676,17 @@ static void enterActiveState() {
   chasePos = 0;
   breathePhase = 0;
   breatheStep = abs(breatheStep);
+  const uint32_t nowMs = millis();
+  activeFadeStartMs = nowMs;
+  activeFadeFromColor = currentWaitColor(nowMs);
+  lastActivityMs = nowMs;
+
+  // The fade-in lands at full brightness, so the breath has to start from its
+  // peak and fall away - otherwise the color would arrive and immediately jump
+  // down to the dim end of the pulse.
+  const uint32_t halfPeriodMs = ProjectConfig::Animation::kActivePulsePeriodMs / 2;
+  activePulseStartMs =
+      nowMs + ProjectConfig::Animation::kActiveFadeInMs - halfPeriodMs;
 
   if (ProjectConfig::Animation::kActiveAnim == 3) {
     uint32_t durMs = (uint32_t)(LedStateMachine::activeUntilMs() - millis());
@@ -525,6 +722,12 @@ static void onStateEntered(LedStateMachine::ProgramState st, uint32_t now) {
   } else if (st == LedStateMachine::ST_WAIT) {
     breathePhase = 0;
     breatheStep = abs(breatheStep);
+    // ENDING has already faded the strips to whatever the idle color is, so
+    // land on it without a second fade. The host owns the tint, so a pour
+    // started from the settings screens comes back to the settings color.
+    waitColorFrom = waitColorTarget;
+    waitFading = false;
+    lastActivityMs = now;
   } else if (st == LedStateMachine::ST_TOXIC) {
     if (ProjectConfig::Animation::kToxicAnim == 2) {
       toxicBreathePhase = 0;
@@ -606,6 +809,12 @@ void begin() {
                               ProjectConfig::Colors::kMaintenanceOrange.g,
                               ProjectConfig::Colors::kMaintenanceOrange.b);
 
+  waitColorFrom = BLU_DAEVA;
+  waitColorTarget = BLU_DAEVA;
+  waitFading = false;
+  idleTinted = false;
+  lastActivityMs = millis();
+
   activeColor = BLU_DAEVA;
   activeColorValid = false;
   endingColor = BLU_DAEVA;
@@ -636,6 +845,32 @@ bool startActiveWithColor(uint32_t activeUntilMs, uint32_t color) {
   activeColorValid = true;
   onStateEntered(LedStateMachine::ST_ACTIVE, millis());
   return true;
+}
+
+bool setIdleTint(uint32_t color) {
+  if (!LedStateMachine::isWaitingForCommand()) {
+    return false;
+  }
+  idleTinted = (color != BLU_DAEVA);
+  beginWaitFadeTo(color);
+  return true;
+}
+
+bool clearIdleTint() {
+  if (!LedStateMachine::isWaitingForCommand()) {
+    return false;
+  }
+  idleTinted = false;
+  beginWaitFadeTo(BLU_DAEVA);
+  return true;
+}
+
+bool extendActive(uint32_t activeUntilMs) {
+  return LedStateMachine::extendActive(activeUntilMs);
+}
+
+bool finishActiveNow() {
+  return LedStateMachine::finishActiveNow(millis());
 }
 
 bool handleReadyCommand() {
@@ -703,7 +938,7 @@ bool update() {
   }
 
   if (tickRes.state == LedStateMachine::ST_WAIT) {
-    waitAnimStep(BLU_DAEVA);
+    waitAnimStep(now);
     nextFrameAt = now + ProjectConfig::Animation::kFrameWaitMs;
     return doneEvent;
   }
@@ -732,13 +967,15 @@ bool update() {
       activeAnim2Step(color);
     } else if (ProjectConfig::Animation::kActiveAnim == 3) {
       bounceAnimStep();
+    } else if (ProjectConfig::Animation::kActiveAnim == 4) {
+      activeAnim4Step(color, now);
     }
 
     nextFrameAt = now + ProjectConfig::Animation::kFrameActiveMs;
     return doneEvent;
   }
 
-  endFlashStep(now);
+  endHoldStep(now);
   nextFrameAt = now + ProjectConfig::Animation::kFrameEndingMs;
 
   return doneEvent;

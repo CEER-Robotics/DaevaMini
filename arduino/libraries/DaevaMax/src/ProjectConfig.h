@@ -76,32 +76,73 @@ constexpr uint32_t kStartupDurationMs = 10000;
 // Set to -1 to disable automatic TOXIC and allow only serial command activation.
 constexpr int32_t kToxicTimeoutMs = -1;
 
-// Number of flashes shown in ENDING state.
-constexpr uint8_t kEndFlashCount = 5;
-// Duration of one ENDING flash cycle (on+off).
-constexpr uint32_t kEndFlashPeriodMs = 500;
-// ON ratio numerator for ENDING flash duty cycle.
-constexpr uint8_t kEndFlashOnPart = 60;
-// OFF ratio numerator for ENDING flash duty cycle.
-constexpr uint8_t kEndFlashOffPart = 40;
+// ENDING has two parts. First it holds the finished drink's color lit steadily
+// (this used to be a blink; a steady hold reads as "finished, take your glass"
+// instead of as an alarm). Then it crossfades that color into the WAIT color,
+// so the strips have already arrived at the idle look by the time the state
+// actually changes and there is no visible snap to white.
+constexpr uint32_t kEndHoldDurationMs = 1300;
+constexpr uint32_t kEndFadeDurationMs = 1200;
+
+// Tap mode (a normally-closed solenoid held open while the guest pours their
+// own beer) is the one case where the board keeps an output energised without
+// knowing in advance for how long.
+//
+// A normally-closed valve already fails safe against the board: cut its power or
+// reset it and the valve shuts. What that does NOT cover is the host dying while
+// the board is happily holding the valve open, so the host has to keep saying it
+// is alive. Each TAP re-arms the valve for kTapKeepAliveWindowMs only; miss a
+// couple of keep-alives and it closes on its own.
+constexpr uint32_t kTapKeepAliveWindowMs = 3000;
+// Absolute ceiling on one pour, however healthy the host claims to be. A pint is
+// far under this; a guest leaning on the button is not the failure being guarded
+// against here, an unattended open valve is.
+constexpr uint32_t kTapMaxOpenMs = 120000;
 
 // How long each TOXIC sub-pattern runs before switching.
 constexpr uint32_t kToxicPatternDurationMs = 1800;
 }  // namespace Timing
 
 namespace Animation {
-// Active animation selector: 1 chase, 2 dual-breathe, 3 bounce.
-constexpr uint8_t kActiveAnim = 3;
+// Active animation selector: 1 chase, 2 dual-breathe, 3 bounce, 4 slow pulse.
+constexpr uint8_t kActiveAnim = 4;
 // Global strip brightness applied at LED driver level (0-255).
-constexpr uint8_t kGlobalBrightness = 102;
+constexpr uint8_t kGlobalBrightness = 36;
 // Accent brightness used by active animation 1 (0-255).
 constexpr uint8_t kActiveAccentBrightness = 120;
+// Crossfade time when the host retints the idle strips (for example on entering
+// the settings screens). Long enough to read as a transition, short enough to
+// feel like a response to the touch.
+constexpr uint32_t kIdleTintFadeMs = 600;
+// Crossfade from the idle color into the drink's color when a pour starts. The
+// pulse only begins once this has landed, so the guest sees the color arrive
+// before it starts breathing.
+constexpr uint32_t kActiveFadeInMs = 700;
+// How long the machine must sit untouched in WAIT before the idle color starts
+// beating to draw attention. Five minutes: long enough that it never fires
+// while somebody is deciding.
+constexpr uint32_t kIdleAttractDelayMs = 300000;
+// One attract cycle: two quick thumps and then a rest, like a heartbeat.
+constexpr uint32_t kAttractThumpMs = 150;
+constexpr uint32_t kAttractGapMs = 170;
+constexpr uint32_t kAttractCycleMs = 2400;
+// Brightness the attract beat falls back to between thumps, and peaks at.
+constexpr uint8_t kAttractMinBrightness = 70;
+constexpr uint8_t kAttractMaxBrightness = 255;
 // Brightness step per frame for WAIT breathing effect.
 constexpr int16_t kWaitBreatheStep = 10;
 // Brightness step per frame for maintenance breathing effect.
 constexpr int16_t kMaintenanceBreatheStep = 10;
 // Half-period of bounce motion in active animation 3.
 constexpr uint32_t kBounceHalfPeriodMs = 1000;
+// Full breath cycle (dim -> bright -> dim) of active animation 4.
+constexpr uint32_t kActivePulsePeriodMs = 2600;
+// Brightness floor of the active pulse, so the drink color never goes black.
+// This is applied on top of kGlobalBrightness, so the effective floor at the
+// driver is kActivePulseMinBrightness * kGlobalBrightness / 255.
+constexpr uint8_t kActivePulseMinBrightness = 25;
+// Brightness ceiling of the active pulse.
+constexpr uint8_t kActivePulseMaxBrightness = 255;
 // Half-period for TOXIC strobe blink.
 constexpr uint32_t kToxicStrobeHalfPeriodMs = 120;
 // Half-period for TOXIC alternate checker pattern.

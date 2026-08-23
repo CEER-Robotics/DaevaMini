@@ -58,7 +58,8 @@ static bool parseByte(const char* s, uint8_t* out) {
 
 // Extracts active color: either BASE/COLOR:<name> or RGB:r,g,b.
 // For RGB, the value after the colon is r; the next two comma-separated tokens are g and b.
-static bool extractActiveColor(const char* line,
+static bool extractCommandColor(const char* line,
+                               const char* command,
                                char* outName,
                                size_t outNameLen,
                                uint8_t* outR,
@@ -84,7 +85,7 @@ static bool extractActiveColor(const char* line,
   }
 
   tok = trimInPlace(tok);
-  if (strcmp(tok, "ACTIVE") != 0) {
+  if (strcmp(tok, command) != 0) {
     return false;
   }
 
@@ -133,7 +134,7 @@ static bool extractActiveColor(const char* line,
   return false;
 }
 
-static bool isActiveCommand(const char* line) {
+static bool isCommand(const char* line, const char* command) {
   if (line == nullptr) {
     return false;
   }
@@ -147,8 +148,61 @@ static bool isActiveCommand(const char* line) {
     return false;
   }
   tok = trimInPlace(tok);
-  return strcmp(tok, "ACTIVE") == 0;
+  return strcmp(tok, command) == 0;
 }
+
+// Turns a parsed color field into a packed color, whether it arrived as an RGB
+// triple or as a preset name.
+static bool resolveColor(bool isRgb,
+                         uint8_t r,
+                         uint8_t g,
+                         uint8_t b,
+                         const char* name,
+                         uint32_t& out) {
+  if (isRgb) {
+    out = ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
+    return true;
+  }
+  return LedAnimations::parsePresetColor(name, out);
+}
+
+// First pump id in the line, as a bare "P<n>" with no duration. Tap mode does
+// not carry one: the board decides how long to stay open, not the host.
+static bool extractTapPump(const char* line, uint8_t& outPump) {
+  for (const char* p = line; *p != '\0'; p++) {
+    if (*p != 'P' && *p != 'p') {
+      continue;
+    }
+    const char* d = p + 1;
+    if (*d < '0' || *d > '9') {
+      continue;
+    }
+    int n = 0;
+    while (*d >= '0' && *d <= '9') {
+      n = n * 10 + (*d - '0');
+      d++;
+    }
+    if (n >= 1 && n <= (int)ProjectConfig::Pump::kCount) {
+      outPump = (uint8_t)n;
+      return true;
+    }
+  }
+  return false;
+}
+
+// Re-arms one channel for the keep-alive window by handing PumpControl a line in
+// the format it already validates, rather than adding a second scheduling path.
+static bool armTapChannel(uint8_t pump) {
+  char line[24];
+  snprintf(line, sizeof(line), "P%u:%lu", (unsigned)pump,
+           (unsigned long)ProjectConfig::Timing::kTapKeepAliveWindowMs);
+  return PumpControl::scheduleFromLine(line) != 0;
+}
+
+// When the tap was opened, so the absolute ceiling can be enforced across
+// keep-alives rather than being pushed forward by them.
+static uint32_t tapOpenedAtMs = 0;
+static bool tapOpen = false;
 
 static void handleSerialLine(const char* line) {
   if (line == nullptr || line[0] == '\0') {
@@ -179,15 +233,128 @@ static void handleSerialLine(const char* line) {
     return;
   }
 
-  if (!isActiveCommand(line)) {
+  if (isExactCommand(line, "TAP OFF")) {
+    tapOpen = false;
+    PumpControl::allOff();
+    if (LedAnimations::finishActiveNow()) {
+      DAEVA_SERIAL.println("OK TAP OFF");
+    } else {
+      DAEVA_SERIAL.println("IGNORED TAP");
+    }
+    return;
+  }
+
+  if (isCommand(line, "TAP")) {
+    char tapName[32];
+    uint8_t tr2 = 0, tg2 = 0, tb2 = 0;
+    bool tapIsRgb = false;
+    if (!extractCommandColor(line, "TAP", tapName, sizeof(tapName),
+                             &tr2, &tg2, &tb2, &tapIsRgb)) {
+      DAEVA_SERIAL.println("ERR TAP COLOR");
+      return;
+    }
+
+    uint32_t tapColor = 0;
+    if (!resolveColor(tapIsRgb, tr2, tg2, tb2, tapName, tapColor)) {
+      DAEVA_SERIAL.println("ERR TAP COLOR");
+      return;
+    }
+
+    uint8_t pump = 0;
+    if (!extractTapPump(line, pump)) {
+      DAEVA_SERIAL.println("ERR TAP PARAMS");
+      return;
+    }
+
+    const uint32_t now = millis();
+    const uint32_t until = now + ProjectConfig::Timing::kTapKeepAliveWindowMs;
+
+    // A keep-alive for a tap already open: re-arm, but never past the ceiling.
+    if (tapOpen && LedAnimations::extendActive(until)) {
+      if ((uint32_t)(now - tapOpenedAtMs) >= ProjectConfig::Timing::kTapMaxOpenMs) {
+        tapOpen = false;
+        PumpControl::allOff();
+        LedAnimations::finishActiveNow();
+        DAEVA_SERIAL.println("ERR TAP TIMEOUT");
+        return;
+      }
+      if (!armTapChannel(pump)) {
+        DAEVA_SERIAL.println("ERR TAP PARAMS");
+        return;
+      }
+      DAEVA_SERIAL.println("OK TAP");
+      return;
+    }
+
+    // Opening for the first time: same gate as ACTIVE, only from WAIT.
+    if (!LedAnimations::isWaitingForCommand()) {
+      DAEVA_SERIAL.println("IGNORED TAP");
+      return;
+    }
+
+    PumpControl::allOff();
+    if (!armTapChannel(pump)) {
+      DAEVA_SERIAL.println("ERR TAP PARAMS");
+      return;
+    }
+
+    if (!LedAnimations::startActiveWithColor(until, tapColor)) {
+      PumpControl::allOff();
+      DAEVA_SERIAL.println("IGNORED TAP");
+      return;
+    }
+
+    tapOpen = true;
+    tapOpenedAtMs = now;
+    DAEVA_SERIAL.println("OK TAP");
+    return;
+  }
+
+  if (isExactCommand(line, "TINT OFF")) {
+    if (LedAnimations::clearIdleTint()) {
+      DAEVA_SERIAL.println("OK TINT");
+    } else {
+      DAEVA_SERIAL.println("IGNORED TINT");
+    }
+    return;
+  }
+
+  if (isCommand(line, "TINT")) {
+    char tintName[32];
+    uint8_t tr = 0, tg = 0, tb = 0;
+    bool tintIsRgb = false;
+    if (!extractCommandColor(line, "TINT", tintName, sizeof(tintName),
+                             &tr, &tg, &tb, &tintIsRgb)) {
+      DAEVA_SERIAL.println("ERR TINT COLOR");
+      return;
+    }
+
+    uint32_t tintColor = 0;
+    if (!resolveColor(tintIsRgb, tr, tg, tb, tintName, tintColor)) {
+      DAEVA_SERIAL.println("ERR TINT COLOR");
+      return;
+    }
+
+    // Only the idle strips can be retinted; anywhere else they are busy saying
+    // something more important than which screen the host is on.
+    if (!LedAnimations::setIdleTint(tintColor)) {
+      DAEVA_SERIAL.println("IGNORED TINT");
+      return;
+    }
+
+    DAEVA_SERIAL.println("OK TINT");
+    return;
+  }
+
+  if (!isCommand(line, "ACTIVE")) {
     return;
   }
 
   char colorName[32];
   uint8_t rgbR = 0, rgbG = 0, rgbB = 0;
   bool isRgb = false;
-  if (!extractActiveColor(line, colorName, sizeof(colorName),
-                          &rgbR, &rgbG, &rgbB, &isRgb)) {
+  if (!extractCommandColor(line, "ACTIVE", colorName, sizeof(colorName),
+                           &rgbR, &rgbG, &rgbB, &isRgb)) {
     DAEVA_SERIAL.println("ERR ACTIVE COLOR");
     return;
   }
@@ -198,9 +365,7 @@ static void handleSerialLine(const char* line) {
   }
 
   uint32_t selectedColor = 0;
-  if (isRgb) {
-    selectedColor = ((uint32_t)rgbR << 16) | ((uint32_t)rgbG << 8) | (uint32_t)rgbB;
-  } else if (!LedAnimations::parsePresetColor(colorName, selectedColor)) {
+  if (!resolveColor(isRgb, rgbR, rgbG, rgbB, colorName, selectedColor)) {
     DAEVA_SERIAL.println("ERR ACTIVE COLOR");
     return;
   }

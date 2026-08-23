@@ -108,6 +108,24 @@ bool handleReady() {
   return false;
 }
 
+bool extendActive(uint32_t activeUntilMs) {
+  if (progState != ST_ACTIVE) {
+    return false;
+  }
+  activeUntil = activeUntilMs;
+  return true;
+}
+
+bool finishActiveNow(uint32_t now) {
+  if (progState != ST_ACTIVE) {
+    return false;
+  }
+  // Leave the transition itself to tick(), so closing the tap goes through
+  // exactly the same path as a pour that ran out of time.
+  activeUntil = now;
+  return true;
+}
+
 TickResult tick(uint32_t now, uint32_t endStatusMs) {
   TickResult result{progState, false, false};
 
