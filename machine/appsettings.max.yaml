@@ -9,7 +9,7 @@ CleanDurationMs: 15000
 SettingsPin: "1234"
 
 LiquidAssignments:
-  - "Tonic"
+  - "Tonica"
   - "Prosecco"
   - "Limone"
   - "Bitter rosso"
@@ -20,7 +20,7 @@ LiquidAssignments:
   - "Bitter arancione"
   - "Gin"
   # Lines 11-14: pressurised kegs
-  - "Tonic"
+  - "Tonica"
   - "Prosecco"
   - "Birra"
   - "Cola"
@@ -77,7 +77,7 @@ Cocktails:
     Ingredients:
       - Name: "Gin"
         Milliliters: 40
-      - Name: "Tonic"
+      - Name: "Tonica"
         Milliliters: 130
   - Id: "ginlemon"
     Name: "Gin Lemon"
@@ -145,7 +145,7 @@ Cocktails:
     Ingredients:
       - Name: "Vodka"
         Milliliters: 40
-      - Name: "Tonic"
+      - Name: "Tonica"
         Milliliters: 130
   - Id: "aperolspritz"
     Name: "Spritz"
@@ -160,7 +160,7 @@ Cocktails:
     LedG: 255
     LedB: 0
     Ingredients:
-      - Name: "Tonic"
+      - Name: "Tonica"
         Milliliters: 20
       - Name: "Bitter arancione"
         Milliliters: 60
@@ -183,7 +183,7 @@ Cocktails:
         Milliliters: 40
       - Name: "Prosecco"
         Milliliters: 80
-      - Name: "Tonic"
+      - Name: "Tonica"
         Milliliters: 20
   - Id: "negroni"
     Name: "Negroni"
@@ -240,7 +240,7 @@ Cocktails:
         Milliliters: 30
       - Name: "Vermouth"
         Milliliters: 30
-      - Name: "Tonic"
+      - Name: "Tonica"
         Milliliters: 60
   - Id: "beer"
     Name: "Birra"
@@ -263,14 +263,15 @@ Cocktails:
   # Gli altri tre fusti. Come la birra: l'ospite apre e chiude la valvola, quindi
   # i millilitri qui sotto descrivono il drink ma non governano l'erogazione.
   # In modalita' Large il fusto vince sulla pompa con lo stesso liquido, percio'
-  # "Prosecco" e "Tonic" finiscono sulle linee 12 e 11 e non sulle bottiglie.
+  # "Prosecco" e "Tonica" finiscono sulle linee 12 e 11 e non sulle bottiglie.
   - Id: "prosecco"
     Name: "Prosecco"
     Subtitle: "Prosecco alla spina"
     Description: "Spillato dal fusto, da solo. Secco e con la bollicina fine, da bere freddo."
     Theme: "Orange"
     IsActive: true
-    ShowImage: false
+    Image: "prosecco"
+    ShowImage: true
     Category: "Fusti"
     LargeEventOnly: true
     IsTap: true
@@ -286,7 +287,8 @@ Cocktails:
     Description: "Dal fusto, ghiacciata. Dolce e molto carbonata, la piu' semplice delle analcoliche."
     Theme: "Burgundy"
     IsActive: true
-    ShowImage: false
+    Image: "cola"
+    ShowImage: true
     Category: "Fusti"
     LargeEventOnly: true
     IsTap: true
@@ -302,7 +304,8 @@ Cocktails:
     Description: "Tonica liscia dal fusto. Amarognola e frizzante, anche da sola."
     Theme: "Teal"
     IsActive: true
-    ShowImage: false
+    Image: "tonica"
+    ShowImage: true
     Category: "Fusti"
     LargeEventOnly: true
     IsTap: true
@@ -310,5 +313,5 @@ Cocktails:
     LedG: 255
     LedB: 255
     Ingredients:
-      - Name: "Tonic"
+      - Name: "Tonica"
         Milliliters: 200

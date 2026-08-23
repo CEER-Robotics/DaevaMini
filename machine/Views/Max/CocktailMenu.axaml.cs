@@ -296,6 +296,15 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
         if (sender is not Button { CommandParameter: CocktailCardItem item }) return;
         if (_isPouring) return;
 
+        // A tap does not need confirming: the guest is about to work the valve by hand,
+        // and the valve screen is itself the decision point. Asking "sei sicuro?" first
+        // would put two taps between wanting a beer and getting one.
+        if (item.Cocktail.IsTap)
+        {
+            OpenTapOverlay(item);
+            return;
+        }
+
         foreach (var other in VisibleCocktails)
             other.IsConfirming = ReferenceEquals(other, item);
 
@@ -323,15 +332,6 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
 
         item.IsConfirming = false;
         _confirmToken++;
-
-        // A tap drink is not poured by dose: it gets its own screen where the guest
-        // works the valve.
-        if (item.Cocktail.IsTap)
-        {
-            OpenTapOverlay(item);
-            return;
-        }
-
         if (PourHandler == null) return;
 
         _isPouring = true;

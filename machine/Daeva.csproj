@@ -38,6 +38,9 @@
       <AvaloniaResource Include="Assets\camparispritz.png" />
       <AvaloniaResource Include="Assets\spritz.png" />
       <AvaloniaResource Include="Assets\birra.png" />
+      <AvaloniaResource Include="Assets\prosecco.png" />
+      <AvaloniaResource Include="Assets\cola.png" />
+      <AvaloniaResource Include="Assets\tonica.png" />
       <AvaloniaResource Include="Assets\DaevaMiniLogo.png" />
       <AvaloniaResource Include="Assets\DaevaWhite.png" />
     </ItemGroup>
