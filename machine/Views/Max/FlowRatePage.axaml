@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:max="clr-namespace:DaevaMini.Views.Max"
+             xmlns:controls="clr-namespace:DaevaMini.Controls"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
              x:Class="DaevaMini.Views.Max.FlowRatePage"
              x:Name="PageHost">
@@ -75,7 +76,9 @@
 
         <Border Canvas.Left="210" Canvas.Top="150" Width="1500" Height="820" CornerRadius="32"
                 Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1" Padding="30,24">
-            <ScrollViewer>
+            <!-- Dragged with a finger like the doses list; see Controls/DragScroll.cs. -->
+            <ScrollViewer controls:DragScroll.Enabled="True"
+                          HorizontalScrollBarVisibility="Disabled">
                 <ItemsControl ItemsSource="{Binding Lines, ElementName=PageHost}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="max:LineFlowRate">
