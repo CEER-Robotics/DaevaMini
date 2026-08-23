@@ -1,0 +1,469 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:DaevaMini.Controls"
+             xmlns:max="clr-namespace:DaevaMini.Views.Max"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+             x:Class="DaevaMini.Views.Max.LiquidSetupPage"
+             x:Name="LiquidHost">
+
+    <UserControl.Styles>
+        <Style Selector="Button.InvisibleBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.InvisibleBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="Button.InvisibleBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Opacity" Value="0.6"/>
+        </Style>
+
+        <Style Selector="ToggleButton.BottleBtn">
+            <Setter Property="Width" Value="200"/>
+            <Setter Property="Height" Value="220"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <StackPanel Spacing="0">
+                        <Grid Width="200" Height="180" Background="Transparent">
+                            <Border Name="GlowRing" Width="140" Height="140" CornerRadius="70"
+                                    BorderThickness="4" BorderBrush="#CAF0F8" Opacity="0"
+                                    BoxShadow="0 0 25 0 #CAF0F8"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Name="InnerBg" Width="140" Height="140" CornerRadius="70"
+                                    Background="#161816" ClipToBounds="True"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              Content="{TemplateBinding Content}"/>
+                        </Grid>
+                        <TextBlock Name="OuterText" Text="{TemplateBinding Tag}" Foreground="{StaticResource TextMuted}"
+                                   FontFamily="Space Grotesk" FontSize="{StaticResource FontBody}" FontWeight="Bold"
+                                   HorizontalAlignment="Center" Margin="0,-25,0,0"/>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="ToggleButton.BottleBtn:checked /template/ Border#InnerBg">
+            <Setter Property="Background" Value="#2A3030"/>
+        </Style>
+        <Style Selector="ToggleButton.BottleBtn:checked /template/ Border#GlowRing">
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+        <Style Selector="ToggleButton.BottleBtn:checked /template/ TextBlock#OuterText">
+            <Setter Property="Foreground" Value="#CAF0F8"/>
+        </Style>
+        <Style Selector="ToggleButton.BottleBtn.Filled /template/ Border#InnerBg">
+            <Setter Property="Background" Value="#223033"/>
+        </Style>
+        <Style Selector="ToggleButton.BottleBtn.Filled /template/ TextBlock#OuterText">
+            <Setter Property="Foreground" Value="#CAF0F8"/>
+        </Style>
+        <Style Selector="ToggleButton.BottleBtn:disabled">
+            <Setter Property="Opacity" Value="0.3"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
+        <Style Selector="ToggleButton.JerryCanBtn">
+            <Setter Property="Width" Value="280"/>
+            <Setter Property="Height" Value="300"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <StackPanel Spacing="0" Background="Transparent">
+                        <Grid Width="280" Height="250" Background="Transparent">
+                            <Border Name="KegGlow" Width="200" Height="200" CornerRadius="28"
+                                    BorderThickness="4" BorderBrush="#CAF0F8" Opacity="0"
+                                    BoxShadow="0 0 25 0 #CAF0F8"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Name="KegFrame" Width="200" Height="200" CornerRadius="28" BorderBrush="#2A2C22"
+                                    BorderThickness="1" ClipToBounds="True"
+                                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Border Name="KegTop" Grid.Row="0" Background="#1B1C16"/>
+                                    <Border Name="KegBottom" Grid.Row="1" Background="#161816"/>
+                                    <ContentPresenter Grid.RowSpan="2" HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center" Content="{TemplateBinding Content}"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                        <TextBlock Name="KegText" Text="{TemplateBinding Tag}" Foreground="{StaticResource TextPrimary}"
+                                   FontFamily="Space Grotesk"
+                                   FontSize="{StaticResource FontTitle}" FontWeight="Bold" HorizontalAlignment="Center"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="ToggleButton.JerryCanBtn:checked /template/ Border#KegGlow">
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+        <Style Selector="ToggleButton.JerryCanBtn:checked /template/ Border#KegTop">
+            <Setter Property="Background" Value="#2A3030"/>
+        </Style>
+        <Style Selector="ToggleButton.JerryCanBtn:checked /template/ Border#KegBottom">
+            <Setter Property="Background" Value="#243033"/>
+        </Style>
+        <Style Selector="ToggleButton.JerryCanBtn:checked /template/ TextBlock#KegText">
+            <Setter Property="Foreground" Value="#CAF0F8"/>
+        </Style>
+        <Style Selector="ToggleButton.JerryCanBtn.Filled /template/ Border#KegTop">
+            <Setter Property="Background" Value="#223033"/>
+        </Style>
+        <Style Selector="ToggleButton.JerryCanBtn.Filled /template/ TextBlock#KegText">
+            <Setter Property="Foreground" Value="#CAF0F8"/>
+        </Style>
+        <Style Selector="ToggleButton.JerryCanBtn:disabled">
+            <Setter Property="Opacity" Value="0.45"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
+        <Style Selector="Button.DoneButtonStyle">
+            <Setter Property="Width" Value="360"/>
+            <Setter Property="Height" Value="120"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Grid Width="360" Height="120" Background="Transparent">
+                        <Border Name="DoneBorder" Width="300" Height="80" CornerRadius="40"
+                                Background="#2A3030" BorderBrush="#CAF0F8" BorderThickness="3"
+                                BoxShadow="0 0 30 0 #CAF0F8"
+                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="{TemplateBinding Content}" HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" FontSize="{StaticResource FontTitle}" FontWeight="SemiBold"
+                                       FontFamily="Space Grotesk" Foreground="{StaticResource Accent}"/>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.DoneButtonStyle:disabled">
+            <Setter Property="Opacity" Value="0.3"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+        <!-- The pencil is the only thing to press on this page, so it is given a real
+             target rather than an icon floating on the container. -->
+        <Style Selector="Button.EditLineBtn">
+            <Setter Property="Width" Value="52"/>
+            <Setter Property="Height" Value="52"/>
+            <Setter Property="CornerRadius" Value="26"/>
+            <Setter Property="Background" Value="#212418"/>
+            <Setter Property="BorderBrush" Value="#3A3D33"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.EditLineBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#2A3030"/>
+        </Style>
+
+        <Style Selector="Button.LiquidBtn">
+            <Setter Property="Height" Value="84"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="#0CFFFFFF"/>
+            <Setter Property="BorderBrush" Value="#20FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="18"/>
+            <Setter Property="Padding" Value="28,0"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.LiquidBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1AFFFFFF"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Canvas Width="1920" Height="1080">
+        <Canvas.Background>
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#0E100C" Offset="0"/>
+                <GradientStop Color="#141712" Offset="1"/>
+            </LinearGradientBrush>
+        </Canvas.Background>
+
+        <Button Canvas.Left="60" Canvas.Top="40" Classes="InvisibleBtn" Click="OnBackClick" Width="240" Height="48">
+            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                          Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                <TextBlock Text="INDIETRO" Foreground="{StaticResource TextPrimary}"
+                           FontSize="{StaticResource FontBody}" FontFamily="Space Grotesk"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+
+        <TextBlock Canvas.Top="40" Width="1920" Text="SELEZIONE LIQUIDI"
+                   Foreground="{StaticResource TextPrimary}"
+                   FontSize="{StaticResource FontSection}" FontWeight="Bold"
+                   FontFamily="Space Grotesk" TextAlignment="Center"/>
+
+        <ToggleButton IsHitTestVisible="False" x:Name="Keg1" Classes="JerryCanBtn" Tag="11" Canvas.Left="120" Canvas.Top="240">
+            <PathIcon Width="62" Height="62" Foreground="{StaticResource TextPrimary}"
+                      Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
+        </ToggleButton>
+
+        <ToggleButton IsHitTestVisible="False" x:Name="Keg2" Classes="JerryCanBtn" Tag="12" Canvas.Left="120" Canvas.Top="540">
+            <PathIcon Width="62" Height="62" Foreground="{StaticResource TextPrimary}"
+                      Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
+        </ToggleButton>
+
+        <ToggleButton IsHitTestVisible="False" x:Name="Keg3" Classes="JerryCanBtn" Tag="13" Canvas.Left="1520" Canvas.Top="240">
+            <PathIcon Width="62" Height="62" Foreground="{StaticResource TextPrimary}"
+                      Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
+        </ToggleButton>
+
+        <ToggleButton IsHitTestVisible="False" x:Name="Keg4" Classes="JerryCanBtn" Tag="14" Canvas.Left="1520" Canvas.Top="540">
+            <PathIcon Width="62" Height="62" Foreground="{StaticResource TextPrimary}"
+                      Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
+        </ToggleButton>
+
+        <ToggleButton IsHitTestVisible="False" x:Name="Bottle4" Classes="BottleBtn" Tag="4" Canvas.Left="530" Canvas.Top="80">
+            <Grid Width="140" Height="140">
+                <Path Data="M 5,0 H 9 A 1,1 0 0 1 10,1 V 6 A 4,4 0 0 0 14,10 V 28 A 2,2 0 0 1 12,30 H 2 A 2,2 0 0 1 0,28 V 10 A 4,4 0 0 0 4,6 V 1 A 1,1 0 0 1 5,0 Z" Fill="Transparent" Stroke="#E7E6DC" StrokeThickness="2" Stretch="Uniform" Width="16" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </ToggleButton>
+
+        <ToggleButton IsHitTestVisible="False" x:Name="Bottle5" Classes="BottleBtn" Tag="5" Canvas.Left="750" Canvas.Top="80">
+            <Grid Width="140" Height="140">
+                <Path Data="M 5,0 H 9 A 1,1 0 0 1 10,1 V 6 A 4,4 0 0 0 14,10 V 28 A 2,2 0 0 1 12,30 H 2 A 2,2 0 0 1 0,28 V 10 A 4,4 0 0 0 4,6 V 1 A 1,1 0 0 1 5,0 Z" Fill="Transparent" Stroke="#E7E6DC" StrokeThickness="2" Stretch="Uniform" Width="16" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </ToggleButton>
+
+        <ToggleButton IsHitTestVisible="False" x:Name="Bottle6" Classes="BottleBtn" Tag="6" Canvas.Left="970" Canvas.Top="80">
+            <Grid Width="140" Height="140">
+                <Path Data="M 5,0 H 9 A 1,1 0 0 1 10,1 V 6 A 4,4 0 0 0 14,10 V 28 A 2,2 0 0 1 12,30 H 2 A 2,2 0 0 1 0,28 V 10 A 4,4 0 0 0 4,6 V 1 A 1,1 0 0 1 5,0 Z" Fill="Transparent" Stroke="#E7E6DC" StrokeThickness="2" Stretch="Uniform" Width="16" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </ToggleButton>
+
+        <ToggleButton IsHitTestVisible="False" x:Name="Bottle7" Classes="BottleBtn" Tag="7" Canvas.Left="1190" Canvas.Top="80">
+            <Grid Width="140" Height="140">
+                <Path Data="M 5,0 H 9 A 1,1 0 0 1 10,1 V 6 A 4,4 0 0 0 14,10 V 28 A 2,2 0 0 1 12,30 H 2 A 2,2 0 0 1 0,28 V 10 A 4,4 0 0 0 4,6 V 1 A 1,1 0 0 1 5,0 Z" Fill="Transparent" Stroke="#E7E6DC" StrokeThickness="2" Stretch="Uniform" Width="16" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </ToggleButton>
+
+        <ToggleButton IsHitTestVisible="False" x:Name="Bottle3" Classes="BottleBtn" Tag="3" Canvas.Left="530" Canvas.Top="280">
+            <Grid Width="140" Height="140">
+                <Path Data="M 5,0 H 9 A 1,1 0 0 1 10,1 V 6 A 4,4 0 0 0 14,10 V 28 A 2,2 0 0 1 12,30 H 2 A 2,2 0 0 1 0,28 V 10 A 4,4 0 0 0 4,6 V 1 A 1,1 0 0 1 5,0 Z" Fill="Transparent" Stroke="#E7E6DC" StrokeThickness="2" Stretch="Uniform" Width="16" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </ToggleButton>
+
+        <ToggleButton IsHitTestVisible="False" x:Name="Bottle8" Classes="BottleBtn" Tag="8" Canvas.Left="1190" Canvas.Top="280">
+            <Grid Width="140" Height="140">
+                <Path Data="M 5,0 H 9 A 1,1 0 0 1 10,1 V 6 A 4,4 0 0 0 14,10 V 28 A 2,2 0 0 1 12,30 H 2 A 2,2 0 0 1 0,28 V 10 A 4,4 0 0 0 4,6 V 1 A 1,1 0 0 1 5,0 Z" Fill="Transparent" Stroke="#E7E6DC" StrokeThickness="2" Stretch="Uniform" Width="16" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </ToggleButton>
+
+        <ToggleButton IsHitTestVisible="False" x:Name="Bottle2" Classes="BottleBtn" Tag="2" Canvas.Left="530" Canvas.Top="480">
+            <Grid Width="140" Height="140">
+                <Path Data="M 5,0 H 9 A 1,1 0 0 1 10,1 V 6 A 4,4 0 0 0 14,10 V 28 A 2,2 0 0 1 12,30 H 2 A 2,2 0 0 1 0,28 V 10 A 4,4 0 0 0 4,6 V 1 A 1,1 0 0 1 5,0 Z" Fill="Transparent" Stroke="#E7E6DC" StrokeThickness="2" Stretch="Uniform" Width="16" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </ToggleButton>
+
+        <ToggleButton IsHitTestVisible="False" x:Name="Bottle9" Classes="BottleBtn" Tag="9" Canvas.Left="1190" Canvas.Top="480">
+            <Grid Width="140" Height="140">
+                <Path Data="M 5,0 H 9 A 1,1 0 0 1 10,1 V 6 A 4,4 0 0 0 14,10 V 28 A 2,2 0 0 1 12,30 H 2 A 2,2 0 0 1 0,28 V 10 A 4,4 0 0 0 4,6 V 1 A 1,1 0 0 1 5,0 Z" Fill="Transparent" Stroke="#E7E6DC" StrokeThickness="2" Stretch="Uniform" Width="16" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </ToggleButton>
+
+        <ToggleButton IsHitTestVisible="False" x:Name="Bottle1" Classes="BottleBtn" Tag="1" Canvas.Left="530" Canvas.Top="680">
+            <Grid Width="140" Height="140">
+                <Path Data="M 5,0 H 9 A 1,1 0 0 1 10,1 V 6 A 4,4 0 0 0 14,10 V 28 A 2,2 0 0 1 12,30 H 2 A 2,2 0 0 1 0,28 V 10 A 4,4 0 0 0 4,6 V 1 A 1,1 0 0 1 5,0 Z" Fill="Transparent" Stroke="#E7E6DC" StrokeThickness="2" Stretch="Uniform" Width="16" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </ToggleButton>
+
+        <ToggleButton IsHitTestVisible="False" x:Name="Bottle10" Classes="BottleBtn" Tag="10" Canvas.Left="1190" Canvas.Top="680">
+            <Grid Width="140" Height="140">
+                <Path Data="M 5,0 H 9 A 1,1 0 0 1 10,1 V 6 A 4,4 0 0 0 14,10 V 28 A 2,2 0 0 1 12,30 H 2 A 2,2 0 0 1 0,28 V 10 A 4,4 0 0 0 4,6 V 1 A 1,1 0 0 1 5,0 Z" Fill="Transparent" Stroke="#E7E6DC" StrokeThickness="2" Stretch="Uniform" Width="16" Height="34" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Grid>
+        </ToggleButton>
+
+        <Button Classes="EditLineBtn" Tag="4" Canvas.Left="678" Canvas.Top="86"
+                Click="OnEditLine">
+            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+        </Button>
+        <Button Classes="EditLineBtn" Tag="5" Canvas.Left="898" Canvas.Top="86"
+                Click="OnEditLine">
+            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+        </Button>
+        <Button Classes="EditLineBtn" Tag="6" Canvas.Left="1118" Canvas.Top="86"
+                Click="OnEditLine">
+            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+        </Button>
+        <Button Classes="EditLineBtn" Tag="7" Canvas.Left="1338" Canvas.Top="86"
+                Click="OnEditLine">
+            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+        </Button>
+        <Button Classes="EditLineBtn" Tag="3" Canvas.Left="678" Canvas.Top="286"
+                Click="OnEditLine">
+            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+        </Button>
+        <Button Classes="EditLineBtn" Tag="8" Canvas.Left="1338" Canvas.Top="286"
+                Click="OnEditLine">
+            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+        </Button>
+        <Button Classes="EditLineBtn" Tag="2" Canvas.Left="678" Canvas.Top="486"
+                Click="OnEditLine">
+            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+        </Button>
+        <Button Classes="EditLineBtn" Tag="9" Canvas.Left="1338" Canvas.Top="486"
+                Click="OnEditLine">
+            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+        </Button>
+        <Button Classes="EditLineBtn" Tag="1" Canvas.Left="678" Canvas.Top="686"
+                Click="OnEditLine">
+            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+        </Button>
+        <Button Classes="EditLineBtn" Tag="10" Canvas.Left="1338" Canvas.Top="686"
+                Click="OnEditLine">
+            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+        </Button>
+        <Button Classes="EditLineBtn" Tag="11" Canvas.Left="334" Canvas.Top="248"
+                Click="OnEditLine">
+            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+        </Button>
+        <Button Classes="EditLineBtn" Tag="12" Canvas.Left="334" Canvas.Top="548"
+                Click="OnEditLine">
+            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+        </Button>
+        <Button Classes="EditLineBtn" Tag="13" Canvas.Left="1734" Canvas.Top="248"
+                Click="OnEditLine">
+            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+        </Button>
+        <Button Classes="EditLineBtn" Tag="14" Canvas.Left="1734" Canvas.Top="548"
+                Click="OnEditLine">
+            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+        </Button>
+
+        <!-- Full-width band across the bottom of the screen. The containers occupy
+             y=80..860 and the kegs end at 790, so this is the one region that is
+             genuinely free; the previous box sat in the middle of the plan and covered
+             the bottles. Status on the left, what is missing on the right. -->
+        <Border Canvas.Left="60" Canvas.Top="880" Width="1800" Height="170"
+                CornerRadius="24" Padding="32,20"
+                Background="{Binding SummaryBackground, ElementName=LiquidHost}"
+                BorderBrush="{Binding SummaryBorder, ElementName=LiquidHost}"
+                BorderThickness="1">
+            <Grid ColumnDefinitions="640,*">
+                <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="4">
+                    <TextBlock Text="{Binding SummaryHeadline, ElementName=LiquidHost}"
+                               Foreground="{Binding SummaryAccent, ElementName=LiquidHost}"
+                               FontSize="{StaticResource FontTitle}" FontWeight="Bold"
+                               FontFamily="Space Grotesk"/>
+                    <TextBlock Text="{Binding SummaryDetail, ElementName=LiquidHost}"
+                               Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
+                               FontFamily="Space Grotesk" TextWrapping="Wrap"/>
+                    <TextBlock Text="Tocca la matita su un contenitore per cambiarne il contenuto."
+                               Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontCaption}"
+                               FontFamily="Space Grotesk" Opacity="0.75"/>
+                </StackPanel>
+
+                <ScrollViewer Grid.Column="1"
+                              controls:DragScroll.Enabled="True"
+                              HorizontalScrollBarVisibility="Disabled"
+                              Margin="24,0,0,0">
+                    <ItemsControl ItemsSource="{Binding MissingLiquids, ElementName=LiquidHost}"
+                                  Margin="0,0,16,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="max:MissingLiquid">
+                                <!-- One line per liquid: the band is short, so the name
+                                     and who wants it sit side by side rather than
+                                     stacked. -->
+                                <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,0,8">
+                                    <TextBlock Text="{Binding Name}"
+                                               Foreground="{StaticResource TextPrimary}"
+                                               FontSize="{StaticResource FontLabel}" FontWeight="Bold"
+                                               FontFamily="Space Grotesk"/>
+                                    <TextBlock Text="{Binding Detail}"
+                                               Foreground="{StaticResource TextMuted}"
+                                               FontSize="{StaticResource FontCaption}"
+                                               FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- Liquid picker, over everything: while a line is being reassigned nothing
+             else on this page should be reachable. -->
+        <Border Canvas.Left="0" Canvas.Top="0" Width="1920" Height="1080"
+                Background="#F2000000"
+                IsVisible="{Binding IsPickerOpen, ElementName=LiquidHost}">
+            <Canvas Width="1920" Height="1080">
+                <TextBlock Canvas.Left="0" Canvas.Top="110" Width="1920" Height="70"
+                           Text="{Binding PickerTitle, ElementName=LiquidHost}"
+                           Foreground="{StaticResource TextPrimary}"
+                           FontSize="{StaticResource FontSection}" FontWeight="Bold"
+                           FontFamily="Space Grotesk" TextAlignment="Center"/>
+                <TextBlock Canvas.Left="0" Canvas.Top="180" Width="1920" Height="46"
+                           Text="{Binding PickerSubtitle, ElementName=LiquidHost}"
+                           Foreground="{StaticResource TextMuted}"
+                           FontSize="{StaticResource FontBody}"
+                           FontFamily="Space Grotesk" TextAlignment="Center"/>
+
+                <Border Canvas.Left="610" Canvas.Top="250" Width="700" Height="620"
+                        CornerRadius="28" Background="#0AFFFFFF"
+                        BorderBrush="#15FFFFFF" BorderThickness="1" Padding="24">
+                    <ScrollViewer controls:DragScroll.Enabled="True"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding Liquids, ElementName=LiquidHost}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Classes="LiquidBtn" Click="OnPickLiquid"
+                                            CommandParameter="{Binding}">
+                                        <TextBlock Text="{Binding}"
+                                                   Foreground="{StaticResource TextPrimary}"
+                                                   FontSize="{StaticResource FontTitle}"
+                                                   FontFamily="Space Grotesk"
+                                                   VerticalAlignment="Center"/>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
+
+                <Button Canvas.Left="610" Canvas.Top="900" Width="330" Height="72"
+                        Classes="LiquidBtn" Click="OnClearLine">
+                    <TextBlock Text="SVUOTA LINEA" Foreground="{StaticResource TextMuted}"
+                               FontSize="{StaticResource FontBody}" FontWeight="Bold"
+                               FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+                </Button>
+                <Button Canvas.Left="980" Canvas.Top="900" Width="330" Height="72"
+                        Classes="LiquidBtn" Click="OnClosePicker">
+                    <TextBlock Text="ANNULLA" Foreground="{StaticResource TextPrimary}"
+                               FontSize="{StaticResource FontBody}" FontWeight="Bold"
+                               FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+                </Button>
+            </Canvas>
+        </Border>
+    </Canvas>
+</UserControl>
