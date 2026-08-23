@@ -35,9 +35,9 @@
 
         <Button Canvas.Left="60" Canvas.Top="40" Classes="InvisibleBtn" Click="Back_Click" Width="260" Height="48">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
-                <PathIcon Width="20" Height="20" Foreground="#E7E6DC" Margin="0,0,12,0"
+                <PathIcon Width="20" Height="20" Foreground="{StaticResource TextPrimary}" Margin="0,0,12,0"
                           Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
-                <TextBlock Text="TORNA AL MENU" Foreground="#E7E6DC" FontSize="18" FontFamily="Space Grotesk"
+                <TextBlock Text="TORNA AL MENU" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontBody}" FontFamily="Space Grotesk"
                            FontWeight="Bold" LetterSpacing="2" VerticalAlignment="Center"/>
             </StackPanel>
         </Button>
@@ -45,10 +45,10 @@
         <Border Canvas.Left="690" Canvas.Top="200" Width="540" Height="680" CornerRadius="48"
                 Background="#08FFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1">
             <StackPanel HorizontalAlignment="Center" Margin="0,60,0,0">
-                <PathIcon Width="48" Height="48" Foreground="#CAF0F8"
+                <PathIcon Width="48" Height="48" Foreground="{StaticResource Accent}"
                           Data="M12,17A2,2 0 0,0 14,15C14,13.89 13.11,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8,6A4,4 0 0,1 12,2A4,4 0 0,1 16,6V8H8V6Z"/>
 
-                <TextBlock x:Name="PromptText" Text="INSERISCI PIN" Foreground="#E7E6DC" FontSize="20"
+                <TextBlock x:Name="PromptText" Text="INSERISCI PIN" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontLabel}"
                            FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="3"
                            HorizontalAlignment="Center" Margin="0,30,0,0"/>
 
@@ -62,62 +62,62 @@
                 <UniformGrid Columns="3" Rows="4" Width="450" Height="400" Margin="0,45,0,0">
                     <Button Classes="InvisibleBtn" Margin="7" Tag="1" Click="Num_Click">
                         <Border Background="#0CFFFFFF" CornerRadius="12">
-                            <TextBlock Text="1" Foreground="#E7E6DC" FontSize="32" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="1" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </Button>
                     <Button Classes="InvisibleBtn" Margin="7" Tag="2" Click="Num_Click">
                         <Border Background="#0CFFFFFF" CornerRadius="12">
-                            <TextBlock Text="2" Foreground="#E7E6DC" FontSize="32" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="2" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </Button>
                     <Button Classes="InvisibleBtn" Margin="7" Tag="3" Click="Num_Click">
                         <Border Background="#0CFFFFFF" CornerRadius="12">
-                            <TextBlock Text="3" Foreground="#E7E6DC" FontSize="32" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="3" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </Button>
                     <Button Classes="InvisibleBtn" Margin="7" Tag="4" Click="Num_Click">
                         <Border Background="#0CFFFFFF" CornerRadius="12">
-                            <TextBlock Text="4" Foreground="#E7E6DC" FontSize="32" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="4" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </Button>
                     <Button Classes="InvisibleBtn" Margin="7" Tag="5" Click="Num_Click">
                         <Border Background="#0CFFFFFF" CornerRadius="12">
-                            <TextBlock Text="5" Foreground="#E7E6DC" FontSize="32" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="5" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </Button>
                     <Button Classes="InvisibleBtn" Margin="7" Tag="6" Click="Num_Click">
                         <Border Background="#0CFFFFFF" CornerRadius="12">
-                            <TextBlock Text="6" Foreground="#E7E6DC" FontSize="32" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="6" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </Button>
                     <Button Classes="InvisibleBtn" Margin="7" Tag="7" Click="Num_Click">
                         <Border Background="#0CFFFFFF" CornerRadius="12">
-                            <TextBlock Text="7" Foreground="#E7E6DC" FontSize="32" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="7" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </Button>
                     <Button Classes="InvisibleBtn" Margin="7" Tag="8" Click="Num_Click">
                         <Border Background="#0CFFFFFF" CornerRadius="12">
-                            <TextBlock Text="8" Foreground="#E7E6DC" FontSize="32" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="8" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </Button>
                     <Button Classes="InvisibleBtn" Margin="7" Tag="9" Click="Num_Click">
                         <Border Background="#0CFFFFFF" CornerRadius="12">
-                            <TextBlock Text="9" Foreground="#E7E6DC" FontSize="32" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="9" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </Button>
                     <Button Classes="InvisibleBtn" Margin="7" Click="Clear_Click">
                         <Border Background="#05FFFFFF" CornerRadius="12">
-                            <TextBlock Text="CANCELLA" Foreground="#E7E6DC" FontSize="20" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="CANCELLA" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontLabel}" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </Button>
                     <Button Classes="InvisibleBtn" Margin="7" Tag="0" Click="Num_Click">
                         <Border Background="#0CFFFFFF" CornerRadius="12">
-                            <TextBlock Text="0" Foreground="#E7E6DC" FontSize="32" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="0" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold" FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </Button>
                     <Button Classes="InvisibleBtn" Margin="7" Click="Del_Click">
                         <Border Background="#05FFFFFF" CornerRadius="12">
-                            <PathIcon Width="28" Height="28" Foreground="#E7E6DC" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            <PathIcon Width="28" Height="28" Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center"
                                       Data="M22,3H7C6.31,3 5.77,3.35 5.41,3.88L0,12L5.41,20.11C5.77,20.64 6.31,21 7,21H22A2,2 0 0,0 24,19V5A2,2 0 0,0 22,3M19,15.59L17.59,17L14,13.41L10.41,17L9,15.59L12.59,12L9,8.41L10.41,7L14,10.59L17.59,7L19,8.41L15.41,12"/>
                         </Border>
                     </Button>

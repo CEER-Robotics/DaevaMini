@@ -17,7 +17,7 @@
             <Button Background="Transparent"
                     Click="OnBackArrow">
                 <TextBlock Text="←"
-                           FontSize="40"
+                           FontSize="{StaticResource FontScreen}"
                            Foreground="White" />
             </Button>
         </StackPanel>
@@ -45,8 +45,8 @@
                             Background="#D0F0F8"
                             CornerRadius="75">
                         <TextBlock x:Name="Slot0"
-                                   Foreground="#000000"
-                                   FontSize="20"
+                                   Foreground="{StaticResource OnAccent}"
+                                   FontSize="{StaticResource FontLabel}"
                                    FontWeight="SemiBold"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
@@ -59,8 +59,8 @@
                             Background="#D0F0F8"
                             CornerRadius="75">
                         <TextBlock x:Name="Slot1"
-                                   Foreground="#000000"
-                                   FontSize="20"
+                                   Foreground="{StaticResource OnAccent}"
+                                   FontSize="{StaticResource FontLabel}"
                                    FontWeight="SemiBold"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
@@ -77,7 +77,7 @@
                             Margin="30,0">
                     <TextBlock Text="Inserisci i liquidi corretti"
                                Foreground="White"
-                               FontSize="32"
+                               FontSize="{StaticResource FontSection}"
                                FontWeight="SemiBold"
                                HorizontalAlignment="Center"
                                TextAlignment="Center"/>
@@ -87,8 +87,8 @@
                             Background="#D0F0F8"
                             CornerRadius="20">
                         <TextBlock Text="DAĒVA"
-                                   Foreground="#000000"
-                                   FontSize="48"
+                                   Foreground="{StaticResource OnAccent}"
+                                   FontSize="{StaticResource FontScreen}"
                                    FontWeight="Bold"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"/>
@@ -104,8 +104,8 @@
                             Background="#D0F0F8"
                             CornerRadius="75">
                         <TextBlock x:Name="Slot2"
-                                   Foreground="#000000"
-                                   FontSize="20"
+                                   Foreground="{StaticResource OnAccent}"
+                                   FontSize="{StaticResource FontLabel}"
                                    FontWeight="SemiBold"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
@@ -118,8 +118,8 @@
                             Background="#D0F0F8"
                             CornerRadius="75">
                         <TextBlock x:Name="Slot3"
-                                   Foreground="#000000"
-                                   FontSize="20"
+                                   Foreground="{StaticResource OnAccent}"
+                                   FontSize="{StaticResource FontLabel}"
                                    FontWeight="SemiBold"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
@@ -138,8 +138,8 @@
                     Background="#539CA8"
                     Click="OnDone">
                 <TextBlock Text="Fatto"
-                           Foreground="#000000"
-                           FontSize="28"
+                           Foreground="{StaticResource OnAccent}"
+                           FontSize="{StaticResource FontSection}"
                            FontWeight="SemiBold"/>
             </Button>
         </Grid>

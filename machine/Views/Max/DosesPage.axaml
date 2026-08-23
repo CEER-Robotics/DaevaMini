@@ -56,20 +56,20 @@
 
         <Button Canvas.Left="60" Canvas.Top="40" Classes="InvisibleBtn" Click="OnBackClick" Width="240" Height="48">
             <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                <PathIcon Width="22" Height="22" Foreground="#E7E6DC"
+                <PathIcon Width="22" Height="22" Foreground="{StaticResource TextPrimary}"
                           Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
-                <TextBlock Text="INDIETRO" Foreground="#E7E6DC" FontSize="16" FontFamily="Space Grotesk"
+                <TextBlock Text="INDIETRO" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontBody}" FontFamily="Space Grotesk"
                            FontWeight="Bold" VerticalAlignment="Center" LetterSpacing="1"/>
             </StackPanel>
         </Button>
 
-        <TextBlock Canvas.Top="40" Width="1920" Text="DOSI DEI COCKTAIL" Foreground="#E7E6DC"
-                   FontSize="28" FontWeight="Bold" FontFamily="Space Grotesk"
+        <TextBlock Canvas.Top="40" Width="1920" Text="DOSI DEI COCKTAIL" Foreground="{StaticResource TextPrimary}"
+                   FontSize="{StaticResource FontSection}" FontWeight="Bold" FontFamily="Space Grotesk"
                    TextAlignment="Center" LetterSpacing="3"/>
 
         <TextBlock Canvas.Top="88" Width="1920"
                    Text="Scegli un cocktail e regola i millilitri di ogni ingrediente. Le modifiche valgono da subito."
-                   Foreground="#8A8F80" FontSize="17" FontFamily="Space Grotesk" TextAlignment="Center"/>
+                   Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}" FontFamily="Space Grotesk" TextAlignment="Center"/>
 
         <!-- cocktail list -->
         <Border Canvas.Left="150" Canvas.Top="150" Width="560" Height="830" CornerRadius="32"
@@ -83,10 +83,10 @@
                                     Click="OnSelectCocktail" CommandParameter="{Binding}">
                                 <Grid ColumnDefinitions="*,Auto">
                                     <TextBlock Grid.Column="0" Text="{Binding Name}"
-                                               Foreground="{Binding NameBrush}" FontSize="22" FontWeight="Bold"
+                                               Foreground="{Binding NameBrush}" FontSize="{StaticResource FontLabel}" FontWeight="Bold"
                                                FontFamily="Space Grotesk" VerticalAlignment="Center"/>
                                     <TextBlock Grid.Column="1" Text="{Binding TotalLabel}"
-                                               Foreground="#8A8F80" FontSize="17"
+                                               Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
                                                FontFamily="Space Grotesk" VerticalAlignment="Center"/>
                                 </Grid>
                             </Button>
@@ -102,10 +102,10 @@
             <DockPanel LastChildFill="True">
                 <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0,0,0,24">
                     <TextBlock Name="SelectedName" Text=""
-                               Foreground="#E7E6DC" FontSize="30" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold"
                                FontFamily="Space Grotesk"/>
                     <TextBlock Name="SelectedTotal" Text=""
-                               Foreground="#CAF0F8" FontSize="18"
+                               Foreground="{StaticResource Accent}" FontSize="{StaticResource FontBody}"
                                FontFamily="Space Grotesk"/>
                 </StackPanel>
 
@@ -117,23 +117,23 @@
                                         Padding="30,0" Margin="0,0,0,12">
                                     <Grid ColumnDefinitions="*,200,Auto">
                                         <TextBlock Grid.Column="0" Text="{Binding Name}"
-                                                   Foreground="#E7E6DC" FontSize="24" FontWeight="Medium"
+                                                   Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontTitle}" FontWeight="Medium"
                                                    FontFamily="Space Grotesk" VerticalAlignment="Center"/>
 
                                         <TextBlock Grid.Column="1" Text="{Binding AmountLabel}"
-                                                   Foreground="#FFFFFF" FontSize="26" FontWeight="Bold"
+                                                   Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontTitle}" FontWeight="Bold"
                                                    FontFamily="Space Grotesk" VerticalAlignment="Center"/>
 
                                         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="14"
                                                     VerticalAlignment="Center">
                                             <Button Classes="StepBtn" Width="52" Height="52"
                                                     Click="OnDecreaseClick" CommandParameter="{Binding}">
-                                                <TextBlock Text="-" Foreground="#E7E6DC" FontSize="28" FontWeight="Bold"
+                                                <TextBlock Text="-" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold"
                                                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </Button>
                                             <Button Classes="StepBtn" Width="52" Height="52"
                                                     Click="OnIncreaseClick" CommandParameter="{Binding}">
-                                                <TextBlock Text="+" Foreground="#E7E6DC" FontSize="28" FontWeight="Bold"
+                                                <TextBlock Text="+" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold"
                                                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </Button>
                                         </StackPanel>
@@ -148,6 +148,6 @@
 
         <TextBlock Name="StatusLine"
                    Canvas.Top="1000" Width="1920" Text=""
-                   Foreground="#CAF0F8" FontSize="18" FontFamily="Space Grotesk" TextAlignment="Center"/>
+                   Foreground="{StaticResource Accent}" FontSize="{StaticResource FontBody}" FontFamily="Space Grotesk" TextAlignment="Center"/>
     </Canvas>
 </UserControl>

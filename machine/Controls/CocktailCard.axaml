@@ -79,10 +79,10 @@
 
         <Button x:Name="CloseButton" Canvas.Left="60" Canvas.Top="40" Classes="InvisibleBtn" Width="250" Height="48">
             <StackPanel Orientation="Horizontal" Spacing="12">
-                <PathIcon Width="24" Height="24" Foreground="#E7E6DC"
+                <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
                           Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
-                <TextBlock Text="TORNA AL MENU" Foreground="#E7E6DC" FontFamily="Space Grotesk"
-                           FontWeight="Bold" FontSize="18" VerticalAlignment="Center"/>
+                <TextBlock Text="TORNA AL MENU" Foreground="{StaticResource TextPrimary}" FontFamily="Space Grotesk"
+                           FontWeight="Bold" FontSize="{StaticResource FontBody}" VerticalAlignment="Center"/>
             </StackPanel>
         </Button>
 
@@ -105,16 +105,16 @@
                 </Border>
 
                 <Border Canvas.Left="640" Canvas.Top="75" Width="190" Height="32" Classes="BadgeStyle">
-                    <TextBlock Text="{Binding Theme}" Foreground="#FFFFFF" FontSize="12" FontWeight="Bold"
+                    <TextBlock Text="{Binding Theme}" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontCaption}" FontWeight="Bold"
                                FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
 
                 <TextBlock Canvas.Left="640" Canvas.Top="112" Width="860" Height="140"
-                           Text="{Binding Title}" Foreground="#FFFFFF" FontSize="92" FontWeight="Bold"
+                           Text="{Binding Title}" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontHero}" FontWeight="Bold"
                            FontFamily="Space Grotesk" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
 
                 <TextBlock Canvas.Left="640" Canvas.Top="265" Width="650" Height="42"
-                           Text="{Binding Subtitle}" Foreground="#CAF0F8" FontSize="24" FontWeight="Bold"
+                           Text="{Binding Subtitle}" Foreground="{StaticResource Accent}" FontSize="{StaticResource FontTitle}" FontWeight="Bold"
                            FontFamily="Space Grotesk" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
 
                 <ItemsControl Canvas.Left="640" Canvas.Top="330" Width="520" Height="180"
@@ -122,7 +122,7 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="models:CocktailIngredient">
                             <Grid Margin="0,0,0,8">
-                                <TextBlock Text="{Binding Name}" Foreground="#E7E6DC" FontSize="24"
+                                <TextBlock Text="{Binding Name}" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontTitle}"
                                            FontWeight="Bold" FontFamily="Space Grotesk"/>
                             </Grid>
                         </DataTemplate>
@@ -130,12 +130,12 @@
                 </ItemsControl>
 
                 <TextBlock Canvas.Left="640" Canvas.Top="540" Width="700" Height="48"
-                           Text="Miscelato con precisione da Daeva Max." Foreground="#E7E6DC"
-                           FontSize="18" TextWrapping="Wrap" LineHeight="28" Opacity="0.8"/>
+                           Text="Miscelato con precisione da Daeva Max." Foreground="{StaticResource TextPrimary}"
+                           FontSize="{StaticResource FontBody}" TextWrapping="Wrap" LineHeight="28" Opacity="0.8"/>
 
                 <Button x:Name="DaleButton" Canvas.Left="640" Canvas.Top="620" Width="400" Height="80"
                         Classes="StartPourBtn">
-                    <TextBlock Text="EROGA" Foreground="#000000" FontSize="28" FontWeight="Bold"
+                    <TextBlock Text="EROGA" Foreground="{StaticResource OnAccent}" FontSize="{StaticResource FontSection}" FontWeight="Bold"
                                FontFamily="Space Grotesk" LetterSpacing="2"/>
                 </Button>
 

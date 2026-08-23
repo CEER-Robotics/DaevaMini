@@ -99,14 +99,14 @@ Modes:
     Color: "#F46036"
     LedColor: "RED"
     LiquidAssignments:
-      - "Campari"
+      - "Bitter rosso"
       - "Vermouth"
       - ""
       - "Gin"
     Cocktails:
       - Id: "negroni"
         Name: "Negroni"
-        Subtitle: "Campari, Vermouth, Gin"
+        Subtitle: "Bitter rosso, Vermouth, Gin"
         Image: "negroni"
         Theme: "Burgundy"
         IsActive: true
@@ -116,13 +116,13 @@ Modes:
         Ingredients:
           - Name: "Gin"
             Milliliters: 30
-          - Name: "Campari"
+          - Name: "Bitter rosso"
             Milliliters: 30
           - Name: "Vermouth"
             Milliliters: 30
       - Id: "negronisbagliato"
         Name: "Negroni Sbagliato"
-        Subtitle: "Campari, Vermouth, Prosecco"
+        Subtitle: "Bitter rosso, Vermouth, Prosecco"
         Image: "negronisbagliato"
         Theme: "Burgundy"
         IsActive: false
@@ -130,7 +130,7 @@ Modes:
         LedG: 255
         LedB: 0
         Ingredients:
-          - Name: "Campari"
+          - Name: "Bitter rosso"
             Milliliters: 30
           - Name: "Vermouth"
             Milliliters: 30
@@ -138,7 +138,7 @@ Modes:
             Milliliters: 60
       - Id: "americano"
         Name: "Americano"
-        Subtitle: "Campari, Vermouth"
+        Subtitle: "Bitter rosso, Vermouth"
         Image: "americano"
         Theme: "Burgundy"
         IsActive: false
@@ -146,15 +146,15 @@ Modes:
         LedG: 255
         LedB: 0
         Ingredients:
-          - Name: "Campari"
+          - Name: "Bitter rosso"
             Milliliters: 30
           - Name: "Vermouth"
             Milliliters: 30
           - Name: "Tonic"
             Milliliters: 60
       - Id: "camparispritz"
-        Name: "Campari Spritz"
-        Subtitle: "Campari, Prosecco"
+        Name: "Spritz Rosso"
+        Subtitle: "Bitter rosso, Prosecco"
         Image: "camparispritz"
         Theme: "Burgundy"
         IsActive: false
@@ -162,7 +162,7 @@ Modes:
         LedG: 255
         LedB: 0
         Ingredients:
-          - Name: "Campari"
+          - Name: "Bitter rosso"
             Milliliters: 40
           - Name: "Prosecco"
             Milliliters: 80

@@ -38,8 +38,8 @@
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                                               Content="{TemplateBinding Content}"/>
                         </Grid>
-                        <TextBlock Name="OuterText" Text="{TemplateBinding Tag}" Foreground="#A0A0A0"
-                                   FontFamily="Space Grotesk" FontSize="18" FontWeight="Bold"
+                        <TextBlock Name="OuterText" Text="{TemplateBinding Tag}" Foreground="{StaticResource TextMuted}"
+                                   FontFamily="Space Grotesk" FontSize="{StaticResource FontBody}" FontWeight="Bold"
                                    HorizontalAlignment="Center" Margin="0,-25,0,0"/>
                     </StackPanel>
                 </ControlTemplate>
@@ -93,9 +93,9 @@
                                 </Grid>
                             </Border>
                         </Grid>
-                        <TextBlock Name="KegText" Text="{TemplateBinding Tag}" Foreground="#E7E6DC"
+                        <TextBlock Name="KegText" Text="{TemplateBinding Tag}" Foreground="{StaticResource TextPrimary}"
                                    FontFamily="Space Grotesk"
-                                   FontSize="26" FontWeight="Bold" HorizontalAlignment="Center"
+                                   FontSize="{StaticResource FontTitle}" FontWeight="Bold" HorizontalAlignment="Center"
                                    Margin="0,4,0,0"/>
                     </StackPanel>
                 </ControlTemplate>
@@ -137,8 +137,8 @@
                                 BoxShadow="0 0 30 0 #CAF0F8"
                                 HorizontalAlignment="Center" VerticalAlignment="Center">
                             <TextBlock Text="{TemplateBinding Content}" HorizontalAlignment="Center"
-                                       VerticalAlignment="Center" FontSize="26" FontWeight="SemiBold"
-                                       FontFamily="Space Grotesk" Foreground="#CAF0F8"/>
+                                       VerticalAlignment="Center" FontSize="{StaticResource FontTitle}" FontWeight="SemiBold"
+                                       FontFamily="Space Grotesk" Foreground="{StaticResource Accent}"/>
                         </Border>
                     </Grid>
                 </ControlTemplate>
@@ -197,31 +197,31 @@
 
         <Button Canvas.Left="60" Canvas.Top="40" Classes="InvisibleBtn" Click="OnBackArrow" Width="240" Height="48">
             <StackPanel Orientation="Horizontal" Spacing="12">
-                <PathIcon Width="24" Height="24" Foreground="#E7E6DC"
+                <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
                           Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
-                <TextBlock Text="TORNA AL MENU" Foreground="#E7E6DC" FontFamily="Space Grotesk"
-                           FontWeight="Bold" FontSize="18" VerticalAlignment="Center"/>
+                <TextBlock Text="TORNA AL MENU" Foreground="{StaticResource TextPrimary}" FontFamily="Space Grotesk"
+                           FontWeight="Bold" FontSize="{StaticResource FontBody}" VerticalAlignment="Center"/>
             </StackPanel>
         </Button>
 
-        <TextBlock Canvas.Top="40" Width="1920" Text="CAMBIO CONTENITORI" Foreground="#E7E6DC"
-                   FontSize="28" FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="4"
+        <TextBlock Canvas.Top="40" Width="1920" Text="CAMBIO CONTENITORI" Foreground="{StaticResource TextPrimary}"
+                   FontSize="{StaticResource FontSection}" FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="4"
                    TextAlignment="Center"/>
 
         <ToggleButton x:Name="Keg1" Classes="JerryCanBtn" Tag="11" Canvas.Left="120" Canvas.Top="240">
-            <PathIcon Width="62" Height="62" Foreground="#E7E6DC"
+            <PathIcon Width="62" Height="62" Foreground="{StaticResource TextPrimary}"
                       Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
         </ToggleButton>
         <ToggleButton x:Name="Keg2" Classes="JerryCanBtn" Tag="12" Canvas.Left="120" Canvas.Top="540">
-            <PathIcon Width="62" Height="62" Foreground="#E7E6DC"
+            <PathIcon Width="62" Height="62" Foreground="{StaticResource TextPrimary}"
                       Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
         </ToggleButton>
         <ToggleButton x:Name="Keg3" Classes="JerryCanBtn" Tag="13" Canvas.Left="1520" Canvas.Top="240">
-            <PathIcon Width="62" Height="62" Foreground="#E7E6DC"
+            <PathIcon Width="62" Height="62" Foreground="{StaticResource TextPrimary}"
                       Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
         </ToggleButton>
         <ToggleButton x:Name="Keg4" Classes="JerryCanBtn" Tag="14" Canvas.Left="1520" Canvas.Top="540">
-            <PathIcon Width="62" Height="62" Foreground="#E7E6DC"
+            <PathIcon Width="62" Height="62" Foreground="{StaticResource TextPrimary}"
                       Data="M224 88C224 74.7 234.7 64 248 64L328 64C341.3 64 352 74.7 352 88L352 112L360 112C373.3 112 384 122.7 384 136C384 149.3 373.3 160 360 160L216 160C202.7 160 192 149.3 192 136C192 122.7 202.7 112 216 112L224 112L224 88zM128 320C128 249.3 185.3 192 256 192L384 192C454.7 192 512 249.3 512 320L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 320zM384 320L384 416C384 433.7 398.3 448 416 448C433.7 448 448 433.7 448 416L448 320C448 302.3 433.7 288 416 288C398.3 288 384 302.3 384 320z"/>
         </ToggleButton>
 
@@ -279,7 +279,7 @@
 
         <StackPanel Canvas.Left="760" Canvas.Top="346" Width="400" HorizontalAlignment="Center">
             <TextBlock Text="Seleziona i contenitori da riempire, poi premi avvia."
-                       Foreground="#CAF0F8" FontSize="24" FontWeight="Bold" FontFamily="Space Grotesk"
+                       Foreground="{StaticResource Accent}" FontSize="{StaticResource FontTitle}" FontWeight="Bold" FontFamily="Space Grotesk"
                        TextAlignment="Center" TextWrapping="Wrap"/>
             <Image Source="avares://Daeva/Assets/DaevaWhite.png" Width="270" Height="82"
                    Stretch="Uniform" Margin="0,45,0,0" HorizontalAlignment="Center">
@@ -302,7 +302,7 @@
             <Line StartPoint="46,32" EndPoint="234,218"
                   Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
             <TextBlock Text="Non disponibili in questa modalità"
-                       Foreground="#E5484D" FontSize="15" FontWeight="Bold"
+                       Foreground="{StaticResource Danger}" FontSize="{StaticResource FontCaption}" FontWeight="Bold"
                        FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
                        Width="240"
                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
@@ -318,7 +318,7 @@
             <Line StartPoint="46,32" EndPoint="234,218"
                   Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
             <TextBlock Text="Non disponibili in questa modalità"
-                       Foreground="#E5484D" FontSize="15" FontWeight="Bold"
+                       Foreground="{StaticResource Danger}" FontSize="{StaticResource FontCaption}" FontWeight="Bold"
                        FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
                        Width="240"
                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
@@ -334,7 +334,7 @@
             <Line StartPoint="46,32" EndPoint="234,218"
                   Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
             <TextBlock Text="Non disponibili in questa modalità"
-                       Foreground="#E5484D" FontSize="15" FontWeight="Bold"
+                       Foreground="{StaticResource Danger}" FontSize="{StaticResource FontCaption}" FontWeight="Bold"
                        FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
                        Width="240"
                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
@@ -350,7 +350,7 @@
             <Line StartPoint="46,32" EndPoint="234,218"
                   Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
             <TextBlock Text="Non disponibili in questa modalità"
-                       Foreground="#E5484D" FontSize="15" FontWeight="Bold"
+                       Foreground="{StaticResource Danger}" FontSize="{StaticResource FontCaption}" FontWeight="Bold"
                        FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
                        Width="240"
                        HorizontalAlignment="Center" VerticalAlignment="Bottom"
@@ -367,16 +367,16 @@
                 IsVisible="False">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="28">
                 <TextBlock Text="Riempimento dei tubi in corso"
-                           Foreground="#E7E6DC" FontSize="34" FontWeight="Bold"
+                           Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold"
                            FontFamily="Space Grotesk" HorizontalAlignment="Center"/>
                 <TextBlock Name="FillProgressDetail"
                            Text=""
-                           Foreground="#CAF0F8" FontSize="20"
+                           Foreground="{StaticResource Accent}" FontSize="{StaticResource FontLabel}"
                            FontFamily="Space Grotesk" HorizontalAlignment="Center"/>
                 <ProgressBar Name="FillProgress"
                              Width="760" Height="42"
                              Minimum="0" Maximum="100" Value="0"
-                             Foreground="#CAF0F8" Background="#24FFFFFF"
+                             Foreground="{StaticResource Accent}" Background="#24FFFFFF"
                              CornerRadius="21"/>
             </StackPanel>
         </Border>
@@ -400,7 +400,7 @@
                 <StackPanel Spacing="14">
                     <TextBlock Name="SizeOverlayTitle"
                                Text="Da quanti litri è la bottiglia che hai inserito?"
-                               Foreground="#E7E6DC" FontSize="34" FontWeight="Bold"
+                               Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontSection}" FontWeight="Bold"
                                FontFamily="Space Grotesk" HorizontalAlignment="Center"/>
                     <StackPanel Name="KegSizes"
                                 Orientation="Horizontal"
@@ -427,7 +427,7 @@
 
                     <TextBlock Name="MixedSelectionNote"
                                Text="Seleziona fusti e bottiglie separatamente: la capacità vale per tutte le linee scelte."
-                               Foreground="#F5C518" FontSize="18"
+                               Foreground="{StaticResource Warning}" FontSize="{StaticResource FontBody}"
                                FontFamily="Space Grotesk" TextWrapping="Wrap"
                                TextAlignment="Center" HorizontalAlignment="Center"
                                Margin="0,24,0,0"
@@ -460,7 +460,7 @@
                             Margin="0,24,0,0"
                             HorizontalAlignment="Center"
                             Click="OnBottleSizeCancel">
-                        <TextBlock Text="ANNULLA" Foreground="#E7E6DC" FontSize="18" FontWeight="Bold"
+                        <TextBlock Text="ANNULLA" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontBody}" FontWeight="Bold"
                                    FontFamily="Space Grotesk"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Button>
