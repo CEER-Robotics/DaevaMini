@@ -69,7 +69,7 @@
             <!-- Two columns rather than one stack: six full-width rows overflowed the
                  panel. Every tile is itself the button - the old APRI / AVVIA pills put
                  a small second target inside a row that was already the thing to press. -->
-            <Grid Margin="60,50" ColumnDefinitions="*,24,*" RowDefinitions="150,24,150,24,150"
+            <Grid Margin="60,50" ColumnDefinitions="*,24,*" RowDefinitions="150,24,150,24,150,24,150"
                   VerticalAlignment="Center">
                 <Button Grid.Row="0" Grid.Column="0" Classes="SettingsTile" Click="OnCocktailsClick">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
@@ -146,10 +146,27 @@
                                       Data="M12,2A3,3 0 0,0 9,5C9,6.31 9.83,7.42 11,7.83V10H8A2,2 0 0,0 6,12V13H4V19H8V13H6V12H11V19H13V12H18V13H16V19H20V13H18V12A2,2 0 0,0 16,10H13V7.83C14.17,7.42 15,6.31 15,5A3,3 0 0,0 12,2Z"/>
                         </Border>
                         <StackPanel VerticalAlignment="Center" Spacing="4">
-                            <TextBlock Text="Portata dei fusti" Foreground="{StaticResource TextPrimary}"
+                            <TextBlock Text="Velocità dei fusti" Foreground="{StaticResource TextPrimary}"
                                        FontSize="{StaticResource FontTitle}"
                                        FontFamily="Space Grotesk" FontWeight="Medium"/>
-                            <TextBlock Text="Calibra la resa" Foreground="{StaticResource TextMuted}"
+                            <TextBlock Text="Misura quanto versano" Foreground="{StaticResource TextMuted}"
+                                       FontSize="{StaticResource FontCaption}"
+                                       FontFamily="Space Grotesk"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Button>
+
+                <Button Grid.Row="6" Grid.Column="0" Classes="SettingsTile" Click="OnChangePinClick">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
+                        <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
+                            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                                      Data="M12,17A2,2 0 0,0 14,15C14,13.89 13.11,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8,6A4,4 0 0,1 12,2A4,4 0 0,1 16,6V8H8V6Z"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Spacing="4">
+                            <TextBlock Text="PIN" Foreground="{StaticResource TextPrimary}"
+                                       FontSize="{StaticResource FontTitle}"
+                                       FontFamily="Space Grotesk" FontWeight="Medium"/>
+                            <TextBlock Text="Cambia il codice delle impostazioni" Foreground="{StaticResource TextMuted}"
                                        FontSize="{StaticResource FontCaption}"
                                        FontFamily="Space Grotesk"/>
                         </StackPanel>

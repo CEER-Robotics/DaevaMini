@@ -55,6 +55,12 @@ public partial class SettingsDaevaMax : UserControl
             mainWindow.ShowCocktailWorkshopPage();
     }
 
+    private void OnChangePinClick(object? sender, RoutedEventArgs e)
+    {
+        if (VisualRoot is MainWindow mainWindow)
+            mainWindow.ShowChangePinPage();
+    }
+
     private void OnFlowRateClick(object? sender, RoutedEventArgs e)
     {
         if (VisualRoot is MainWindow mainWindow)
