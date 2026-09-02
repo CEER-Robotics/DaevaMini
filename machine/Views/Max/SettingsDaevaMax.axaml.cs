@@ -1,4 +1,5 @@
 using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -16,9 +17,13 @@ public partial class SettingsDaevaMax : UserControl
     }
 
     private static readonly IBrush SelectedBackground = new SolidColorBrush(Color.Parse("#CAF0F8"));
-    private static readonly IBrush IdleBackground = new SolidColorBrush(Color.Parse("#15FFFFFF"));
     private static readonly IBrush SelectedForeground = new SolidColorBrush(Color.Parse("#131818"));
-    private static readonly IBrush IdleForeground = new SolidColorBrush(Color.Parse("#8A8F80"));
+
+    // Track/thumb colors and the two thumb positions for the "Attiva fusti" switch.
+    private static readonly IBrush SwitchTrackOff = new SolidColorBrush(Color.Parse("#33FFFFFF"));
+    private static readonly IBrush SwitchThumbOff = new SolidColorBrush(Color.Parse("#E7E6DC"));
+    private static readonly Thickness ThumbOffMargin = new(4, 4, 4, 4);
+    private static readonly Thickness ThumbOnMargin = new(42, 4, 4, 4);
 
     private void OnBackClick(object? sender, RoutedEventArgs e)
     {
@@ -44,10 +49,10 @@ public partial class SettingsDaevaMax : UserControl
             mainWindow.ShowContainerCleanPage();
     }
 
-    private void OnDosesClick(object? sender, RoutedEventArgs e)
+    private void OnCocktailsClick(object? sender, RoutedEventArgs e)
     {
         if (VisualRoot is MainWindow mainWindow)
-            mainWindow.ShowDosesPage();
+            mainWindow.ShowCocktailWorkshopPage();
     }
 
     private void OnFlowRateClick(object? sender, RoutedEventArgs e)
@@ -56,9 +61,11 @@ public partial class SettingsDaevaMax : UserControl
             mainWindow.ShowFlowRatePage();
     }
 
-    private void OnSmallEventClick(object? sender, RoutedEventArgs e) => SetEventMode("Small");
-
-    private void OnLargeEventClick(object? sender, RoutedEventArgs e) => SetEventMode("Large");
+    private void OnEventModeToggle(object? sender, RoutedEventArgs e)
+    {
+        bool large = AppConfigService.Instance.Config.IsLargeEvent;
+        SetEventMode(large ? "Small" : "Large");
+    }
 
     /// <summary>
     /// Switches the machine between bottles only and bottles plus kegs. Everything that
@@ -80,10 +87,9 @@ public partial class SettingsDaevaMax : UserControl
     {
         bool large = AppConfigService.Instance.Config.IsLargeEvent;
 
-        SmallEventBg.Background = large ? IdleBackground : SelectedBackground;
-        SmallEventText.Foreground = large ? IdleForeground : SelectedForeground;
-        LargeEventBg.Background = large ? SelectedBackground : IdleBackground;
-        LargeEventText.Foreground = large ? SelectedForeground : IdleForeground;
+        EventModeTrack.Background = large ? SelectedBackground : SwitchTrackOff;
+        EventModeThumb.Background = large ? SelectedForeground : SwitchThumbOff;
+        EventModeThumb.Margin = large ? ThumbOnMargin : ThumbOffMargin;
 
         // Same switch as before under a plainer name: "large event" only ever meant
         // "the kegs are plugged in", and saying so directly saves explaining it.

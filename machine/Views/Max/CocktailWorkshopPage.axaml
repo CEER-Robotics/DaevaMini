@@ -1,0 +1,595 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:max="clr-namespace:DaevaMini.Views.Max"
+             xmlns:controls="clr-namespace:DaevaMini.Controls"
+             xmlns:converters="clr-namespace:DaevaMini.Converters"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+             x:Class="DaevaMini.Views.Max.CocktailWorkshopPage"
+             x:Name="Host">
+
+    <UserControl.Resources>
+        <converters:BitmapAssetConverter x:Key="BitmapAssetConverter"/>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="Button.InvisibleBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.InvisibleBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+
+        <Style Selector="Button.PickBtn">
+            <Setter Property="Background" Value="#0CFFFFFF"/>
+            <Setter Property="BorderBrush" Value="#20FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="18,0"/>
+        </Style>
+        <Style Selector="Button.PickBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1AFFFFFF"/>
+        </Style>
+
+        <Style Selector="Button.StepBtn">
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Background" Value="#1F211C"/>
+            <Setter Property="BorderBrush" Value="#3A3D33"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="25"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.StepBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#2A3030"/>
+        </Style>
+
+        <Style Selector="Button.PrimaryBtn">
+            <Setter Property="Height" Value="84"/>
+            <Setter Property="Background" Value="#16301F"/>
+            <Setter Property="BorderBrush" Value="#3FBF7F"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="22"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.PrimaryBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1D4029"/>
+        </Style>
+        <Style Selector="Button.PrimaryBtn:disabled">
+            <Setter Property="Opacity" Value="0.35"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
+        <Style Selector="Button.GhostBtn">
+            <Setter Property="Height" Value="84"/>
+            <Setter Property="Background" Value="#0CFFFFFF"/>
+            <Setter Property="BorderBrush" Value="#20FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="22"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.GhostBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1AFFFFFF"/>
+        </Style>
+
+        <!-- Stretch, or a key shrinks to the width of its letter and leaves a
+             fingertip-sized gap between what you see and what you can hit. -->
+        <Style Selector="Button.KeyBtn">
+            <Setter Property="Background" Value="#171A14"/>
+            <Setter Property="BorderBrush" Value="#2E322A"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.KeyBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#2A3030"/>
+        </Style>
+        <!-- Shift, backspace and space: the modifier keys a PC board sets apart. -->
+        <Style Selector="Button.ModKey">
+            <Setter Property="Background" Value="#0E1310"/>
+        </Style>
+
+        <Style Selector="Button.DangerBtn">
+            <Setter Property="Background" Value="#1A0E0E"/>
+            <Setter Property="BorderBrush" Value="#5A2326"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Padding" Value="20,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.DangerBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#2A1315"/>
+        </Style>
+
+        <Style Selector="Button.AddBtn">
+            <Setter Property="Background" Value="#0CFFFFFF"/>
+            <Setter Property="BorderBrush" Value="#2A6068"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.AddBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1AFFFFFF"/>
+        </Style>
+
+        <Style Selector="TextBlock.PanelTitle">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="FontSize" Value="{StaticResource FontLabel}"/>
+            <Setter Property="FontFamily" Value="Space Grotesk"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="LetterSpacing" Value="2"/>
+        </Style>
+        <Style Selector="TextBlock.KeyCap">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="FontSize" Value="{StaticResource FontLabel}"/>
+            <Setter Property="FontFamily" Value="Space Grotesk"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Canvas Width="1920" Height="1080">
+        <Canvas.Background>
+            <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%" RadiusX="80%" RadiusY="80%">
+                <GradientStop Color="#1A2222" Offset="0"/>
+                <GradientStop Color="#0B0D0D" Offset="1"/>
+            </RadialGradientBrush>
+        </Canvas.Background>
+
+        <Button Canvas.Left="60" Canvas.Top="40" Classes="InvisibleBtn" Click="OnBackClick" Width="240" Height="48">
+            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                <PathIcon Width="22" Height="22" Foreground="{StaticResource TextPrimary}"
+                          Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                <TextBlock Text="INDIETRO" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontBody}"
+                           FontFamily="Space Grotesk" FontWeight="Bold" VerticalAlignment="Center" LetterSpacing="1"/>
+            </StackPanel>
+        </Button>
+
+        <TextBlock Canvas.Top="40" Width="1920" Text="COCKTAIL" Foreground="{StaticResource TextPrimary}"
+                   FontSize="{StaticResource FontSection}" FontWeight="Bold" FontFamily="Space Grotesk"
+                   TextAlignment="Center" LetterSpacing="3"/>
+
+        <TextBlock Canvas.Top="88" Width="1920"
+                   Text="Scegli un drink per ritoccarne le dosi, o creane uno con quello che le linee stanno portando."
+                   Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
+                   FontFamily="Space Grotesk" TextAlignment="Center"/>
+
+        <!-- The menu -->
+        <Border Canvas.Left="60" Canvas.Top="140" Width="520" Height="820" CornerRadius="30"
+                Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1" Padding="22">
+            <DockPanel LastChildFill="True">
+                <TextBlock DockPanel.Dock="Top" Classes="PanelTitle" Text="IN MENU" Margin="0,0,0,14"/>
+
+                <Button DockPanel.Dock="Top" Classes="GhostBtn" Click="OnNewCocktail" Margin="0,0,0,14">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="+" Foreground="{StaticResource Accent}" FontSize="{StaticResource FontTitle}"
+                                   FontWeight="Bold" FontFamily="Space Grotesk"/>
+                        <TextBlock Text="NUOVO COCKTAIL" Foreground="{StaticResource Accent}"
+                                   FontSize="{StaticResource FontBody}" FontWeight="Bold"
+                                   FontFamily="Space Grotesk" LetterSpacing="1" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+
+                <ScrollViewer controls:DragScroll.Enabled="True" HorizontalScrollBarVisibility="Disabled">
+                    <ItemsControl ItemsSource="{Binding Menu, ElementName=Host}" Margin="0,0,14,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="max:MenuCocktail">
+                                <!-- The on/off pill is a sibling of the select button, not
+                                     nested inside it: nesting made one tap do both. -->
+                                <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                                    <Button Grid.Column="0" Classes="PickBtn" Height="70"
+                                            Opacity="{Binding RowOpacity}"
+                                            Click="OnSelectCocktail" CommandParameter="{Binding}">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Grid.Column="0" Text="{Binding Name}"
+                                                       Foreground="{Binding NameBrush}" FontSize="{StaticResource FontBody}"
+                                                       FontWeight="Bold" FontFamily="Space Grotesk"
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding TotalLabel}"
+                                                       Foreground="{StaticResource TextMuted}"
+                                                       FontSize="{StaticResource FontCaption}" FontFamily="Space Grotesk"
+                                                       VerticalAlignment="Center" Margin="12,0,0,0"/>
+                                        </Grid>
+                                    </Button>
+                                    <Button Grid.Column="1" Classes="PickBtn" Width="86" Height="70"
+                                            Margin="8,0,0,0" HorizontalContentAlignment="Center"
+                                            Click="OnToggleActive" CommandParameter="{Binding}">
+                                        <TextBlock Text="{Binding ActiveLabel}" Foreground="{Binding ActiveBrush}"
+                                                   FontSize="{StaticResource FontCaption}" FontWeight="Bold"
+                                                   FontFamily="Space Grotesk" HorizontalAlignment="Center"/>
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- What the lines are carrying -->
+        <Border Canvas.Left="600" Canvas.Top="140" Width="470" Height="820" CornerRadius="30"
+                Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1" Padding="22">
+            <DockPanel LastChildFill="True">
+                <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,14">
+                    <TextBlock Classes="PanelTitle" Text="SULLE LINEE"/>
+                    <TextBlock Text="Tocca per aggiungere alla ricetta" Foreground="{StaticResource TextMuted}"
+                               FontSize="{StaticResource FontCaption}" FontFamily="Space Grotesk"/>
+                </StackPanel>
+
+                <ScrollViewer controls:DragScroll.Enabled="True" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="0,0,14,0" Spacing="8">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="BASI ALCOLICHE" Foreground="{StaticResource TextMuted}"
+                                       FontSize="{StaticResource FontCaption}" FontWeight="Bold"
+                                       FontFamily="Space Grotesk" LetterSpacing="2" VerticalAlignment="Center"/>
+                            <Button Grid.Column="1" Classes="AddBtn" Click="OnAddBase">
+                                <TextBlock Text="+ AGGIUNGI" Foreground="{StaticResource Accent}"
+                                           FontSize="{StaticResource FontCaption}" FontWeight="Bold"
+                                           FontFamily="Space Grotesk"/>
+                            </Button>
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding Bases, ElementName=Host}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="max:WorkshopLiquid">
+                                    <Button Classes="PickBtn" Height="76" Margin="0,0,0,8"
+                                            Opacity="{Binding RowOpacity}"
+                                            Click="OnAddLiquid" CommandParameter="{Binding}">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                                                <TextBlock Text="{Binding Name}" Foreground="{StaticResource TextPrimary}"
+                                                           FontSize="{StaticResource FontBody}" FontWeight="Bold"
+                                                           FontFamily="Space Grotesk" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Detail}" Foreground="{StaticResource TextMuted}"
+                                                           FontSize="{StaticResource FontCaption}" FontFamily="Space Grotesk"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="+" Foreground="{StaticResource Accent}"
+                                                       FontSize="{StaticResource FontTitle}" FontWeight="Bold"
+                                                       FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+                            <TextBlock Grid.Column="0" Text="ANALCOLICI" Foreground="{StaticResource TextMuted}"
+                                       FontSize="{StaticResource FontCaption}" FontWeight="Bold"
+                                       FontFamily="Space Grotesk" LetterSpacing="2" VerticalAlignment="Center"/>
+                            <Button Grid.Column="1" Classes="AddBtn" Click="OnAddMixer">
+                                <TextBlock Text="+ AGGIUNGI" Foreground="{StaticResource Accent}"
+                                           FontSize="{StaticResource FontCaption}" FontWeight="Bold"
+                                           FontFamily="Space Grotesk"/>
+                            </Button>
+                        </Grid>
+                        <ItemsControl ItemsSource="{Binding Mixers, ElementName=Host}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="max:WorkshopLiquid">
+                                    <Button Classes="PickBtn" Height="76" Margin="0,0,0,8"
+                                            Opacity="{Binding RowOpacity}"
+                                            Click="OnAddLiquid" CommandParameter="{Binding}">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                                                <TextBlock Text="{Binding Name}" Foreground="{StaticResource TextPrimary}"
+                                                           FontSize="{StaticResource FontBody}" FontWeight="Bold"
+                                                           FontFamily="Space Grotesk" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Detail}" Foreground="{StaticResource TextMuted}"
+                                                           FontSize="{StaticResource FontCaption}" FontFamily="Space Grotesk"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="+" Foreground="{StaticResource Accent}"
+                                                       FontSize="{StaticResource FontTitle}" FontWeight="Bold"
+                                                       FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- The editor -->
+        <Border Canvas.Left="1090" Canvas.Top="140" Width="770" Height="820" CornerRadius="30"
+                Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1" Padding="24">
+            <DockPanel LastChildFill="True">
+                <StackPanel DockPanel.Dock="Top" Spacing="12" Margin="0,0,0,16">
+                    <Button Classes="PickBtn" Height="94" Click="OnOpenKeyboard">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                                <TextBlock Text="{Binding DrinkName, ElementName=Host}"
+                                           Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontTitle}"
+                                           FontWeight="Bold" FontFamily="Space Grotesk" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding EditorSubtitle, ElementName=Host}"
+                                           Foreground="{StaticResource TextMuted}"
+                                           FontSize="{StaticResource FontCaption}" FontFamily="Space Grotesk"/>
+                            </StackPanel>
+                            <PathIcon Grid.Column="1" Width="22" Height="22" Foreground="{StaticResource TextMuted}"
+                                      VerticalAlignment="Center"
+                                      Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+                        </Grid>
+                    </Button>
+
+                    <Grid ColumnDefinitions="Auto,*">
+                        <TextBlock Grid.Column="0" Text="{Binding TotalLabel, ElementName=Host}"
+                                   Foreground="{StaticResource Accent}" FontSize="{StaticResource FontBody}"
+                                   FontWeight="Bold" FontFamily="Space Grotesk"/>
+                        <TextBlock Grid.Column="1" IsVisible="{Binding IsDirty, ElementName=Host}"
+                                   Text="modifiche non salvate" Foreground="{StaticResource Warning}"
+                                   FontSize="{StaticResource FontCaption}" FontFamily="Space Grotesk"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <TextBlock IsVisible="{Binding HasMissing, ElementName=Host}"
+                               Text="{Binding MissingLabel, ElementName=Host}"
+                               Foreground="{StaticResource Warning}" FontSize="{StaticResource FontCaption}"
+                               FontFamily="Space Grotesk" TextWrapping="Wrap"/>
+
+                    <Grid ColumnDefinitions="*,12,Auto">
+                        <Button Grid.Column="0" Classes="PickBtn" Height="76" Click="OnOpenImagePicker">
+                            <Grid ColumnDefinitions="Auto,Auto,*">
+                                <Border Grid.Column="0" Width="52" Height="52" CornerRadius="12"
+                                        Background="#14FFFFFF" ClipToBounds="True"
+                                        IsVisible="{Binding HasImage, ElementName=Host}">
+                                    <Image Source="{Binding ImagePreview, ElementName=Host, Converter={StaticResource BitmapAssetConverter}}"
+                                           Stretch="Uniform"/>
+                                </Border>
+                                <PathIcon Grid.Column="1" Width="22" Height="22" Margin="14,0,0,0"
+                                          Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"
+                                          Data="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/>
+                                <TextBlock Grid.Column="2" Text="{Binding ImageLabel, ElementName=Host}"
+                                           Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontCaption}"
+                                           FontFamily="Space Grotesk" VerticalAlignment="Center"
+                                           Margin="14,0,0,0" TextTrimming="CharacterEllipsis"/>
+                            </Grid>
+                        </Button>
+
+                        <!-- Only creations can be deleted; the shipped recipes are switched
+                             off with the ON/OFF pill instead. -->
+                        <Button Grid.Column="2" Classes="DangerBtn" Height="76"
+                                IsVisible="{Binding CanDelete, ElementName=Host}"
+                                Click="OnDelete">
+                            <TextBlock Text="{Binding DeleteLabel, ElementName=Host}"
+                                       Foreground="{StaticResource Danger}" FontSize="{StaticResource FontCaption}"
+                                       FontWeight="Bold" FontFamily="Space Grotesk"/>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Bottom" Spacing="10" Margin="0,16,0,0">
+                    <TextBlock Name="StatusLine" Text="" Foreground="{StaticResource Accent}"
+                               FontSize="{StaticResource FontCaption}" FontFamily="Space Grotesk"
+                               TextWrapping="Wrap" MinHeight="20"/>
+                    <Button Classes="PrimaryBtn" Click="OnSave" IsEnabled="{Binding CanSave, ElementName=Host}">
+                        <TextBlock Text="{Binding SaveLabel, ElementName=Host}" Foreground="{StaticResource TextPrimary}"
+                                   FontSize="{StaticResource FontBody}" FontWeight="Bold"
+                                   FontFamily="Space Grotesk" LetterSpacing="1"/>
+                    </Button>
+                </StackPanel>
+
+                <Grid>
+                    <TextBlock IsVisible="{Binding IsRecipeEmpty, ElementName=Host}"
+                               Text="Scegli un cocktail a sinistra per ritoccarlo, oppure tocca un liquido al centro per iniziarne uno nuovo."
+                               Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
+                               FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
+                               VerticalAlignment="Center" Margin="40,0"/>
+
+                    <ScrollViewer controls:DragScroll.Enabled="True" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding Recipe, ElementName=Host}" Margin="0,0,14,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="max:WorkshopIngredient">
+                                    <Border Background="#0CFFFFFF" BorderBrush="#20FFFFFF" BorderThickness="1"
+                                            CornerRadius="16" Padding="18,10" Margin="0,0,0,8">
+                                        <Grid ColumnDefinitions="*,Auto,Auto">
+                                            <TextBlock Grid.Column="0" Text="{Binding Name}"
+                                                       Foreground="{StaticResource TextPrimary}"
+                                                       FontSize="{StaticResource FontBody}" FontWeight="Bold"
+                                                       FontFamily="Space Grotesk" VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis"/>
+
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12"
+                                                        VerticalAlignment="Center">
+                                                <Button Classes="StepBtn" Click="OnDecrease" CommandParameter="{Binding}">
+                                                    <TextBlock Text="−" Classes="KeyCap"/>
+                                                </Button>
+                                                <TextBlock Text="{Binding MlLabel}" Foreground="{StaticResource TextPrimary}"
+                                                           FontSize="{StaticResource FontBody}" FontWeight="Bold"
+                                                           FontFamily="Space Grotesk" Width="96"
+                                                           TextAlignment="Center" VerticalAlignment="Center"/>
+                                                <Button Classes="StepBtn" Click="OnIncrease" CommandParameter="{Binding}">
+                                                    <TextBlock Text="+" Classes="KeyCap"/>
+                                                </Button>
+                                            </StackPanel>
+
+                                            <Button Grid.Column="2" Classes="InvisibleBtn" Width="44" Height="44"
+                                                    Margin="10,0,0,0"
+                                                    Click="OnRemoveIngredient" CommandParameter="{Binding}">
+                                                <PathIcon Width="20" Height="20" Foreground="{StaticResource Danger}"
+                                                          Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </DockPanel>
+        </Border>
+
+        <!-- Artwork picker: the pngs compiled into the app, plus a plain-card option. -->
+        <Border Canvas.Left="0" Canvas.Top="0" Width="1920" Height="1080"
+                Background="#E60B0D0D"
+                IsVisible="{Binding IsImagePickerOpen, ElementName=Host}">
+            <Border Width="1320" Height="820" CornerRadius="36" Background="#12140F"
+                    BorderBrush="#20FFFFFF" BorderThickness="1" Padding="34"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <DockPanel LastChildFill="True">
+                    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,22">
+                        <TextBlock Grid.Column="0" Text="IMMAGINE DEL COCKTAIL" Classes="PanelTitle"
+                                   VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Classes="GhostBtn" Width="160" Click="OnCloseImagePicker">
+                            <TextBlock Text="CHIUDI" Foreground="{StaticResource TextMuted}"
+                                       FontSize="{StaticResource FontCaption}" FontWeight="Bold"
+                                       FontFamily="Space Grotesk"/>
+                        </Button>
+                    </Grid>
+
+                    <ScrollViewer controls:DragScroll.Enabled="True" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding Artworks, ElementName=Host}" Margin="0,0,14,0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="max:ArtworkOption">
+                                    <Button Classes="PickBtn" Width="232" Height="220" Margin="0,0,12,12"
+                                            Click="OnPickArtwork" CommandParameter="{Binding}">
+                                        <Grid RowDefinitions="*,Auto">
+                                            <Border Grid.Row="0" Background="#08FFFFFF" CornerRadius="12"
+                                                    Margin="0,10,0,0" ClipToBounds="True">
+                                                <Grid>
+                                                    <TextBlock Text="—" IsVisible="{Binding IsNone}"
+                                                               Foreground="{StaticResource TextMuted}"
+                                                               FontSize="{StaticResource FontSection}"
+                                                               FontFamily="Space Grotesk"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <Image Source="{Binding Source, Converter={StaticResource BitmapAssetConverter}}"
+                                                           IsVisible="{Binding !IsNone}"
+                                                           Stretch="Uniform" Margin="10"/>
+                                                </Grid>
+                                            </Border>
+                                            <TextBlock Grid.Row="1" Text="{Binding Label}"
+                                                       Foreground="{StaticResource TextPrimary}"
+                                                       FontSize="{StaticResource FontCaption}"
+                                                       FontFamily="Space Grotesk" Margin="0,8,0,10"
+                                                       HorizontalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+        </Border>
+
+        <!-- On-screen keyboard, laid out like a PC board: backspace off the end of the
+             top row, shift starting the bottom letter row, space bar under the letters. -->
+        <Border Canvas.Left="0" Canvas.Top="0" Width="1920" Height="1080"
+                Background="#E60B0D0D"
+                IsVisible="{Binding IsKeyboardOpen, ElementName=Host}">
+            <Border Width="1420" Height="760" CornerRadius="36" Background="#12140F"
+                    BorderBrush="#20FFFFFF" BorderThickness="1" Padding="36"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <DockPanel LastChildFill="True">
+                    <StackPanel DockPanel.Dock="Top" Spacing="10" Margin="0,0,0,22">
+                        <TextBlock Text="{Binding KeyboardTitle, ElementName=Host}" Classes="PanelTitle"/>
+                        <Border Background="#0CFFFFFF" BorderBrush="#20FFFFFF" BorderThickness="1"
+                                CornerRadius="16" Height="82" Padding="22,0">
+                            <TextBlock Text="{Binding NameDraft, ElementName=Host}"
+                                       Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontTitle}"
+                                       FontWeight="Bold" FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel Spacing="0" VerticalAlignment="Center">
+                        <!-- Row 1: QWERTYUIOP, then backspace on the right like a PC. -->
+                        <Grid Height="92" ColumnDefinitions="*,*,*,*,*,*,*,*,*,*,1.6*">
+                            <Button Grid.Column="0" Classes="KeyBtn" Tag="Q" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[0], ElementName=Host}"/></Button>
+                            <Button Grid.Column="1" Classes="KeyBtn" Tag="W" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[1], ElementName=Host}"/></Button>
+                            <Button Grid.Column="2" Classes="KeyBtn" Tag="E" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[2], ElementName=Host}"/></Button>
+                            <Button Grid.Column="3" Classes="KeyBtn" Tag="R" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[3], ElementName=Host}"/></Button>
+                            <Button Grid.Column="4" Classes="KeyBtn" Tag="T" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[4], ElementName=Host}"/></Button>
+                            <Button Grid.Column="5" Classes="KeyBtn" Tag="Y" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[5], ElementName=Host}"/></Button>
+                            <Button Grid.Column="6" Classes="KeyBtn" Tag="U" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[6], ElementName=Host}"/></Button>
+                            <Button Grid.Column="7" Classes="KeyBtn" Tag="I" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[7], ElementName=Host}"/></Button>
+                            <Button Grid.Column="8" Classes="KeyBtn" Tag="O" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[8], ElementName=Host}"/></Button>
+                            <Button Grid.Column="9" Classes="KeyBtn" Tag="P" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[9], ElementName=Host}"/></Button>
+                            <Button Grid.Column="10" Classes="KeyBtn ModKey" Click="OnKeyBackspace">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                                              Data="M22,3H7C6.31,3 5.77,3.35 5.41,3.88L0,12L5.41,20.11C5.77,20.64 6.31,21 7,21H22A2,2 0 0,0 24,19V5A2,2 0 0,0 22,3M19,15.59L17.59,17L14,13.41L10.41,17L9,15.59L12.59,12L9,8.41L10.41,7L14,10.59L17.59,7L19,8.41L15.41,12"/>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+
+                        <!-- Row 2: ASDFGHJKL, indented half a key like a PC board. -->
+                        <Grid Height="92" ColumnDefinitions="0.5*,*,*,*,*,*,*,*,*,*,1.1*">
+                            <Button Grid.Column="1" Classes="KeyBtn" Tag="A" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[10], ElementName=Host}"/></Button>
+                            <Button Grid.Column="2" Classes="KeyBtn" Tag="S" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[11], ElementName=Host}"/></Button>
+                            <Button Grid.Column="3" Classes="KeyBtn" Tag="D" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[12], ElementName=Host}"/></Button>
+                            <Button Grid.Column="4" Classes="KeyBtn" Tag="F" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[13], ElementName=Host}"/></Button>
+                            <Button Grid.Column="5" Classes="KeyBtn" Tag="G" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[14], ElementName=Host}"/></Button>
+                            <Button Grid.Column="6" Classes="KeyBtn" Tag="H" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[15], ElementName=Host}"/></Button>
+                            <Button Grid.Column="7" Classes="KeyBtn" Tag="J" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[16], ElementName=Host}"/></Button>
+                            <Button Grid.Column="8" Classes="KeyBtn" Tag="K" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[17], ElementName=Host}"/></Button>
+                            <Button Grid.Column="9" Classes="KeyBtn" Tag="L" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[18], ElementName=Host}"/></Button>
+                        </Grid>
+
+                        <!-- Row 3: shift, then ZXCVBNM. -->
+                        <Grid Height="92" ColumnDefinitions="1.6*,*,*,*,*,*,*,*,1.6*">
+                            <Button Grid.Column="0" Classes="KeyBtn ModKey" Click="OnShift">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <PathIcon Width="22" Height="22" Foreground="{Binding ShiftBrush, ElementName=Host}"
+                                              Data="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"/>
+                                    <TextBlock Text="MAIUSC" Foreground="{Binding ShiftBrush, ElementName=Host}"
+                                               FontSize="{StaticResource FontCaption}" FontWeight="Bold"
+                                               FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Grid.Column="1" Classes="KeyBtn" Tag="Z" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[19], ElementName=Host}"/></Button>
+                            <Button Grid.Column="2" Classes="KeyBtn" Tag="X" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[20], ElementName=Host}"/></Button>
+                            <Button Grid.Column="3" Classes="KeyBtn" Tag="C" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[21], ElementName=Host}"/></Button>
+                            <Button Grid.Column="4" Classes="KeyBtn" Tag="V" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[22], ElementName=Host}"/></Button>
+                            <Button Grid.Column="5" Classes="KeyBtn" Tag="B" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[23], ElementName=Host}"/></Button>
+                            <Button Grid.Column="6" Classes="KeyBtn" Tag="N" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[24], ElementName=Host}"/></Button>
+                            <Button Grid.Column="7" Classes="KeyBtn" Tag="M" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[25], ElementName=Host}"/></Button>
+                        </Grid>
+
+                        <!-- Row 4: the space bar sits under the letters, with clear and done. -->
+                        <Grid Height="92" ColumnDefinitions="1.6*,5*,1.6*">
+                            <Button Grid.Column="0" Classes="KeyBtn ModKey" Click="OnKeyClear">
+                                <TextBlock Text="CANCELLA" Foreground="{StaticResource TextMuted}"
+                                           FontSize="{StaticResource FontCaption}" FontWeight="Bold"
+                                           FontFamily="Space Grotesk"/>
+                            </Button>
+                            <Button Grid.Column="1" Classes="KeyBtn ModKey" Click="OnKeySpace">
+                                <TextBlock Text="spazio" Foreground="{StaticResource TextMuted}"
+                                           FontSize="{StaticResource FontCaption}" FontFamily="Space Grotesk"/>
+                            </Button>
+                            <Button Grid.Column="2" Classes="KeyBtn" Click="OnCloseKeyboard"
+                                    Background="#16301F" BorderBrush="#3FBF7F">
+                                <TextBlock Text="FATTO" Foreground="{StaticResource TextPrimary}"
+                                           FontSize="{StaticResource FontCaption}" FontWeight="Bold"
+                                           FontFamily="Space Grotesk" LetterSpacing="1"/>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+        </Border>
+    </Canvas>
+</UserControl>

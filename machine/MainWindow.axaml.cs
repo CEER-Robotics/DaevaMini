@@ -319,7 +319,7 @@ public partial class MainWindow : Window
     /// </summary>
     private static void ApplyIdleTint(object page)
     {
-        bool isSettings = page is SettingsDaevaMax or NumberPadPage or DosesPage
+        bool isSettings = page is SettingsDaevaMax or NumberPadPage or CocktailWorkshopPage
             or FlowRatePage or ContainerSetupPage or ContainerFillPage
             or ContainerCleanPage or LiquidSetupPage;
 
@@ -349,10 +349,14 @@ public partial class MainWindow : Window
         return null;
     }
 
-    public void ShowDosesPage()
+    /// <summary>
+    /// Recipes: retuning what is on the menu and inventing new drinks, on one page.
+    /// Replaces the old separate doses and craft pages.
+    /// </summary>
+    public void ShowCocktailWorkshopPage()
     {
         if (_pageContainer != null)
-            SetPage(new DosesPage());
+            SetPage(new CocktailWorkshopPage());
     }
 
     public void ShowFlowRatePage()

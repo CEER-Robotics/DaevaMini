@@ -108,6 +108,29 @@ public sealed class AppConfig
     /// <summary>Max-only: flat cocktail list (no modes).</summary>
     [YamlMember(Alias = "Cocktails")]
     public CocktailConfig[] Cocktails { get; set; } = Array.Empty<CocktailConfig>();
+
+    /// <summary>
+    /// Liquids the bar added on the machine itself, with the kind they said they are.
+    /// </summary>
+    /// <remarks>
+    /// Everything else the machine knows about a liquid is inferred - a name is "known"
+    /// because a recipe or a line mentions it, and alcoholic because it is on a built-in
+    /// list. Neither covers a bottle of rum carried in for one evening: it is on no line
+    /// yet and no recipe asks for it. This is where those go, so they survive a restart
+    /// and land in the right column of the cocktail page.
+    /// </remarks>
+    [YamlMember(Alias = "CustomLiquids")]
+    public CustomLiquidConfig[] CustomLiquids { get; set; } = Array.Empty<CustomLiquidConfig>();
+}
+
+public sealed class CustomLiquidConfig
+{
+    [YamlMember(Alias = "Name")]
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>Set by which column it was added from, not guessed from the name.</summary>
+    [YamlMember(Alias = "Alcoholic")]
+    public bool Alcoholic { get; set; }
 }
 
 public sealed class FlowRateConfig

@@ -69,19 +69,19 @@
             <!-- Two columns rather than one stack: six full-width rows overflowed the
                  panel. Every tile is itself the button - the old APRI / AVVIA pills put
                  a small second target inside a row that was already the thing to press. -->
-            <Grid Margin="60,50" ColumnDefinitions="*,24,*" RowDefinitions="150,24,150,24,150,24,150"
+            <Grid Margin="60,50" ColumnDefinitions="*,24,*" RowDefinitions="150,24,150,24,150"
                   VerticalAlignment="Center">
-                <Button Grid.Row="0" Grid.Column="0" Classes="SettingsTile" Click="OnDosesClick">
+                <Button Grid.Row="0" Grid.Column="0" Classes="SettingsTile" Click="OnCocktailsClick">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
                         <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
                             <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
                                       Data="M3,2H21V4H20V8A4,4 0 0,1 16,12H14V20H17V22H7V20H10V12H8A4,4 0 0,1 4,8V4H3V2M6,4V8A2,2 0 0,0 8,10H16A2,2 0 0,0 18,8V4H6Z"/>
                         </Border>
                         <StackPanel VerticalAlignment="Center" Spacing="4">
-                            <TextBlock Text="Dosi dei cocktail" Foreground="{StaticResource TextPrimary}"
+                            <TextBlock Text="Cocktail" Foreground="{StaticResource TextPrimary}"
                                        FontSize="{StaticResource FontTitle}"
                                        FontFamily="Space Grotesk" FontWeight="Medium"/>
-                            <TextBlock Text="Ritocca le ricette" Foreground="{StaticResource TextMuted}"
+                            <TextBlock Text="Dosi, ricette e creazioni" Foreground="{StaticResource TextMuted}"
                                        FontSize="{StaticResource FontCaption}"
                                        FontFamily="Space Grotesk"/>
                         </StackPanel>
@@ -156,9 +156,13 @@
                     </StackPanel>
                 </Button>
 
-                <Border Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="3" CornerRadius="24" Background="#0CFFFFFF" Padding="30,0">
-                    <Grid>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="24">
+                <!-- Stretch overrides the SettingsTile style's Left content alignment: without
+                     it the inner Grid shrinks to its content and the switch sits against the
+                     text instead of the card's right edge. -->
+                <Button Grid.Row="4" Grid.Column="2" Classes="SettingsTile" Click="OnEventModeToggle"
+                        Padding="30,0,20,0" HorizontalContentAlignment="Stretch">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
                             <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
                                 <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
                                           Data="M5,4H19A2,2 0 0,1 21,6V18A2,2 0 0,1 19,20H5A2,2 0 0,1 3,18V6A2,2 0 0,1 5,4M7,8V16H11V8H7M13,8V16H17V8H13Z"/>
@@ -168,33 +172,26 @@
                                            FontFamily="Space Grotesk" FontWeight="Medium"/>
                                 <TextBlock Name="EventModeDetail"
                                            Text="" Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontCaption}"
-                                           FontFamily="Space Grotesk"/>
+                                           FontFamily="Space Grotesk" TextWrapping="Wrap" MaxWidth="300"/>
                             </StackPanel>
                         </StackPanel>
 
-                        <StackPanel Orientation="Horizontal" Spacing="12"
-                                    HorizontalAlignment="Right" VerticalAlignment="Center">
-                            <Button Name="SmallEventBtn" Classes="InvisibleBtn" Click="OnSmallEventClick"
-                                    Width="120" Height="54">
-                                <Border Name="SmallEventBg" Background="#15FFFFFF" CornerRadius="27"
-                                        BorderBrush="#2A2C22" BorderThickness="1">
-                                    <TextBlock Name="SmallEventText" Text="NO" Foreground="{StaticResource TextMuted}"
-                                               FontWeight="Bold" FontSize="{StaticResource FontBody}"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
-                                </Border>
-                            </Button>
-                            <Button Name="LargeEventBtn" Classes="InvisibleBtn" Click="OnLargeEventClick"
-                                    Width="120" Height="54">
-                                <Border Name="LargeEventBg" Background="#15FFFFFF" CornerRadius="27"
-                                        BorderBrush="#2A2C22" BorderThickness="1">
-                                    <TextBlock Name="LargeEventText" Text="SI" Foreground="{StaticResource TextMuted}"
-                                               FontWeight="Bold" FontSize="{StaticResource FontBody}"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center" LetterSpacing="1"/>
-                                </Border>
-                            </Button>
-                        </StackPanel>
+                        <!-- iOS-style switch: a pill track with a circular thumb that slides
+                             between two Margin values (ApplyEventMode). One tap target for
+                             the whole tile, matching every other SettingsTile in this grid. -->
+                        <Border Grid.Column="1" Name="EventModeTrack" Width="84" Height="46" CornerRadius="23"
+                                BorderBrush="#33FFFFFF" BorderThickness="1" VerticalAlignment="Center">
+                            <Border Name="EventModeThumb" Width="38" Height="38" CornerRadius="19"
+                                    HorizontalAlignment="Left">
+                                <Border.Transitions>
+                                    <Transitions>
+                                        <ThicknessTransition Property="Margin" Duration="0:0:0.18"/>
+                                    </Transitions>
+                                </Border.Transitions>
+                            </Border>
+                        </Border>
                     </Grid>
-                </Border>
+                </Button>
             </Grid>
         </Border>
 
