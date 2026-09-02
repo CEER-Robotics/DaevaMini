@@ -53,6 +53,7 @@ public partial class LiquidSetupPage : UserControl, INotifyPropertyChanged
         ];
 
         ApplyLabels();
+        ApplyKegAvailability();
         RefreshSummary();
     }
 
@@ -72,6 +73,7 @@ public partial class LiquidSetupPage : UserControl, INotifyPropertyChanged
         => Dispatcher.UIThread.Post(() =>
         {
             ApplyLabels();
+            ApplyKegAvailability();
             RefreshSummary();
         });
 
@@ -90,13 +92,46 @@ public partial class LiquidSetupPage : UserControl, INotifyPropertyChanged
     {
         var assignments = AppConfigService.Instance.Config.LiquidAssignments;
 
+        bool kegsOn = AppConfigService.Instance.Config.IsLargeEvent;
+
         for (int i = 0; i < _containers.Length; i++)
         {
             if (_containers[i] == null) continue;
 
+            // A blocked keg carries no caption: the red overlay's own message takes that
+            // spot, and leaving "— vuoto —" there would print two labels on top of each other.
+            if (i >= AppConfig.PumpChannelCount && !kegsOn)
+            {
+                _containers[i]!.Tag = string.Empty;
+                continue;
+            }
+
             bool hasLiquid = i < assignments.Length && !string.IsNullOrWhiteSpace(assignments[i]);
             _containers[i]!.Tag = hasLiquid ? assignments[i] : "— vuoto —";
         }
+    }
+
+    /// <summary>
+    /// Crosses the kegs out when "Attiva fusti" is off, matching the refill page, and
+    /// takes their pencils out of service so a line that cannot pour cannot be reassigned.
+    /// </summary>
+    private void ApplyKegAvailability()
+    {
+        bool kegsOn = AppConfigService.Instance.Config.IsLargeEvent;
+
+        Keg1Blocked.IsVisible = !kegsOn;
+        Keg2Blocked.IsVisible = !kegsOn;
+        Keg3Blocked.IsVisible = !kegsOn;
+        Keg4Blocked.IsVisible = !kegsOn;
+
+        KegEdit1.IsEnabled = kegsOn;
+        KegEdit2.IsEnabled = kegsOn;
+        KegEdit3.IsEnabled = kegsOn;
+        KegEdit4.IsEnabled = kegsOn;
+
+        for (int i = AppConfig.PumpChannelCount; i < _containers.Length; i++)
+            if (_containers[i] != null)
+                _containers[i]!.IsEnabled = kegsOn;
     }
 
     // ------------------------------------------------------------ what is missing

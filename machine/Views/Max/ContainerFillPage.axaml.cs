@@ -47,10 +47,21 @@ public partial class ContainerFillPage : UserControl
     private void ApplyLiquidAssignments()
     {
         var assignments = AppConfigService.Instance.Config.GetActiveLiquidAssignments();
+        bool kegsOn = AppConfigService.Instance.Config.IsLargeEvent;
 
         for (int i = 0; i < _bottles.Length; i++)
         {
             if (_bottles[i] == null) continue;
+
+            // A blocked keg carries no caption: the red overlay's own message takes that
+            // spot, and leaving "Slot 11" there would print two labels on top of each other.
+            if (i >= PumpChannels && !kegsOn)
+            {
+                _bottles[i]!.Tag = string.Empty;
+                _bottles[i]!.IsEnabled = false;
+                continue;
+            }
+
             bool hasLiquid = i < assignments.Length && !string.IsNullOrWhiteSpace(assignments[i]);
             _bottles[i]!.Tag = hasLiquid ? assignments[i] : $"Slot {i + 1}";
             _bottles[i]!.IsEnabled = hasLiquid;
@@ -59,7 +70,11 @@ public partial class ContainerFillPage : UserControl
 
     private void OnConfigChanged(object? sender, AppConfigChangedEventArgs e)
     {
-        Dispatcher.UIThread.Post(ApplyLiquidAssignments);
+        Dispatcher.UIThread.Post(() =>
+        {
+            ApplyLiquidAssignments();
+            ApplyKegAvailability();
+        });
     }
 
     private void OnBackArrow(object? sender, RoutedEventArgs e)

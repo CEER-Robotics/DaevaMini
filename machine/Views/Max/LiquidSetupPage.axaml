@@ -168,6 +168,10 @@
         <Style Selector="Button.EditLineBtn:pointerover /template/ ContentPresenter">
             <Setter Property="Background" Value="#2A3030"/>
         </Style>
+        <Style Selector="Button.EditLineBtn:disabled">
+            <Setter Property="Opacity" Value="0.3"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
 
         <Style Selector="Button.LiquidBtn">
             <Setter Property="Height" Value="84"/>
@@ -340,26 +344,94 @@
             <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
                       Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
         </Button>
-        <Button Classes="EditLineBtn" Tag="11" Canvas.Left="334" Canvas.Top="248"
+        <Button x:Name="KegEdit1" Classes="EditLineBtn" Tag="11" Canvas.Left="334" Canvas.Top="248"
                 Click="OnEditLine">
             <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
                       Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
         </Button>
-        <Button Classes="EditLineBtn" Tag="12" Canvas.Left="334" Canvas.Top="548"
+        <Button x:Name="KegEdit2" Classes="EditLineBtn" Tag="12" Canvas.Left="334" Canvas.Top="548"
                 Click="OnEditLine">
             <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
                       Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
         </Button>
-        <Button Classes="EditLineBtn" Tag="13" Canvas.Left="1734" Canvas.Top="248"
+        <Button x:Name="KegEdit3" Classes="EditLineBtn" Tag="13" Canvas.Left="1734" Canvas.Top="248"
                 Click="OnEditLine">
             <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
                       Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
         </Button>
-        <Button Classes="EditLineBtn" Tag="14" Canvas.Left="1734" Canvas.Top="548"
+        <Button x:Name="KegEdit4" Classes="EditLineBtn" Tag="14" Canvas.Left="1734" Canvas.Top="548"
                 Click="OnEditLine">
             <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
                       Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
         </Button>
+
+        <!-- Kegs off: the same red cross used on the refill page, so the two screens
+     read alike. ApplyKegAvailability also blanks the label underneath, leaving
+     this message in its place instead of stacking two captions. -->
+        <Grid Name="Keg1Blocked"
+              Canvas.Left="120"
+              Canvas.Top="240"
+              Width="280"
+              Height="300"
+              IsHitTestVisible="False"
+              IsVisible="False">
+            <Line StartPoint="46,32" EndPoint="234,218"
+                  Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
+            <TextBlock Text="Non disponibili in questa modalità"
+                       Foreground="{StaticResource Danger}" FontSize="{StaticResource FontCaption}" FontWeight="Bold"
+                       FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
+                       Width="240"
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Margin="0,0,0,6"/>
+        </Grid>
+        <Grid Name="Keg2Blocked"
+              Canvas.Left="120"
+              Canvas.Top="540"
+              Width="280"
+              Height="300"
+              IsHitTestVisible="False"
+              IsVisible="False">
+            <Line StartPoint="46,32" EndPoint="234,218"
+                  Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
+            <TextBlock Text="Non disponibili in questa modalità"
+                       Foreground="{StaticResource Danger}" FontSize="{StaticResource FontCaption}" FontWeight="Bold"
+                       FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
+                       Width="240"
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Margin="0,0,0,6"/>
+        </Grid>
+        <Grid Name="Keg3Blocked"
+              Canvas.Left="1520"
+              Canvas.Top="240"
+              Width="280"
+              Height="300"
+              IsHitTestVisible="False"
+              IsVisible="False">
+            <Line StartPoint="46,32" EndPoint="234,218"
+                  Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
+            <TextBlock Text="Non disponibili in questa modalità"
+                       Foreground="{StaticResource Danger}" FontSize="{StaticResource FontCaption}" FontWeight="Bold"
+                       FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
+                       Width="240"
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Margin="0,0,0,6"/>
+        </Grid>
+        <Grid Name="Keg4Blocked"
+              Canvas.Left="1520"
+              Canvas.Top="540"
+              Width="280"
+              Height="300"
+              IsHitTestVisible="False"
+              IsVisible="False">
+            <Line StartPoint="46,32" EndPoint="234,218"
+                  Stroke="#E5484D" StrokeThickness="6" StrokeLineCap="Round" Opacity="0.75"/>
+            <TextBlock Text="Non disponibili in questa modalità"
+                       Foreground="{StaticResource Danger}" FontSize="{StaticResource FontCaption}" FontWeight="Bold"
+                       FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
+                       Width="240"
+                       HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                       Margin="0,0,0,6"/>
+        </Grid>
 
         <!-- Full-width band across the bottom of the screen. The containers occupy
              y=80..860 and the kegs end at 790, so this is the one region that is
