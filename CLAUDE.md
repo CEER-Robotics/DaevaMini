@@ -65,6 +65,8 @@ Key fields: `FlowRate.MillisecondsPerMilliliter` (pump calibration), `LiquidAssi
 - `DAEVA_MACHINE_SECRET` — per-machine secret; required for `/api/machine-events` and `/api/machine-status`.
 - `DAEVA_SERIAL_PORT` — force a specific serial port (e.g. `/dev/ttyAMA0` for the Pi 5 GPIO UART). Unset = auto-detect, which prefers `USB`/`ACM`/`COM` names and is unreliable on the Pi's onboard UART.
 
+Those defaults are what the code falls back to, **not** what the assembled Max runs on. The deployed machine sets all four in `~/.config/daeva/daeva-max.env`: backend `https://daeva-poc.stpjkmfxnfpf0.eu-central-1.cs.amazonlightsail.com` (not Railway), `DAEVA_MACHINE_ID=MACCHINA-1` (not `daeva-max-01`), the provisioned secret, and `DAEVA_SERIAL_PORT=/dev/ttyAMA0`. Check that file before assuming which backend a pour was reported to.
+
 ## Common commands
 
 ### Machine (host app)
@@ -79,8 +81,11 @@ $env:DAEVA_MACHINE_SECRET="<SECRET>"; dotnet run --project machine/Daeva.csproj
 
 # Publish + deploy to the Raspberry Pi
 dotnet publish -c Release -r linux-arm64 --self-contained true
-rsync -av ./bin/Release/net9.0/linux-arm64/ daeva-mini@192.168.1.117:/home/daeva-mini/release/
+rsync -av ./bin/Release/net9.0/linux-arm64/ daeva-max@192.168.68.126:/home/daeva-max/release/   # Max
+rsync -av ./bin/Release/net9.0/linux-arm64/ daeva-mini@192.168.1.117:/home/daeva-mini/release/  # Mini (address unverified)
 ```
+
+**Never add `--delete` to that rsync.** `~/release` holds `daeva-machine.db`, which is the live config and the telemetry queue and is *not* part of the publish output — `--delete` would wipe the bar's whole setup. Overwriting `appsettings.max.yaml` with the repo seed is harmless by comparison: the seed is imported `INSERT OR IGNORE`, so SQLite keeps the machine's real values (the Pi's YAML is a mirror the app rewrites, and it has long since diverged from the repo). Restart with `systemctl --user restart daeva-max` — that blanks the screen, so ask first if the machine is in use. Older configs are kept in `~/backup-config`.
 
 There is no test project. In `DEBUG` builds, if no Arduino is connected the app **simulates** the dispense (still records a `completed` telemetry event) instead of failing — useful for UI work on a dev box.
 
@@ -124,7 +129,9 @@ Two misleading failure modes: without the udev rules the upload fails with *"Tee
 
 ### Testing firmware against the real machine
 
-Pi 5 host: `ssh daeva-max@192.168.68.120`. The UI is a **user** unit — `systemctl --user {stop,start} daeva-max` — and it holds `/dev/ttyAMA0`, so stop it before touching the port and restart it after. Runtime env (backend URL, machine id/secret, `DAEVA_SERIAL_PORT`) lives in `~/.config/daeva/daeva-max.env`, sourced by the `~/.local/bin/daeva-max` wrapper — *not* in the systemd unit. There is no persistent journal; app stdout goes to `~/.xsession-errors`.
+Pi 5 host: `ssh daeva-max@192.168.68.126`. It has **two Wi-Fi interfaces** on the same subnet — `wlan1` at `.126` and `wlan0` at `.128`, both DHCP, so the addresses move; `eth0` is cabled but gets no IPv4 (no DHCP on that link), so the Ethernet port is not a way in as things stand. Finding it again when the address changes takes some care: **the Pi answers neither ping nor mDNS by name**, so a ping sweep and `daeva-max.local` both come up empty. What works is an mDNS query for `_workstation._tcp.local` (Avahi answers) followed by a TCP check on port 22 — or just match the MAC OUI `2c:cf:67` (`wlan0`, Raspberry Pi Ltd) in `arp -a`. Both interfaces serve the same host key, so an identical SSH banner is not two machines.
+
+The UI is a **user** unit — `systemctl --user {stop,start} daeva-max` — and it holds `/dev/ttyAMA0`, so stop it before touching the port and restart it after. Runtime env (backend URL, machine id/secret, `DAEVA_SERIAL_PORT`) lives in `~/.config/daeva/daeva-max.env`, sourced by the `~/.local/bin/daeva-max` wrapper — *not* in the systemd unit. There is no persistent journal; app stdout goes to `~/.xsession-errors`.
 
 Fastest end-to-end check is a UART round-trip:
 
