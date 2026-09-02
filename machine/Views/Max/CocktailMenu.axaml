@@ -303,22 +303,25 @@
 
         <!-- Confirming slides the artwork to the left edge and frees the right half
              for the tasting note. -->
+        <!-- The artwork keeps its 215 px box and is scaled to 160/215 instead of having
+             Width and Height animated: those are layout properties, so the old version
+             re-arranged the card on every frame of the slide. Scale and translate are
+             one composited transform, and the box never moves, so nothing re-measures. -->
         <Style Selector="Image.Art">
             <Setter Property="Width" Value="215"/>
             <Setter Property="Height" Value="215"/>
-            <Setter Property="RenderTransform" Value="none"/>
+            <Setter Property="RenderTransformOrigin" Value="50%,50%"/>
+            <Setter Property="RenderTransform" Value="translateX(0px) scale(1)"/>
             <Setter Property="Transitions">
                 <Transitions>
-                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3" Easing="CubicEaseOut"/>
-                    <DoubleTransition Property="Width" Duration="0:0:0.3" Easing="CubicEaseOut"/>
-                    <DoubleTransition Property="Height" Duration="0:0:0.3" Easing="CubicEaseOut"/>
+                    <TransformOperationsTransition Property="RenderTransform"
+                                                   Duration="0:0:0.34"
+                                                   Easing="CubicEaseOut"/>
                 </Transitions>
             </Setter>
         </Style>
         <Style Selector="Border.Card.confirming Image.Art">
-            <Setter Property="Width" Value="160"/>
-            <Setter Property="Height" Value="160"/>
-            <Setter Property="RenderTransform" Value="translateX(-114px)"/>
+            <Setter Property="RenderTransform" Value="translateX(-114px) scale(0.744)"/>
         </Style>
 
         <Style Selector="Button.MiniConfirmBtn">
@@ -525,11 +528,20 @@
                           VerticalAlignment="Top"
                           Margin="0"
                           ItemsSource="{Binding Pages, ElementName=MenuHost}">
+                <!-- Slid with a render transform, not with Margin: a margin animation
+                     re-measures and re-arranges the whole strip - every page, every card -
+                     on each frame, which is what made paging stutter on the machine.
+                     A transform only moves pixels that are already laid out. -->
                 <ItemsControl.Transitions>
                     <Transitions>
-                        <ThicknessTransition Property="Margin" Duration="0:0:0.42" Easing="CubicEaseOut"/>
+                        <TransformOperationsTransition Property="RenderTransform"
+                                                       Duration="0:0:0.38"
+                                                       Easing="CubicEaseOut"/>
                     </Transitions>
                 </ItemsControl.Transitions>
+                <ItemsControl.RenderTransform>
+                    <TranslateTransform/>
+                </ItemsControl.RenderTransform>
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal"/>

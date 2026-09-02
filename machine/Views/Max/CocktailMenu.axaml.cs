@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
@@ -15,6 +16,7 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Media.Transformation;
 using DaevaMini.Models;
 using DaevaMini.Services;
 using DaevaMini.ViewModels;
@@ -34,11 +36,37 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
 
     /// <summary>Track width: the thread of light reaches the end exactly when the pour does.</summary>
     private const double ProgressTrackWidth = 900;
-    private const double SwipeThreshold = 140;
+    /// <summary>
+    /// How far the strip has to have travelled, on release, to land on the next page
+    /// rather than springing back.
+    /// </summary>
+    private const double SwipeThreshold = 110;
+
+    /// <summary>
+    /// A flick: short and quick beats far and slow, so a fast wrist still turns the page
+    /// even though the finger barely moved.
+    /// </summary>
+    private const double FlickThreshold = 45;
+    private const int FlickMaxMs = 300;
+
+    /// <summary>Horizontal intent: a drag counts as a swipe only if it out-runs its own drift.</summary>
     private const double SwipeAxisBias = 1.4;
+
+    /// <summary>Resistance past the first and last page, so the end of the strip is felt.</summary>
+    private const double EdgeResistance = 3.0;
     private CocktailMenuViewModel? _viewModel;
     private INotifyCollectionChanged? _cocktailsCollection;
     private Point? _swipeStart;
+
+    /// <summary>Set once a press has turned into a horizontal drag: the strip is following the finger.</summary>
+    private bool _isDragging;
+
+    /// <summary>Wall clock of the press, for telling a flick from a slow drag.</summary>
+    private long _swipeStartedAtMs;
+
+    /// <summary>The strip's transition, parked while dragging so the strip tracks 1:1.</summary>
+    private Transitions? _stripTransitions;
+
     private int _currentPage;
     private FilterTab? _activeFilter;
     private bool _isPouring;
@@ -57,6 +85,7 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
         PageSurface.AddHandler(PointerPressedEvent, OnSurfacePointerPressed, RoutingStrategies.Tunnel, handledEventsToo: true);
         PageSurface.AddHandler(PointerMovedEvent, OnSurfacePointerMoved, RoutingStrategies.Tunnel, handledEventsToo: true);
         PageSurface.AddHandler(PointerReleasedEvent, OnSurfacePointerReleased, RoutingStrategies.Tunnel, handledEventsToo: true);
+        PageSurface.AddHandler(PointerCaptureLostEvent, OnSurfacePointerCaptureLost, RoutingStrategies.Tunnel, handledEventsToo: true);
     }
 
     /// <summary>Raised when the user taps the back button (return to splash).</summary>
@@ -499,12 +528,23 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
     /// Slides the strip so the current page fills the viewport. The Margin transition on
     /// the control turns the jump into a glide, which is why paging feels continuous.
     /// </summary>
-    private void ApplyStripOffset()
+    private void ApplyStripOffset() => SetStripOffset(-_currentPage * PageWidth);
+
+    /// <summary>
+    /// Moves the strip to an absolute horizontal offset, in design pixels.
+    /// </summary>
+    /// <remarks>
+    /// A render transform rather than a margin: the strip carries every page and every
+    /// card, so animating a layout property re-measured the lot on each frame. This only
+    /// shifts what has already been drawn, which is what keeps the swipe smooth on the Pi.
+    /// </remarks>
+    private void SetStripOffset(double x)
     {
         // Without an explicit width the strip measures to zero and nothing is drawn:
         // it has to be as wide as all the pages it carries.
         MenuStrip.Width = Math.Max(Pages.Count, 1) * PageWidth;
-        MenuStrip.Margin = new Thickness(-_currentPage * PageWidth, 0, 0, 0);
+        MenuStrip.RenderTransform = TransformOperations.Parse(
+            string.Create(CultureInfo.InvariantCulture, $"translateX({x:0.##}px)"));
     }
 
     private void OnPageIndicatorClick(object? sender, RoutedEventArgs e)
@@ -520,8 +560,15 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
         if (TotalPages <= 1) return;
 
         _swipeStart = e.GetPosition(PageSurface);
+        _swipeStartedAtMs = Environment.TickCount64;
+        _isDragging = false;
     }
 
+    /// <summary>
+    /// Drags the strip under the finger. Nothing used to move until the finger came off,
+    /// which read as "swiping does nothing" and had people jabbing at the pager dots -
+    /// so the page now follows the touch and only the landing is animated.
+    /// </summary>
     private void OnSurfacePointerMoved(object? sender, PointerEventArgs e)
     {
         if (_swipeStart is not { } start) return;
@@ -529,33 +576,108 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
         Point current = e.GetPosition(PageSurface);
         double dx = current.X - start.X;
         double dy = current.Y - start.Y;
-        if (Math.Abs(dx) > SwipeThreshold && Math.Abs(dx) > Math.Abs(dy) * SwipeAxisBias)
+
+        if (!_isDragging)
         {
-            e.Handled = true;
+            // Wait for the gesture to declare itself: a press that drifts vertically, or
+            // barely moves at all, is a tap on a card and must stay one.
+            if (Math.Abs(dx) < 12 || Math.Abs(dx) <= Math.Abs(dy) * SwipeAxisBias) return;
+
+            _isDragging = true;
+
+            // Park the glide: while the finger is down the strip must track it exactly,
+            // or every move would chase a 420 ms animation and lag behind.
+            _stripTransitions = MenuStrip.Transitions;
+            MenuStrip.Transitions = null;
         }
+
+        SetStripOffset(-_currentPage * PageWidth + Resisted(dx));
+        e.Handled = true;
+    }
+
+    /// <summary>
+    /// The travel the strip actually makes for a given finger movement. Past the first or
+    /// last page it gives only a fraction, so the end of the strip is felt rather than
+    /// hit: the page still moves, it just will not follow you into empty space.
+    /// </summary>
+    private double Resisted(double dx)
+    {
+        bool pullingPastStart = dx > 0 && _currentPage == 0;
+        bool pullingPastEnd = dx < 0 && _currentPage >= TotalPages - 1;
+
+        return pullingPastStart || pullingPastEnd ? dx / EdgeResistance : dx;
     }
 
     private void OnSurfacePointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        if (_swipeStart is not { } start)
-            return;
+        if (_swipeStart is not { } start) return;
 
         Point end = e.GetPosition(PageSurface);
         double dx = end.X - start.X;
         double dy = end.Y - start.Y;
-        _swipeStart = null;
+        long heldMs = Environment.TickCount64 - _swipeStartedAtMs;
 
-        if (TotalPages <= 1 || Math.Abs(dx) <= SwipeThreshold || Math.Abs(dx) <= Math.Abs(dy) * SwipeAxisBias)
+        bool wasDragging = _isDragging;
+        _swipeStart = null;
+        _isDragging = false;
+
+        // Whatever happens next is animated again, including springing back.
+        if (wasDragging && _stripTransitions != null)
         {
+            MenuStrip.Transitions = _stripTransitions;
+            _stripTransitions = null;
+        }
+
+        if (TotalPages <= 1 || Math.Abs(dx) <= Math.Abs(dy) * SwipeAxisBias)
+        {
+            if (wasDragging) ApplyStripOffset();
             return;
         }
 
-        if (dx < 0)
-            GoToPage(_currentPage + 1);
+        bool far = Math.Abs(dx) > SwipeThreshold;
+        bool flicked = heldMs <= FlickMaxMs && Math.Abs(dx) > FlickThreshold;
+
+        if (!far && !flicked)
+        {
+            // Short of both: fall back to where we started.
+            if (wasDragging) ApplyStripOffset();
+            return;
+        }
+
+        int target = dx < 0 ? _currentPage + 1 : _currentPage - 1;
+
+        // GoToPage does nothing when the page is already the first or last, so the strip
+        // still has to be sent home after a pull against the edge.
+        if (Math.Clamp(target, 0, TotalPages - 1) == _currentPage)
+        {
+            if (wasDragging) ApplyStripOffset();
+        }
         else
-            GoToPage(_currentPage - 1);
+        {
+            GoToPage(target);
+        }
 
         e.Handled = true;
+    }
+
+    /// <summary>
+    /// A drag can end without a release - the pointer leaves the window, or something
+    /// else takes the capture - and the strip would be left parked mid-page.
+    /// </summary>
+    private void OnSurfacePointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
+    {
+        if (!_isDragging && _swipeStart is null) return;
+
+        _swipeStart = null;
+        _isDragging = false;
+
+        if (_stripTransitions != null)
+        {
+            MenuStrip.Transitions = _stripTransitions;
+            _stripTransitions = null;
+        }
+
+        ApplyStripOffset();
     }
 
     private void GoToPage(int page)
