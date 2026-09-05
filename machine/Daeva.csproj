@@ -45,12 +45,17 @@
       <AvaloniaResource Include="Assets\DaevaWhite.png" />
     </ItemGroup>
 
+    <!-- Always, not PreserveNewest: the app rewrites its own copy of these files in the
+         output directory every time the configuration is saved, which leaves that copy
+         newer than the one in the repo - so PreserveNewest silently stopped copying and
+         edits to the seed never reached a running build. The seed is imported
+         INSERT OR IGNORE, so overwriting it costs nothing: SQLite keeps the live values. -->
     <ItemGroup>
       <Content Include="appsettings.mini.yaml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="appsettings.max.yaml">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
 
