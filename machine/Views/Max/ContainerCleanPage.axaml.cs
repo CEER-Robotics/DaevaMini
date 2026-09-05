@@ -48,9 +48,22 @@ public partial class ContainerCleanPage : UserControl
     /// </summary>
     private void ApplyLiquidAssignments()
     {
+        bool kegsOn = AppConfigService.Instance.Config.IsLargeEvent;
+
         for (int i = 0; i < _bottles.Length; i++)
         {
             if (_bottles[i] == null) continue;
+
+            // A blocked keg carries no caption: the red overlay's own message takes that
+            // spot, and leaving "Fusto 11" there would print two labels on top of each
+            // other. Same rule as the container page.
+            if (i >= AppConfig.PumpChannelCount && !kegsOn)
+            {
+                _bottles[i]!.Tag = string.Empty;
+                _bottles[i]!.IsEnabled = false;
+                continue;
+            }
+
             _bottles[i]!.Tag = LineName(i + 1);
             _bottles[i]!.IsEnabled = true;
         }
@@ -62,7 +75,11 @@ public partial class ContainerCleanPage : UserControl
 
     private void OnConfigChanged(object? sender, AppConfigChangedEventArgs e)
     {
-        Dispatcher.UIThread.Post(ApplyLiquidAssignments);
+        Dispatcher.UIThread.Post(() =>
+        {
+            ApplyLiquidAssignments();
+            ApplyKegAvailability();
+        });
     }
 
     private void OnBackArrow(object? sender, RoutedEventArgs e)
