@@ -177,7 +177,7 @@ public partial class LiquidSetupPage : UserControl, INotifyPropertyChanged
             // Only drinks that would otherwise be on the menu: something switched off,
             // or keg-only at a small event, is absent on purpose.
             if (!cocktail.IsActive) continue;
-            if (cocktail.LargeEventOnly && !config.IsLargeEvent) continue;
+            if (!config.IsLargeEvent && CocktailAvailability.RequiresKegs(cocktail, config)) continue;
 
             foreach (var missing in CocktailAvailability.MissingLiquids(cocktail, loaded))
             {

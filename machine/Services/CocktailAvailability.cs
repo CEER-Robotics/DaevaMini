@@ -37,6 +37,34 @@ public static class CocktailAvailability
         => cocktail.Ingredients.All(i => loaded.Contains(i.Name));
 
     /// <summary>
+    /// Whether this drink can only be poured with the kegs connected: either it is drawn
+    /// from a tap, or one of its ingredients is carried by a keg and by no pump.
+    /// </summary>
+    /// <remarks>
+    /// Derived from the assignments as they are now, never from a flag written when the
+    /// recipe was saved. A drink invented before its liquids were plumbed used to be
+    /// branded keg-only for good, and stayed off the menu at every small event even once
+    /// the bottles were on the pumps. An ingredient on no line at all is not a keg
+    /// problem: <see cref="CanBeMade"/> already keeps that drink off the menu.
+    /// </remarks>
+    public static bool RequiresKegs(CocktailConfig cocktail, AppConfig config)
+    {
+        if (cocktail.IsTap) return true;
+
+        var onPumps = config.LiquidAssignments
+            .Take(AppConfig.PumpChannelCount)
+            .Where(a => !string.IsNullOrWhiteSpace(a))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var onKegs = config.LiquidAssignments
+            .Skip(AppConfig.PumpChannelCount)
+            .Where(a => !string.IsNullOrWhiteSpace(a))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        return cocktail.Ingredients.Any(i => onKegs.Contains(i.Name) && !onPumps.Contains(i.Name));
+    }
+
+    /// <summary>
     /// Every liquid the machine knows how to use: what the recipes ask for, plus
     /// whatever is already loaded even if no recipe uses it. Sorted, because this is
     /// what the container page offers when reassigning a line.

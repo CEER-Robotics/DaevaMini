@@ -374,7 +374,7 @@ public partial class CocktailWorkshopPage : UserControl, INotifyPropertyChanged
             _editing.Name = name;
             _editing.Subtitle = string.Join(", ", Recipe.Select(r => r.Name));
             _editing.Ingredients = ingredients;
-            _editing.LargeEventOnly = UsesKegOnlyLiquid(config, Recipe);
+            _editing.LargeEventOnly = CocktailAvailability.RequiresKegs(_editing, config);
             _editing.Image = _image;
             _editing.ShowImage = !string.IsNullOrEmpty(_image);
 
@@ -396,9 +396,10 @@ public partial class CocktailWorkshopPage : UserControl, INotifyPropertyChanged
                 Theme = Recipe.Any(r => r.IsAlcoholic) ? "Burgundy" : "Teal",
                 Category = "Creazioni",
                 IsActive = true,
-                LargeEventOnly = UsesKegOnlyLiquid(config, Recipe),
                 Ingredients = ingredients,
             };
+
+            cocktail.LargeEventOnly = CocktailAvailability.RequiresKegs(cocktail, config);
 
             config.Cocktails = config.Cocktails.Append(cocktail).ToArray();
             AppConfigService.Instance.SaveConfig("cocktail-new");
@@ -437,20 +438,6 @@ public partial class CocktailWorkshopPage : UserControl, INotifyPropertyChanged
         for (int n = 2; ; n++)
             if (!taken.Contains($"{baseId}-{n}"))
                 return $"{baseId}-{n}";
-    }
-
-    /// <summary>
-    /// True when an ingredient is carried by a keg and by no pump: without the kegs that
-    /// drink cannot be poured at all.
-    /// </summary>
-    private static bool UsesKegOnlyLiquid(AppConfig config, IEnumerable<WorkshopIngredient> recipe)
-    {
-        var onPumps = config.LiquidAssignments
-            .Take(AppConfig.PumpChannelCount)
-            .Where(a => !string.IsNullOrWhiteSpace(a))
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-        return recipe.Any(r => !onPumps.Contains(r.Name));
     }
 
     // ------------------------------------------------------------ artwork

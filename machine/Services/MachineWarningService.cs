@@ -144,7 +144,7 @@ public sealed class MachineWarningService
                 continue;
 
             // Keg-only drinks are off the menu at a small event, so a missing line is expected.
-            if (cocktail.LargeEventOnly && !config.IsLargeEvent)
+            if (!config.IsLargeEvent && CocktailAvailability.RequiresKegs(cocktail, config))
                 continue;
 
             var missing = CocktailAvailability.MissingLiquids(cocktail, assigned);

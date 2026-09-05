@@ -19,7 +19,10 @@ public sealed class MaxCocktailRepository : ICocktailRepository
             // Switched off in the doses settings: off the menu entirely, not shown
             // greyed out. A drink nobody can order has no business taking a card.
             .Where(c => c.IsActive)
-            .Where(c => !c.LargeEventOnly || config.IsLargeEvent)
+            // Keg drinks are off the menu while the kegs are unplugged. Asked of the
+            // current assignments rather than of CocktailConfig.LargeEventOnly, which is
+            // a snapshot from save time and goes stale the moment a line is reassigned.
+            .Where(c => config.IsLargeEvent || !CocktailAvailability.RequiresKegs(c, config))
             // And nothing whose ingredients are not loaded on some line: the menu
             // follows whatever the containers actually hold.
             .Where(c => CocktailAvailability.CanBeMade(c, loaded))
