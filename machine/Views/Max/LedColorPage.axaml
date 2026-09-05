@@ -1,0 +1,290 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+             x:Class="DaevaMini.Views.Max.LedColorPage"
+             x:Name="Host">
+
+    <UserControl.Styles>
+        <Style Selector="Button.InvisibleBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        </Style>
+        <Style Selector="Button.InvisibleBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="Button.InvisibleBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Opacity" Value="0.6"/>
+        </Style>
+
+        <Style Selector="Button.PresetBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.PresetBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Opacity" Value="0.75"/>
+        </Style>
+        <Style Selector="Button.PresetBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Opacity" Value="0.5"/>
+        </Style>
+
+        <Style Selector="Button.PrimaryBtn">
+            <Setter Property="Height" Value="84"/>
+            <Setter Property="Background" Value="#16301F"/>
+            <Setter Property="BorderBrush" Value="#3FBF7F"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="22"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.PrimaryBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1D4029"/>
+        </Style>
+
+        <Style Selector="Button.GhostBtn">
+            <Setter Property="Height" Value="84"/>
+            <Setter Property="Background" Value="#0CFFFFFF"/>
+            <Setter Property="BorderBrush" Value="#20FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="22"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.GhostBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1AFFFFFF"/>
+        </Style>
+
+        <Style Selector="Button.LinkBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.LinkBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Opacity" Value="0.7"/>
+        </Style>
+
+        <Style Selector="TextBlock.KeyCap">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="FontSize" Value="{StaticResource FontLabel}"/>
+            <Setter Property="FontFamily" Value="Space Grotesk"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style Selector="TextBlock.SwatchLabel">
+            <Setter Property="Foreground" Value="{StaticResource TextMuted}"/>
+            <Setter Property="FontSize" Value="{StaticResource FontCaption}"/>
+            <Setter Property="FontFamily" Value="Space Grotesk"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Canvas Width="1920" Height="1080">
+        <Canvas.Background>
+            <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%" RadiusX="80%" RadiusY="80%">
+                <GradientStop Color="#1A2222" Offset="0"/>
+                <GradientStop Color="#0B0D0D" Offset="1"/>
+            </RadialGradientBrush>
+        </Canvas.Background>
+
+        <Button Canvas.Left="60" Canvas.Top="40" Classes="InvisibleBtn" Click="OnBackClick" Width="220" Height="48">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
+                <PathIcon Width="20" Height="20" Foreground="{StaticResource TextPrimary}" Margin="0,0,12,0"
+                          Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                <TextBlock Text="INDIETRO" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontBody}"
+                           FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="2" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+
+        <TextBlock Canvas.Top="40" Width="1920" Text="COLORE DEFAULT" Foreground="{StaticResource TextPrimary}"
+                   FontSize="{StaticResource FontSection}" FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="4"
+                   HorizontalAlignment="Center" TextAlignment="Center"/>
+
+        <Border Canvas.Left="460" Canvas.Top="110" Width="1000" Height="880" CornerRadius="32"
+                Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1">
+            <StackPanel Margin="70,44" HorizontalAlignment="Center">
+                <TextBlock Text="Colore delle strisce quando la macchina aspetta un cliente: schermata iniziale e menu, fuori da un'erogazione."
+                           Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontCaption}"
+                           FontFamily="Space Grotesk" TextWrapping="Wrap" TextAlignment="Center"
+                           HorizontalAlignment="Center" Width="760"/>
+
+                <!-- Changes here go straight to the strip (see LedColorPage.axaml.cs /
+                     MainWindow.ApplyIdleTint): what you see on the machine while this page
+                     is open is the live preview. "SALVA COLORE" is what keeps it. -->
+                <Border Width="150" Height="150" CornerRadius="75" Margin="0,26,0,0"
+                        Background="{Binding PreviewBrush, ElementName=Host}"
+                        BorderBrush="#33FFFFFF" BorderThickness="2" HorizontalAlignment="Center"/>
+
+                <TextBlock Text="{Binding RgbLabel, ElementName=Host}" Foreground="{StaticResource TextPrimary}"
+                           FontSize="{StaticResource FontLabel}" FontFamily="Space Grotesk" FontWeight="Bold"
+                           LetterSpacing="1" HorizontalAlignment="Center" Margin="0,16,0,0"/>
+
+                <UniformGrid Columns="5" Rows="2" Width="820" Height="200" Margin="0,30,0,0">
+                    <Button Classes="PresetBtn" Tag="202,240,248" Click="OnPresetClick">
+                        <StackPanel Spacing="10" HorizontalAlignment="Center">
+                            <Border Width="64" Height="64" CornerRadius="32" Background="#CAF0F8" BorderBrush="#33FFFFFF" BorderThickness="1"/>
+                            <TextBlock Text="Blu Daeva" Classes="SwatchLabel"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="PresetBtn" Tag="255,255,255" Click="OnPresetClick">
+                        <StackPanel Spacing="10" HorizontalAlignment="Center">
+                            <Border Width="64" Height="64" CornerRadius="32" Background="#FFFFFF" BorderBrush="#33FFFFFF" BorderThickness="1"/>
+                            <TextBlock Text="Bianco" Classes="SwatchLabel"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="PresetBtn" Tag="255,200,140" Click="OnPresetClick">
+                        <StackPanel Spacing="10" HorizontalAlignment="Center">
+                            <Border Width="64" Height="64" CornerRadius="32" Background="#FFC88C" BorderBrush="#33FFFFFF" BorderThickness="1"/>
+                            <TextBlock Text="Bianco caldo" Classes="SwatchLabel"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="PresetBtn" Tag="255,120,0" Click="OnPresetClick">
+                        <StackPanel Spacing="10" HorizontalAlignment="Center">
+                            <Border Width="64" Height="64" CornerRadius="32" Background="#FF7800" BorderBrush="#33FFFFFF" BorderThickness="1"/>
+                            <TextBlock Text="Arancione" Classes="SwatchLabel"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="PresetBtn" Tag="255,0,0" Click="OnPresetClick">
+                        <StackPanel Spacing="10" HorizontalAlignment="Center">
+                            <Border Width="64" Height="64" CornerRadius="32" Background="#FF0000" BorderBrush="#33FFFFFF" BorderThickness="1"/>
+                            <TextBlock Text="Rosso" Classes="SwatchLabel"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="PresetBtn" Tag="0,255,0" Click="OnPresetClick">
+                        <StackPanel Spacing="10" HorizontalAlignment="Center">
+                            <Border Width="64" Height="64" CornerRadius="32" Background="#00FF00" BorderBrush="#33FFFFFF" BorderThickness="1"/>
+                            <TextBlock Text="Verde" Classes="SwatchLabel"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="PresetBtn" Tag="0,120,255" Click="OnPresetClick">
+                        <StackPanel Spacing="10" HorizontalAlignment="Center">
+                            <Border Width="64" Height="64" CornerRadius="32" Background="#0078FF" BorderBrush="#33FFFFFF" BorderThickness="1"/>
+                            <TextBlock Text="Blu" Classes="SwatchLabel"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="PresetBtn" Tag="0,255,255" Click="OnPresetClick">
+                        <StackPanel Spacing="10" HorizontalAlignment="Center">
+                            <Border Width="64" Height="64" CornerRadius="32" Background="#00FFFF" BorderBrush="#33FFFFFF" BorderThickness="1"/>
+                            <TextBlock Text="Ciano" Classes="SwatchLabel"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="PresetBtn" Tag="255,0,255" Click="OnPresetClick">
+                        <StackPanel Spacing="10" HorizontalAlignment="Center">
+                            <Border Width="64" Height="64" CornerRadius="32" Background="#FF00FF" BorderBrush="#33FFFFFF" BorderThickness="1"/>
+                            <TextBlock Text="Magenta" Classes="SwatchLabel"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="PresetBtn" Tag="140,0,255" Click="OnPresetClick">
+                        <StackPanel Spacing="10" HorizontalAlignment="Center">
+                            <Border Width="64" Height="64" CornerRadius="32" Background="#8C00FF" BorderBrush="#33FFFFFF" BorderThickness="1"/>
+                            <TextBlock Text="Viola" Classes="SwatchLabel"/>
+                        </StackPanel>
+                    </Button>
+                </UniformGrid>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20" Margin="0,26,0,0">
+                    <Button Classes="GhostBtn" Width="260" Click="OnResetClick">
+                        <TextBlock Text="PREDEFINITO" Classes="KeyCap"/>
+                    </Button>
+                    <Button Classes="GhostBtn" Width="260" Click="OnCustomiseClick">
+                        <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                            <PathIcon Width="22" Height="22" Foreground="{StaticResource TextPrimary}"
+                                      Data="M17.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,9A1.5,1.5 0 0,1 19,10.5A1.5,1.5 0 0,1 17.5,12M14.5,8A1.5,1.5 0 0,1 13,6.5A1.5,1.5 0 0,1 14.5,5A1.5,1.5 0 0,1 16,6.5A1.5,1.5 0 0,1 14.5,8M9.5,8A1.5,1.5 0 0,1 8,6.5A1.5,1.5 0 0,1 9.5,5A1.5,1.5 0 0,1 11,6.5A1.5,1.5 0 0,1 9.5,8M6.5,12A1.5,1.5 0 0,1 5,10.5A1.5,1.5 0 0,1 6.5,9A1.5,1.5 0 0,1 8,10.5A1.5,1.5 0 0,1 6.5,12M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A1.5,1.5 0 0,0 13.5,19.5C13.5,19.11 13.35,18.76 13.11,18.5C12.88,18.23 12.73,17.88 12.73,17.5A1.5,1.5 0 0,1 14.23,16H16A5,5 0 0,0 21,11C21,6.58 16.97,3 12,3Z"/>
+                            <TextBlock Text="PERSONALIZZA" Classes="KeyCap"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="PrimaryBtn" Width="260" Click="OnSaveClick">
+                        <TextBlock Text="SALVA COLORE" Classes="KeyCap"/>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Name="StatusLine" Canvas.Top="1015" Width="1920" Text=""
+                   Foreground="{StaticResource Accent}" FontSize="{StaticResource FontBody}"
+                   FontFamily="Space Grotesk" FontWeight="Bold" TextAlignment="Center"/>
+
+        <!-- The wheel, on top of the page like every other overlay here. Hue runs round the
+             rim, saturation from the washed-out middle outwards, and the bar underneath is
+             brightness - the same three axes a phone's picker uses. -->
+        <Border Canvas.Left="0" Canvas.Top="0" Width="1920" Height="1080" Background="#E60B0D0D"
+                IsVisible="{Binding IsWheelOpen, ElementName=Host}">
+            <Border Width="960" Height="680" CornerRadius="32" Background="#12140F"
+                    BorderBrush="#20FFFFFF" BorderThickness="1" Padding="40,28,40,32"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <DockPanel LastChildFill="True">
+                    <Grid DockPanel.Dock="Top" ColumnDefinitions="140,*,140" Height="48" Margin="0,0,0,20">
+                        <Button Grid.Column="0" Classes="LinkBtn" HorizontalAlignment="Left" Click="OnCloseWheel">
+                            <TextBlock Text="Indietro" Foreground="{StaticResource TextMuted}"
+                                       FontSize="{StaticResource FontBody}" FontFamily="Space Grotesk"/>
+                        </Button>
+                        <TextBlock Grid.Column="1" Text="PERSONALIZZA" Foreground="{StaticResource TextPrimary}"
+                                   FontSize="{StaticResource FontLabel}" FontFamily="Space Grotesk"
+                                   FontWeight="Bold" LetterSpacing="2"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="420,60,*">
+                        <StackPanel Grid.Column="0">
+                            <Canvas Width="420" Height="420"
+                                    PointerPressed="OnWheelPointerPressed"
+                                    PointerMoved="OnWheelPointerMoved">
+                                <!-- Transparent backing: a Canvas with no fill takes no
+                                     pointer events in its empty corners, and the wheel
+                                     needs the whole square to track a finger. -->
+                                <Border Canvas.Left="0" Canvas.Top="0" Width="420" Height="420" Background="#01FFFFFF"/>
+                                <Image Canvas.Left="0" Canvas.Top="0" Width="420" Height="420"
+                                       Source="{Binding WheelImage, ElementName=Host}" IsHitTestVisible="False"/>
+                                <Ellipse Canvas.Left="{Binding MarkerLeft, ElementName=Host}"
+                                         Canvas.Top="{Binding MarkerTop, ElementName=Host}"
+                                         Width="34" Height="34" IsHitTestVisible="False"
+                                         Fill="{Binding PreviewBrush, ElementName=Host}"
+                                         Stroke="#FFFFFF" StrokeThickness="3"/>
+                            </Canvas>
+
+                            <Canvas Width="420" Height="56" Margin="0,28,0,0"
+                                    PointerPressed="OnBrightnessPointerPressed"
+                                    PointerMoved="OnBrightnessPointerMoved">
+                                <Border Canvas.Left="0" Canvas.Top="0" Width="420" Height="56" CornerRadius="16"
+                                        Background="{Binding BrightnessBrush, ElementName=Host}"
+                                        BorderBrush="#20FFFFFF" BorderThickness="1"/>
+                                <Border Canvas.Left="{Binding BrightnessHandleLeft, ElementName=Host}" Canvas.Top="-4"
+                                        Width="10" Height="64" CornerRadius="5" IsHitTestVisible="False"
+                                        Background="#FFFFFF" BorderBrush="#40000000" BorderThickness="1"/>
+                            </Canvas>
+
+                            <TextBlock Text="LUMINOSITÀ" Classes="SwatchLabel" Margin="0,14,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
+                            <Border Width="180" Height="180" CornerRadius="90"
+                                    Background="{Binding PreviewBrush, ElementName=Host}"
+                                    BorderBrush="#33FFFFFF" BorderThickness="2" HorizontalAlignment="Center"/>
+                            <TextBlock Text="{Binding RgbLabel, ElementName=Host}" Foreground="{StaticResource TextPrimary}"
+                                       FontSize="{StaticResource FontLabel}" FontFamily="Space Grotesk" FontWeight="Bold"
+                                       LetterSpacing="1" HorizontalAlignment="Center"/>
+                            <Button Classes="PrimaryBtn" Width="260" Click="OnCloseWheel" Margin="0,16,0,0">
+                                <TextBlock Text="FATTO" Classes="KeyCap"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </DockPanel>
+            </Border>
+        </Border>
+    </Canvas>
+</UserControl>

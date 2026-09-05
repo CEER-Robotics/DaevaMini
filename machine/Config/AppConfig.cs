@@ -18,6 +18,26 @@ public sealed class AppConfig
     [YamlMember(Alias = "SettingsPin")]
     public string SettingsPin { get; set; } = "1234";
 
+    /// <summary>
+    /// Strip color while the machine is idle - not in settings, not mid-pour. Defaults
+    /// to the firmware's own default WAIT color (kBluDaeva in ProjectConfig.h), so an
+    /// unedited config looks exactly as it did before this became configurable.
+    /// </summary>
+    [YamlMember(Alias = "IdleLedR")]
+    public int IdleLedR { get; set; } = 202;
+
+    [YamlMember(Alias = "IdleLedG")]
+    public int IdleLedG { get; set; } = 240;
+
+    [YamlMember(Alias = "IdleLedB")]
+    public int IdleLedB { get; set; } = 248;
+
+    [YamlIgnore]
+    public (byte R, byte G, byte B) IdleLedRgb => (
+        (byte)Math.Clamp(IdleLedR, 0, 255),
+        (byte)Math.Clamp(IdleLedG, 0, 255),
+        (byte)Math.Clamp(IdleLedB, 0, 255));
+
     [YamlMember(Alias = "LiquidAssignments")]
     public string[] LiquidAssignments { get; set; } = Array.Empty<string>();
     /// <summary>

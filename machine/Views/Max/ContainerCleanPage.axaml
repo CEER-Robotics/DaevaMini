@@ -150,12 +150,12 @@
             </RadialGradientBrush>
         </Canvas.Background>
 
-        <Button Canvas.Left="60" Canvas.Top="40" Classes="InvisibleBtn" Click="OnBackArrow" Width="240" Height="48">
-            <StackPanel Orientation="Horizontal" Spacing="12">
-                <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+        <Button Canvas.Left="60" Canvas.Top="40" Classes="InvisibleBtn" Click="OnBackArrow" Width="220" Height="48">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
+                <PathIcon Width="20" Height="20" Foreground="{StaticResource TextPrimary}" Margin="0,0,12,0"
                           Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
-                <TextBlock Text="TORNA AL MENU" Foreground="{StaticResource TextPrimary}" FontFamily="Space Grotesk"
-                           FontWeight="Bold" FontSize="{StaticResource FontBody}" VerticalAlignment="Center"/>
+                <TextBlock Text="INDIETRO" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontBody}"
+                           FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="2" VerticalAlignment="Center"/>
             </StackPanel>
         </Button>
 

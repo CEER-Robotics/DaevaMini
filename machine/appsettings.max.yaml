@@ -8,6 +8,12 @@ FillDurationMs: 5000
 CleanDurationMs: 15000
 SettingsPin: "1234"
 
+# Colore delle strisce quando la macchina e' in attesa (schermata iniziale e menu,
+# fuori da impostazioni ed erogazione). Modificabile da Impostazioni > Colore di attesa.
+IdleLedR: 202
+IdleLedG: 240
+IdleLedB: 248
+
 LiquidAssignments:
   - "Tonica"
   - "Prosecco"

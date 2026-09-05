@@ -1,0 +1,432 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:max="clr-namespace:DaevaMini.Views.Max"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+             x:Class="DaevaMini.Views.Max.WifiSetupPage"
+             x:Name="Host">
+
+    <UserControl.Styles>
+        <Style Selector="Button.InvisibleBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        </Style>
+        <Style Selector="Button.InvisibleBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="Button.InvisibleBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Opacity" Value="0.6"/>
+        </Style>
+
+        <Style Selector="Button.NetworkRow">
+            <Setter Property="Background" Value="#0CFFFFFF"/>
+            <Setter Property="BorderBrush" Value="#15FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="18"/>
+            <Setter Property="Height" Value="104"/>
+            <Setter Property="Margin" Value="0,0,0,14"/>
+            <Setter Property="Padding" Value="30,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.NetworkRow:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1AFFFFFF"/>
+        </Style>
+
+        <Style Selector="Button.GhostBtn">
+            <Setter Property="Height" Value="76"/>
+            <Setter Property="Background" Value="#0CFFFFFF"/>
+            <Setter Property="BorderBrush" Value="#20FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.GhostBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1AFFFFFF"/>
+        </Style>
+
+        <!-- Bare text/icon button for the sheet header and the reveal eye: no frame, so a
+             secondary action reads as a word rather than competing with the real buttons. -->
+        <Style Selector="Button.LinkBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.LinkBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Opacity" Value="0.7"/>
+        </Style>
+        <Style Selector="Button.LinkBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Opacity" Value="0.45"/>
+        </Style>
+        <Style Selector="Button.LinkBtn:disabled">
+            <Setter Property="Opacity" Value="0.35"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
+        <Style Selector="Button.KeyBtn">
+            <Setter Property="Background" Value="#171A14"/>
+            <Setter Property="BorderBrush" Value="#2E322A"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.KeyBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#2A3030"/>
+        </Style>
+        <Style Selector="Button.KeyBtn:disabled">
+            <Setter Property="Opacity" Value="0.35"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+        <Style Selector="Button.ModKey">
+            <Setter Property="Background" Value="#0E1310"/>
+        </Style>
+
+        <Style Selector="TextBlock.KeyCap">
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="FontSize" Value="{StaticResource FontLabel}"/>
+            <Setter Property="FontFamily" Value="Space Grotesk"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Canvas Width="1920" Height="1080">
+        <Canvas.Background>
+            <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%" RadiusX="80%" RadiusY="80%">
+                <GradientStop Color="#1A2222" Offset="0"/>
+                <GradientStop Color="#0B0D0D" Offset="1"/>
+            </RadialGradientBrush>
+        </Canvas.Background>
+
+        <Button Canvas.Left="60" Canvas.Top="40" Classes="InvisibleBtn" Click="OnBackClick" Width="220" Height="48">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
+                <PathIcon Width="20" Height="20" Foreground="{StaticResource TextPrimary}" Margin="0,0,12,0"
+                          Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                <TextBlock Text="INDIETRO" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontBody}"
+                           FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="2" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+
+        <TextBlock Canvas.Top="40" Width="1920" Text="WI-FI" Foreground="{StaticResource TextPrimary}"
+                   FontSize="{StaticResource FontSection}" FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="4"
+                   HorizontalAlignment="Center" TextAlignment="Center"/>
+
+        <Border Canvas.Left="360" Canvas.Top="110" Width="1200" Height="880" CornerRadius="32"
+                Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1">
+            <DockPanel LastChildFill="True" Margin="50,40">
+                <!-- Header: who we're on, who else is around, and the rescan button. -->
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,24">
+                    <StackPanel Grid.Column="0" Spacing="6">
+                        <TextBlock Text="{Binding StatusHeader, ElementName=Host}"
+                                   Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontTitle}"
+                                   FontFamily="Space Grotesk" FontWeight="Medium"/>
+                        <TextBlock Text="Modalità simulata: nmcli non è disponibile su questo PC di sviluppo."
+                                   IsVisible="{Binding IsSimulated, ElementName=Host}"
+                                   Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontCaption}"
+                                   FontFamily="Space Grotesk"/>
+                    </StackPanel>
+                    <Button Grid.Column="1" Classes="GhostBtn" Width="260" Click="OnRescanClick"
+                            IsEnabled="{Binding !IsScanning, ElementName=Host}">
+                        <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                            <PathIcon Width="20" Height="20" Foreground="{StaticResource TextPrimary}"
+                                      Data="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"/>
+                            <TextBlock Text="CERCA RETI" Classes="KeyCap" FontSize="{StaticResource FontCaption}"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusText, ElementName=Host}"
+                           IsVisible="{Binding !IsPasswordPanelOpen, ElementName=Host}"
+                           Foreground="{StaticResource Accent}" FontSize="{StaticResource FontBody}"
+                           FontFamily="Space Grotesk" FontWeight="Bold" TextAlignment="Center"
+                           Margin="0,20,0,0"/>
+
+                <!-- Nothing found yet, or still looking: the list itself is empty either way. -->
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16"
+                            IsVisible="{Binding IsEmpty, ElementName=Host}">
+                    <TextBlock Text="Ricerca reti in corso..." IsVisible="{Binding IsScanning, ElementName=Host}"
+                               Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
+                               FontFamily="Space Grotesk" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Nessuna rete trovata. Riprova a cercare." IsVisible="{Binding !IsScanning, ElementName=Host}"
+                               Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
+                               FontFamily="Space Grotesk" HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <ScrollViewer IsVisible="{Binding HasNetworks, ElementName=Host}">
+                    <ItemsControl ItemsSource="{Binding Networks, ElementName=Host}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="max:WifiNetworkRow">
+                                <Button Classes="NetworkRow" Click="OnNetworkClick" CommandParameter="{Binding}">
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                        <Border Grid.Column="0" Width="52" Height="52" CornerRadius="26"
+                                                Background="#15FFFFFF" Margin="0,0,22,0">
+                                            <Grid>
+                                                <PathIcon Width="22" Height="22" Foreground="{StaticResource TextPrimary}"
+                                                          IsVisible="{Binding Secured}"
+                                                          Data="M12,17A2,2 0 0,0 14,15C14,13.89 13.11,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M8,6A4,4 0 0,1 12,2A4,4 0 0,1 16,6V8H8V6Z"/>
+                                                <PathIcon Width="22" Height="22" Foreground="{StaticResource TextMuted}"
+                                                          IsVisible="{Binding !Secured}"
+                                                          Data="M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z"/>
+                                            </Grid>
+                                        </Border>
+                                        <TextBlock Grid.Column="1" Text="{Binding Ssid}"
+                                                   Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontLabel}"
+                                                   FontFamily="Space Grotesk" FontWeight="Medium" VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <Border Grid.Column="2" IsVisible="{Binding IsCurrent}" Margin="0,0,20,0"
+                                                Background="#1F3A2A" BorderBrush="#3FBF7F" BorderThickness="1"
+                                                CornerRadius="12" Padding="14,6">
+                                            <TextBlock Text="CONNESSA" Foreground="#7FE0A8" FontSize="{StaticResource FontCaption}"
+                                                       FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="1"/>
+                                        </Border>
+                                        <TextBlock Grid.Column="3" Text="{Binding SignalLabel}"
+                                                   Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
+                                                   FontFamily="Space Grotesk" VerticalAlignment="Center" Width="60"
+                                                   TextAlignment="Right"/>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- Password entry: covers the whole canvas like every other keyboard overlay in
+             this app, so the network list and its own status line sit behind it while a
+             connection attempt is in flight. -->
+        <Border Canvas.Left="0" Canvas.Top="0" Width="1920" Height="1080" Background="#E60B0D0D"
+                IsVisible="{Binding IsPasswordPanelOpen, ElementName=Host}">
+            <Border Width="1420" Height="620" CornerRadius="32" Background="#12140F"
+                    BorderBrush="#20FFFFFF" BorderThickness="1" Padding="40,28,40,28"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <DockPanel LastChildFill="True">
+                    <!-- Sheet header, phone-style: the way out on the left, the question in
+                         the middle. The right column is an empty twin of the left button so
+                         the title sits optically centred rather than nudged off by it. -->
+                    <Grid DockPanel.Dock="Top" ColumnDefinitions="160,*,160" Height="52" Margin="0,0,0,30">
+                        <Button Grid.Column="0" Classes="LinkBtn" HorizontalAlignment="Left"
+                                Click="OnClosePasswordPanel"
+                                IsEnabled="{Binding !IsConnecting, ElementName=Host}">
+                            <TextBlock Text="Annulla" Foreground="{StaticResource TextMuted}"
+                                       FontSize="{StaticResource FontBody}" FontFamily="Space Grotesk"/>
+                        </Button>
+
+                        <TextBlock Grid.Column="1" Text="{Binding PasswordTitle, ElementName=Host}"
+                                   Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontLabel}"
+                                   FontFamily="Space Grotesk" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </Grid>
+
+                    <!-- One inset row, label on the left and the entry beside it, as the
+                         phone's join sheet does it. The bar after the bullets is a resting
+                         caret: without it an empty field reads as a dead panel. -->
+                    <Border DockPanel.Dock="Top" Width="760" Height="76" HorizontalAlignment="Center"
+                            CornerRadius="18" Background="#12FFFFFF" BorderBrush="#1FFFFFFF" BorderThickness="1"
+                            Padding="28,0" Margin="0,0,0,14">
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <TextBlock Grid.Column="0" Text="Password" Width="130"
+                                       Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
+                                       FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding PasswordDisplay, ElementName=Host}"
+                                           Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontLabel}"
+                                           FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="2"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                <Border Width="2" Height="26" CornerRadius="1" Margin="4,0,0,0"
+                                        Background="{StaticResource Accent}" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <Button Grid.Column="2" Classes="LinkBtn" Width="48" Height="48"
+                                    Click="OnToggleReveal" IsVisible="{Binding HasPassword, ElementName=Host}">
+                                <Grid>
+                                    <PathIcon Width="24" Height="24" Foreground="{StaticResource TextMuted}"
+                                              IsVisible="{Binding IsHidden, ElementName=Host}"
+                                              Data="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
+                                    <PathIcon Width="24" Height="24" Foreground="{StaticResource Accent}"
+                                              IsVisible="{Binding !IsHidden, ElementName=Host}"
+                                              Data="M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.08L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.74,7.13 11.35,7 12,7Z"/>
+                                </Grid>
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- Fixed height, not collapsing: an error appearing must not shove the
+                         keyboard down under the fingers already on it. -->
+                    <TextBlock DockPanel.Dock="Top" Text="{Binding StatusText, ElementName=Host}"
+                               Height="24" Margin="0,0,0,14"
+                               Foreground="{StaticResource Accent}" FontSize="{StaticResource FontCaption}"
+                               FontFamily="Space Grotesk" FontWeight="Bold"
+                               HorizontalAlignment="Center" TextAlignment="Center"/>
+
+                    <!-- Top rather than Center: with the password bar pushed down to sit
+                         close above it, centering would have split the leftover space and
+                         reopened the same gap between them. -->
+                    <StackPanel Spacing="0" VerticalAlignment="Top">
+                        <!-- Letters keyboard: same QWERTY layout as the rest of the app, but
+                             shift toggles on and off instead of firing once, and the last
+                             key of the bottom row swaps to digits/symbols instead of closing. -->
+                        <StackPanel IsVisible="{Binding IsLettersMode, ElementName=Host}" Spacing="0">
+                            <Grid Height="86" ColumnDefinitions="*,*,*,*,*,*,*,*,*,*,1.6*">
+                                <Button Grid.Column="0" Classes="KeyBtn" Tag="Q" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[0], ElementName=Host}"/></Button>
+                                <Button Grid.Column="1" Classes="KeyBtn" Tag="W" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[1], ElementName=Host}"/></Button>
+                                <Button Grid.Column="2" Classes="KeyBtn" Tag="E" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[2], ElementName=Host}"/></Button>
+                                <Button Grid.Column="3" Classes="KeyBtn" Tag="R" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[3], ElementName=Host}"/></Button>
+                                <Button Grid.Column="4" Classes="KeyBtn" Tag="T" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[4], ElementName=Host}"/></Button>
+                                <Button Grid.Column="5" Classes="KeyBtn" Tag="Y" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[5], ElementName=Host}"/></Button>
+                                <Button Grid.Column="6" Classes="KeyBtn" Tag="U" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[6], ElementName=Host}"/></Button>
+                                <Button Grid.Column="7" Classes="KeyBtn" Tag="I" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[7], ElementName=Host}"/></Button>
+                                <Button Grid.Column="8" Classes="KeyBtn" Tag="O" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[8], ElementName=Host}"/></Button>
+                                <Button Grid.Column="9" Classes="KeyBtn" Tag="P" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[9], ElementName=Host}"/></Button>
+                                <Button Grid.Column="10" Classes="KeyBtn ModKey" Click="OnKeyBackspace">
+                                    <PathIcon Width="22" Height="22" Foreground="{StaticResource TextPrimary}"
+                                              Data="M22,3H7C6.31,3 5.77,3.35 5.41,3.88L0,12L5.41,20.11C5.77,20.64 6.31,21 7,21H22A2,2 0 0,0 24,19V5A2,2 0 0,0 22,3M19,15.59L17.59,17L14,13.41L10.41,17L9,15.59L12.59,12L9,8.41L10.41,7L14,10.59L17.59,7L19,8.41L15.41,12"/>
+                                </Button>
+                            </Grid>
+                            <Grid Height="86" ColumnDefinitions="0.5*,*,*,*,*,*,*,*,*,*,1.1*">
+                                <Button Grid.Column="1" Classes="KeyBtn" Tag="A" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[10], ElementName=Host}"/></Button>
+                                <Button Grid.Column="2" Classes="KeyBtn" Tag="S" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[11], ElementName=Host}"/></Button>
+                                <Button Grid.Column="3" Classes="KeyBtn" Tag="D" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[12], ElementName=Host}"/></Button>
+                                <Button Grid.Column="4" Classes="KeyBtn" Tag="F" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[13], ElementName=Host}"/></Button>
+                                <Button Grid.Column="5" Classes="KeyBtn" Tag="G" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[14], ElementName=Host}"/></Button>
+                                <Button Grid.Column="6" Classes="KeyBtn" Tag="H" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[15], ElementName=Host}"/></Button>
+                                <Button Grid.Column="7" Classes="KeyBtn" Tag="J" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[16], ElementName=Host}"/></Button>
+                                <Button Grid.Column="8" Classes="KeyBtn" Tag="K" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[17], ElementName=Host}"/></Button>
+                                <Button Grid.Column="9" Classes="KeyBtn" Tag="L" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[18], ElementName=Host}"/></Button>
+                            </Grid>
+                            <Grid Height="86" ColumnDefinitions="1.6*,*,*,*,*,*,*,*,1.6*">
+                                <Button Grid.Column="0" Classes="KeyBtn ModKey" Click="OnShift">
+                                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                        <PathIcon Width="20" Height="20" Foreground="{Binding ShiftBrush, ElementName=Host}"
+                                                  Data="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z"/>
+                                        <TextBlock Text="MAIUSC" Foreground="{Binding ShiftBrush, ElementName=Host}"
+                                                   FontSize="{StaticResource FontCaption}" FontWeight="Bold"
+                                                   FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Grid.Column="1" Classes="KeyBtn" Tag="Z" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[19], ElementName=Host}"/></Button>
+                                <Button Grid.Column="2" Classes="KeyBtn" Tag="X" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[20], ElementName=Host}"/></Button>
+                                <Button Grid.Column="3" Classes="KeyBtn" Tag="C" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[21], ElementName=Host}"/></Button>
+                                <Button Grid.Column="4" Classes="KeyBtn" Tag="V" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[22], ElementName=Host}"/></Button>
+                                <Button Grid.Column="5" Classes="KeyBtn" Tag="B" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[23], ElementName=Host}"/></Button>
+                                <Button Grid.Column="6" Classes="KeyBtn" Tag="N" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[24], ElementName=Host}"/></Button>
+                                <Button Grid.Column="7" Classes="KeyBtn" Tag="M" Click="OnKeyPress"><TextBlock Classes="KeyCap" Text="{Binding Keys[25], ElementName=Host}"/></Button>
+                            </Grid>
+                            <Grid Height="86" ColumnDefinitions="1.3*,1.3*,3*,2*">
+                                <Button Grid.Column="0" Classes="KeyBtn ModKey" Click="OnToggleKeyboardMode">
+                                    <TextBlock Text="{Binding ModeLabel, ElementName=Host}" Foreground="{StaticResource TextMuted}"
+                                               FontSize="{StaticResource FontCaption}" FontWeight="Bold" FontFamily="Space Grotesk"/>
+                                </Button>
+                                <Button Grid.Column="1" Classes="KeyBtn ModKey" Click="OnKeyClear">
+                                    <TextBlock Text="CANCELLA" Foreground="{StaticResource TextMuted}"
+                                               FontSize="{StaticResource FontCaption}" FontWeight="Bold" FontFamily="Space Grotesk"/>
+                                </Button>
+                                <Button Grid.Column="2" Classes="KeyBtn ModKey" Click="OnKeySpace">
+                                    <TextBlock Text="spazio" Foreground="{StaticResource TextMuted}"
+                                               FontSize="{StaticResource FontCaption}" FontFamily="Space Grotesk"/>
+                                </Button>
+                                <!-- Bottom-right of the keyboard, same corner "FATTO" closes the
+                                     naming keyboard from elsewhere in the app - here it commits
+                                     the password instead of just dismissing the pad. -->
+                                <Button Grid.Column="3" Classes="KeyBtn" Background="#16301F" BorderBrush="#3FBF7F"
+                                        Click="OnConnectClick" IsEnabled="{Binding CanConnect, ElementName=Host}">
+                                    <TextBlock Text="{Binding ConnectButtonLabel, ElementName=Host}"
+                                               Foreground="{StaticResource TextPrimary}"
+                                               FontSize="{StaticResource FontCaption}" FontWeight="Bold" FontFamily="Space Grotesk"/>
+                                </Button>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Digits and symbols: a phone keyboard's "123" page, laid out the
+                             same 10-wide way as the letters above so nothing jumps around
+                             when the mode key is tapped. -->
+                        <StackPanel IsVisible="{Binding IsSymbolsMode, ElementName=Host}" Spacing="0">
+                            <Grid Height="86" ColumnDefinitions="*,*,*,*,*,*,*,*,*,*,1.6*">
+                                <Button Grid.Column="0" Classes="KeyBtn" Tag="1" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="1"/></Button>
+                                <Button Grid.Column="1" Classes="KeyBtn" Tag="2" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="2"/></Button>
+                                <Button Grid.Column="2" Classes="KeyBtn" Tag="3" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="3"/></Button>
+                                <Button Grid.Column="3" Classes="KeyBtn" Tag="4" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="4"/></Button>
+                                <Button Grid.Column="4" Classes="KeyBtn" Tag="5" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="5"/></Button>
+                                <Button Grid.Column="5" Classes="KeyBtn" Tag="6" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="6"/></Button>
+                                <Button Grid.Column="6" Classes="KeyBtn" Tag="7" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="7"/></Button>
+                                <Button Grid.Column="7" Classes="KeyBtn" Tag="8" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="8"/></Button>
+                                <Button Grid.Column="8" Classes="KeyBtn" Tag="9" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="9"/></Button>
+                                <Button Grid.Column="9" Classes="KeyBtn" Tag="0" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="0"/></Button>
+                                <Button Grid.Column="10" Classes="KeyBtn ModKey" Click="OnKeyBackspace">
+                                    <PathIcon Width="22" Height="22" Foreground="{StaticResource TextPrimary}"
+                                              Data="M22,3H7C6.31,3 5.77,3.35 5.41,3.88L0,12L5.41,20.11C5.77,20.64 6.31,21 7,21H22A2,2 0 0,0 24,19V5A2,2 0 0,0 22,3M19,15.59L17.59,17L14,13.41L10.41,17L9,15.59L12.59,12L9,8.41L10.41,7L14,10.59L17.59,7L19,8.41L15.41,12"/>
+                                </Button>
+                            </Grid>
+                            <Grid Height="86" ColumnDefinitions="*,*,*,*,*,*,*,*,*,*,1.6*">
+                                <Button Grid.Column="0" Classes="KeyBtn" Tag="-" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="-"/></Button>
+                                <Button Grid.Column="1" Classes="KeyBtn" Tag="_" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="_"/></Button>
+                                <Button Grid.Column="2" Classes="KeyBtn" Tag="=" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="="/></Button>
+                                <Button Grid.Column="3" Classes="KeyBtn" Tag="+" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="+"/></Button>
+                                <Button Grid.Column="4" Classes="KeyBtn" Tag="." Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="."/></Button>
+                                <Button Grid.Column="5" Classes="KeyBtn" Tag="," Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text=","/></Button>
+                                <Button Grid.Column="6" Classes="KeyBtn" Tag=":" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text=":"/></Button>
+                                <Button Grid.Column="7" Classes="KeyBtn" Tag=";" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text=";"/></Button>
+                                <Button Grid.Column="8" Classes="KeyBtn" Tag="'" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="'"/></Button>
+                                <Button Grid.Column="9" Classes="KeyBtn" Tag="&quot;" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="&quot;"/></Button>
+                            </Grid>
+                            <Grid Height="86" ColumnDefinitions="*,*,*,*,*,*,*,*,*,*,1.6*">
+                                <Button Grid.Column="0" Classes="KeyBtn" Tag="!" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="!"/></Button>
+                                <Button Grid.Column="1" Classes="KeyBtn" Tag="@" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="@"/></Button>
+                                <Button Grid.Column="2" Classes="KeyBtn" Tag="#" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="#"/></Button>
+                                <Button Grid.Column="3" Classes="KeyBtn" Tag="$" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="$"/></Button>
+                                <Button Grid.Column="4" Classes="KeyBtn" Tag="%" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="%"/></Button>
+                                <Button Grid.Column="5" Classes="KeyBtn" Tag="&amp;" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="&amp;"/></Button>
+                                <Button Grid.Column="6" Classes="KeyBtn" Tag="*" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="*"/></Button>
+                                <Button Grid.Column="7" Classes="KeyBtn" Tag="?" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="?"/></Button>
+                                <Button Grid.Column="8" Classes="KeyBtn" Tag="/" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="/"/></Button>
+                                <Button Grid.Column="9" Classes="KeyBtn" Tag="\" Click="OnSymbolPress"><TextBlock Classes="KeyCap" Text="\"/></Button>
+                            </Grid>
+                            <Grid Height="86" ColumnDefinitions="1.3*,1.3*,3*,2*">
+                                <Button Grid.Column="0" Classes="KeyBtn ModKey" Click="OnToggleKeyboardMode">
+                                    <TextBlock Text="{Binding ModeLabel, ElementName=Host}" Foreground="{StaticResource TextMuted}"
+                                               FontSize="{StaticResource FontCaption}" FontWeight="Bold" FontFamily="Space Grotesk"/>
+                                </Button>
+                                <Button Grid.Column="1" Classes="KeyBtn ModKey" Click="OnKeyClear">
+                                    <TextBlock Text="CANCELLA" Foreground="{StaticResource TextMuted}"
+                                               FontSize="{StaticResource FontCaption}" FontWeight="Bold" FontFamily="Space Grotesk"/>
+                                </Button>
+                                <Button Grid.Column="2" Classes="KeyBtn ModKey" Click="OnKeySpace">
+                                    <TextBlock Text="spazio" Foreground="{StaticResource TextMuted}"
+                                               FontSize="{StaticResource FontCaption}" FontFamily="Space Grotesk"/>
+                                </Button>
+                                <Button Grid.Column="3" Classes="KeyBtn" Background="#16301F" BorderBrush="#3FBF7F"
+                                        Click="OnConnectClick" IsEnabled="{Binding CanConnect, ElementName=Host}">
+                                    <TextBlock Text="{Binding ConnectButtonLabel, ElementName=Host}"
+                                               Foreground="{StaticResource TextPrimary}"
+                                               FontSize="{StaticResource FontCaption}" FontWeight="Bold" FontFamily="Space Grotesk"/>
+                                </Button>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+        </Border>
+    </Canvas>
+</UserControl>

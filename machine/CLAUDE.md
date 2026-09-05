@@ -71,6 +71,21 @@ See `arduino/main/SERIAL_PROTOCOL.md` for the full protocol reference.
 - **Routed events**: Pages communicate back/settings/fill/clean actions upward via Avalonia routed events; the main window subscribes and handles navigation
 - **Debug vs Release**: Debug opens a fixed-size window; Release runs fullscreen without decorations
 
+## Wi-Fi setup
+
+`Services/WifiService.cs` scans and connects to networks by shelling out to `nmcli`
+(`System.Diagnostics.Process`, arguments passed via `ArgumentList` so nothing needs
+manual shell-quoting) - that is what Raspberry Pi OS (Bookworm+) uses for networking
+out of the box, so nothing new has to be installed on the machine. `Views/Max/
+WifiSetupPage` drives it: scan, tap a network, on-screen keyboard for the password.
+
+`nmcli` does not exist on this Windows dev box. `WifiService.IsSimulated` flips on the
+first failed process launch and every call then answers from a small canned network
+list instead - the same fallback shape as "no Arduino connected simulates the pour".
+A short-enough password (or an open network) simulates "wrong password"; everything
+else simulates success. Don't chase real nmcli behavior on this box - test the actual
+flow on the Pi.
+
 ## UI Theming
 
 Cocktails have a `CocktailTheme` (Burgundy, Teal, Orange) that drives card styling. `CocktailThemeHelper` maps themes to color brushes. Global style resources are in `Styles/AppStyles.axaml`.

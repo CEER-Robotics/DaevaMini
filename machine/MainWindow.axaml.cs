@@ -311,21 +311,30 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Holds an orange tint for the whole settings area and the default idle color
+    /// Holds an orange tint for the whole settings area and the configured idle color
     /// everywhere else. Fire-and-forget on a worker thread: the tint is decoration and
     /// the UI must not wait on the serial port to change page. The firmware's "OK TINT"
     /// is left on the wire for <see cref="ArduinoSerialManager"/> to skip, which it
     /// already does for unsolicited lines.
     /// </summary>
+    /// <remarks>
+    /// <see cref="LedColorPage"/> is deliberately left out of the settings list: it
+    /// previews its own color live while open (so staff can see the change on the
+    /// actual strip), and forcing it to orange like every other settings screen would
+    /// defeat that.
+    /// </remarks>
     private static void ApplyIdleTint(object page)
     {
+        if (page is LedColorPage) return;
+
         bool isSettings = page is SettingsDaevaMax or NumberPadPage or CocktailWorkshopPage
             or FlowRatePage or ContainerSetupPage or ContainerFillPage
-            or ContainerCleanPage or LiquidSetupPage or ChangePinPage;
+            or ContainerCleanPage or LiquidSetupPage or ChangePinPage or WifiSetupPage;
 
+        var idleRgb = AppConfigService.Instance.Config.IdleLedRgb;
         string command = isSettings
             ? ArduinoProtocolHelper.BuildTintCommand(SettingsTint)
-            : ArduinoProtocolHelper.TintOffCommand;
+            : ArduinoProtocolHelper.BuildTintCommand(idleRgb);
 
         Task.Run(() => ArduinoSerialManager.Instance.Send(command));
     }
@@ -377,6 +386,18 @@ public partial class MainWindow : Window
     {
         if (_pageContainer != null)
             SetPage(new ChangePinPage());
+    }
+
+    public void ShowLedColorPage()
+    {
+        if (_pageContainer != null)
+            SetPage(new LedColorPage());
+    }
+
+    public void ShowWifiSetupPage()
+    {
+        if (_pageContainer != null)
+            SetPage(new WifiSetupPage());
     }
 
     public void ShowSettingsUnlockPage()

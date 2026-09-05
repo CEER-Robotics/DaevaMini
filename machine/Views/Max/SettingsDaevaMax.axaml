@@ -64,14 +64,35 @@
                    FontSize="{StaticResource FontSection}" FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="4"
                    HorizontalAlignment="Center" TextAlignment="Center"/>
 
-        <Border Canvas.Left="260" Canvas.Top="110" Width="1400" Height="880" CornerRadius="32"
+        <Border Canvas.Left="260" Canvas.Top="110" Width="1400" Height="946" CornerRadius="32"
                 Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1">
             <!-- Two columns rather than one stack: six full-width rows overflowed the
                  panel. Every tile is itself the button - the old APRI / AVVIA pills put
                  a small second target inside a row that was already the thing to press. -->
-            <Grid Margin="60,50" ColumnDefinitions="*,24,*" RowDefinitions="150,24,150,24,150,24,150"
+            <!-- Tiles are ordered by importance, not by category: connectivity first
+                 (nothing else - the backend sync, the cocktail menu, anyone remoting in -
+                 works without it), then the day-to-day operational screens, then the
+                 occasional calibration/security ones, with the purely cosmetic one last. -->
+            <Grid Margin="60,50" ColumnDefinitions="*,24,*" RowDefinitions="150,24,150,24,150,24,150,24,150"
                   VerticalAlignment="Center">
-                <Button Grid.Row="0" Grid.Column="0" Classes="SettingsTile" Click="OnCocktailsClick">
+                <Button Grid.Row="0" Grid.Column="0" Classes="SettingsTile" Click="OnWifiClick">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
+                        <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
+                            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                                      Data="M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Spacing="4">
+                            <TextBlock Text="Wi-Fi" Foreground="{StaticResource TextPrimary}"
+                                       FontSize="{StaticResource FontTitle}"
+                                       FontFamily="Space Grotesk" FontWeight="Medium"/>
+                            <TextBlock Text="Collega la macchina a una rete" Foreground="{StaticResource TextMuted}"
+                                       FontSize="{StaticResource FontCaption}"
+                                       FontFamily="Space Grotesk"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Button>
+
+                <Button Grid.Row="0" Grid.Column="2" Classes="SettingsTile" Click="OnCocktailsClick">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
                         <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
                             <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
@@ -88,7 +109,7 @@
                     </StackPanel>
                 </Button>
 
-                <Button Grid.Row="0" Grid.Column="2" Classes="SettingsTile" Click="OnLiquidsClick">
+                <Button Grid.Row="2" Grid.Column="0" Classes="SettingsTile" Click="OnLiquidsClick">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
                         <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
                             <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
@@ -105,7 +126,7 @@
                     </StackPanel>
                 </Button>
 
-                <Button Grid.Row="2" Grid.Column="0" Classes="SettingsTile" Click="OnFillingClick">
+                <Button Grid.Row="2" Grid.Column="2" Classes="SettingsTile" Click="OnFillingClick">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
                         <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
                             <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
@@ -122,7 +143,7 @@
                     </StackPanel>
                 </Button>
 
-                <Button Grid.Row="2" Grid.Column="2" Classes="SettingsTile" Click="OnCleaningClick">
+                <Button Grid.Row="4" Grid.Column="0" Classes="SettingsTile" Click="OnCleaningClick">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
                         <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
                             <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
@@ -139,7 +160,7 @@
                     </StackPanel>
                 </Button>
 
-                <Button Grid.Row="4" Grid.Column="0" Classes="SettingsTile" Click="OnFlowRateClick">
+                <Button Grid.Row="6" Grid.Column="0" Classes="SettingsTile" Click="OnFlowRateClick">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
                         <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
                             <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
@@ -156,7 +177,7 @@
                     </StackPanel>
                 </Button>
 
-                <Button Grid.Row="6" Grid.Column="0" Classes="SettingsTile" Click="OnChangePinClick">
+                <Button Grid.Row="6" Grid.Column="2" Classes="SettingsTile" Click="OnChangePinClick">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
                         <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
                             <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
@@ -167,6 +188,23 @@
                                        FontSize="{StaticResource FontTitle}"
                                        FontFamily="Space Grotesk" FontWeight="Medium"/>
                             <TextBlock Text="Cambia il codice delle impostazioni" Foreground="{StaticResource TextMuted}"
+                                       FontSize="{StaticResource FontCaption}"
+                                       FontFamily="Space Grotesk"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Button>
+
+                <Button Grid.Row="8" Grid.Column="0" Classes="SettingsTile" Click="OnLedColorClick">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="24">
+                        <Border Width="60" Height="60" CornerRadius="30" Background="#15FFFFFF">
+                            <PathIcon Width="24" Height="24" Foreground="{StaticResource TextPrimary}"
+                                      Data="M12,2C6.5,2 2,6.5 2,12A10,10 0 0,0 12,22C12.6,22 13,21.6 13,21C13,20.7 12.9,20.5 12.7,20.3C12.5,20.1 12.4,19.9 12.4,19.6C12.4,19 12.9,18.5 13.5,18.5H15.5C18.6,18.5 21,16.1 21,13C21,7.5 16.5,2 12,2M7,10A1.5,1.5 0 0,1 5.5,8.5A1.5,1.5 0 0,1 7,7A1.5,1.5 0 0,1 8.5,8.5A1.5,1.5 0 0,1 7,10M11,7A1.5,1.5 0 0,1 9.5,5.5A1.5,1.5 0 0,1 11,4A1.5,1.5 0 0,1 12.5,5.5A1.5,1.5 0 0,1 11,7M15,7A1.5,1.5 0 0,1 13.5,5.5A1.5,1.5 0 0,1 15,4A1.5,1.5 0 0,1 16.5,5.5A1.5,1.5 0 0,1 15,7M17,10A1.5,1.5 0 0,1 15.5,8.5A1.5,1.5 0 0,1 17,7A1.5,1.5 0 0,1 18.5,8.5A1.5,1.5 0 0,1 17,10Z"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Spacing="4">
+                            <TextBlock Text="Colore default" Foreground="{StaticResource TextPrimary}"
+                                       FontSize="{StaticResource FontTitle}"
+                                       FontFamily="Space Grotesk" FontWeight="Medium"/>
+                            <TextBlock Text="Luci delle strisce a riposo" Foreground="{StaticResource TextMuted}"
                                        FontSize="{StaticResource FontCaption}"
                                        FontFamily="Space Grotesk"/>
                         </StackPanel>

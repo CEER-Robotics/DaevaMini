@@ -67,6 +67,18 @@ public partial class SettingsDaevaMax : UserControl
             mainWindow.ShowFlowRatePage();
     }
 
+    private void OnLedColorClick(object? sender, RoutedEventArgs e)
+    {
+        if (VisualRoot is MainWindow mainWindow)
+            mainWindow.ShowLedColorPage();
+    }
+
+    private void OnWifiClick(object? sender, RoutedEventArgs e)
+    {
+        if (VisualRoot is MainWindow mainWindow)
+            mainWindow.ShowWifiSetupPage();
+    }
+
     private void OnEventModeToggle(object? sender, RoutedEventArgs e)
     {
         bool large = AppConfigService.Instance.Config.IsLargeEvent;
