@@ -17,7 +17,21 @@ public enum WarningLevel
     Critical
 }
 
-public sealed record MachineWarning(WarningLevel Level, string Title, string Detail)
+/// <summary>What kind of problem this is, so a listener can take only the ones it wants.</summary>
+public enum MachineWarningKind
+{
+    /// <summary>A container running low or already empty.</summary>
+    ContainerLevel,
+
+    /// <summary>An active recipe whose ingredients are on no line at all.</summary>
+    MissingLine
+}
+
+public sealed record MachineWarning(
+    WarningLevel Level,
+    string Title,
+    string Detail,
+    MachineWarningKind Kind = MachineWarningKind.ContainerLevel)
 {
     public static readonly IBrush CriticalBrush = new SolidColorBrush(Color.Parse("#E5484D"));
     public static readonly IBrush WarningBrush = new SolidColorBrush(Color.Parse("#F5C518"));
@@ -155,7 +169,8 @@ public sealed class MachineWarningService
             yield return new MachineWarning(
                 WarningLevel.Critical,
                 $"{cocktail.Name}: manca una linea",
-                $"Nessuna pompa assegnata a {string.Join(", ", missing)}. Il drink resta fuori dal menu.");
+                $"Nessuna pompa assegnata a {string.Join(", ", missing)}. Il drink resta fuori dal menu.",
+                MachineWarningKind.MissingLine);
         }
     }
 

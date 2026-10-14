@@ -89,3 +89,52 @@ flow on the Pi.
 ## UI Theming
 
 Cocktails have a `CocktailTheme` (Burgundy, Teal, Orange) that drives card styling. `CocktailThemeHelper` maps themes to color brushes. Global style resources are in `Styles/AppStyles.axaml`.
+
+## Notifications
+
+Two shapes, one service. `Services/MachineNotificationService.cs` is the only thing that
+posts; `Controls/NotificationLayer` is mounted once in `MainWindow.axaml` *beside* the
+page container (inside `RootScaler`, so it shares the 1920x1080 design space) and is the
+only thing that listens. A notification raised mid-pour therefore survives the page
+change underneath it, and no page carries its own banner.
+
+- **Push** (`NotificationStyle.Push`) — phone-style banner, slides down from the top,
+  stacks up to three, leaves after 7 s or on tap. Used for a container going low or
+  running dry.
+- **Alert** (`NotificationStyle.Alert`) — iOS "battery low" card over a dimmed page,
+  dismissed with OK, queued if one is already up. Used for faults: a pour that did not
+  happen. Posted from the failure paths of `MainWindow.DispenseAsync` and from
+  `CocktailMenu.SetTapError`.
+
+Container pushes are derived, not posted by hand: `Attach()` (called once from the
+`MainWindow` constructor) watches `MachineWarningService.WarningsChanged` and announces
+warnings of kind `ContainerLevel` that were **not** in the previous snapshot. The first
+snapshot is seeded silently - a bottle that was already empty at switch-on is the menu
+badge's job, and the push is for "this just happened". A warning that disappears clears
+its cooldown, so a refilled container that runs dry again is announced again.
+
+Every notification carries a `Key`; the same key is silent for 2 minutes, which is what
+stops a dead board from stacking one alert per attempted pour. At most two more
+faults queue behind the one on screen; past that they are dropped, because the fault
+behind the fourth identical card is the same fault.
+
+To look at both styles without emptying a bottle or unplugging the board, run with
+`--DemoNotifiche`: `Services/NotificationDemo.cs` then posts an invented notification
+every 9 s, cycling banners and faults. It is inside `#if DEBUG`, so it cannot exist in
+the build that goes on the machine.
+
+## Top-bar chrome
+
+Every control in the strip across the top of a screen - back, the menu shortcuts, the
+splash status pill, the warning badge - wears `Button.ChromeChip` / `Border.ChromeChip`
+from `Styles/AppStyles.axaml`: 56 high, 28 radius, `ChromeSurface` on `ChromeBorder`.
+The colours are tokens in `App.axaml` (`ChromeSurface`, `ChromeSurfaceHover`,
+`ChromeSurfacePressed`, `ChromeBorder`, `ChromeBorderHover`), so the whole bar moves with
+one edit. The chip style also sets the icon and caption treatment, which is why those
+chips carry a bare `<PathIcon Data=.../>` and `<TextBlock Text=.../>` with no colours of
+their own. Don't restyle a top-bar control inside a page - that is what left the splash
+on a neutral `#2D2D2D` while the menu was on the green-tinted `#161816`.
+
+Status colours are tokens too: `Ok` (#7FE0A8) and `Warning` (#F5C518) for "fine" and
+"needs attention", `Danger` (#E5484D) for broken. The splash dot used to carry its own
+green and amber.

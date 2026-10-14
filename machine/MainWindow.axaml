@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:DaevaMini.Controls"
         mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
         x:Class="DaevaMini.MainWindow"
         Title="DaevaMini"
@@ -12,6 +13,13 @@
          sets Stretch=None, making this a no-op; in DEBUG it shrinks the preview to fit
          a smaller dev screen without touching a single design coordinate. -->
     <Viewbox x:Name="RootScaler" Stretch="Uniform">
-        <ContentControl Name="PageContainer" Width="1920" Height="1080"/>
+        <!-- The notification layer is a sibling of the pages, not part of them: it has to
+             survive a page change, because a container running dry mid-pour must still be
+             announced once the pour screen has gone. Inside the scaler so it is measured
+             in the same design coordinates as everything else. -->
+        <Panel Width="1920" Height="1080">
+            <ContentControl Name="PageContainer" Width="1920" Height="1080"/>
+            <controls:NotificationLayer Name="Notifications"/>
+        </Panel>
     </Viewbox>
 </Window>

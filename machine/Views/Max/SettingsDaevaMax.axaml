@@ -51,7 +51,7 @@
             </RadialGradientBrush>
         </Canvas.Background>
 
-        <Button Canvas.Left="60" Canvas.Top="40" Classes="InvisibleBtn" Click="OnBackClick" Width="220" Height="48">
+        <Button Canvas.Left="60" Canvas.Top="40" Classes="ChromeChip" Click="OnBackClick" Width="220" Height="56">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
                 <PathIcon Width="20" Height="20" Foreground="{StaticResource TextPrimary}" Margin="0,0,12,0"
                           Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>

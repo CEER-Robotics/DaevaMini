@@ -1,0 +1,205 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:DaevaMini.Controls"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+             x:Class="DaevaMini.Controls.NotificationLayer"
+             x:Name="LayerHost">
+
+    <!-- Sits over every page inside the same 1920x1080 scaler, so a notification raised
+         while a pour is running is still on screen after the page changes underneath it.
+         Nothing here has a background except the alert scrim: the layer must be invisible
+         to touch wherever it is not actually showing something. -->
+
+    <UserControl.Styles>
+        <!-- iOS banner: rounded, translucent, floating clear of the top edge. -->
+        <Style Selector="Border.Toast">
+            <Setter Property="Background" Value="#F01E2420"/>
+            <Setter Property="BorderBrush" Value="#2EFFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="30"/>
+            <Setter Property="Width" Value="760"/>
+            <Setter Property="Padding" Value="20,18"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BoxShadow" Value="0 18 48 0 #80000000"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <!-- Margin rather than a transform: the banner is laid out by the
+                         stack above, so the slide and the gap it leaves for the next one
+                         are the same animation. Three small controls, so the re-measure
+                         this costs is not worth a transform plus a spacer to manage. -->
+                    <ThicknessTransition Property="Margin" Duration="0:0:0.42" Easing="CubicEaseOut"/>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.26" Easing="CubicEaseOut"/>
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <Style Selector="Border.AlertScrim">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                </Transitions>
+            </Setter>
+        </Style>
+
+        <!-- The iOS "battery low" card: small, centred, scales up as it lands. -->
+        <Style Selector="Border.AlertCard">
+            <Setter Property="Opacity" Value="0"/>
+            <Setter Property="RenderTransform" Value="scale(0.86)"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.22" Easing="CubicEaseOut"/>
+                    <TransformOperationsTransition Property="RenderTransform"
+                                                   Duration="0:0:0.3"
+                                                   Easing="CubicEaseOut"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border.AlertCard.shown">
+            <Setter Property="Opacity" Value="1"/>
+            <Setter Property="RenderTransform" Value="none"/>
+        </Style>
+
+        <Style Selector="Button.AlertOkBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.AlertOkBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#14FFFFFF"/>
+        </Style>
+        <Style Selector="Button.AlertOkBtn:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#24FFFFFF"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Panel>
+        <!-- Push banners -->
+        <ItemsControl Name="ToastHost"
+                      ItemsSource="{Binding Toasts, ElementName=LayerHost}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Top"
+                      Margin="0,28,0,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="controls:ToastItem">
+                    <Border Classes="Toast"
+                            Margin="{Binding Offset}"
+                            Opacity="{Binding Opacity}"
+                            PointerPressed="OnToastPressed"
+                            Tag="{Binding}">
+                        <Grid ColumnDefinitions="56,20,*,Auto">
+                            <Border Grid.Column="0"
+                                    Width="56"
+                                    Height="56"
+                                    CornerRadius="16"
+                                    Background="{Binding Accent}"
+                                    VerticalAlignment="Top">
+                                <PathIcon Width="28"
+                                          Height="28"
+                                          Data="{Binding IconData}"
+                                          Foreground="#131818"/>
+                            </Border>
+
+                            <StackPanel Grid.Column="2" Spacing="4" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Title}"
+                                           Foreground="{StaticResource TextPrimary}"
+                                           FontFamily="Space Grotesk"
+                                           FontWeight="SemiBold"
+                                           FontSize="{StaticResource FontLabel}"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding Message}"
+                                           Foreground="{StaticResource TextMuted}"
+                                           FontFamily="Space Grotesk"
+                                           FontSize="{StaticResource FontBody}"
+                                           TextWrapping="Wrap"
+                                           MaxLines="2"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+
+                            <TextBlock Grid.Column="3"
+                                       Text="ora"
+                                       Margin="16,0,0,0"
+                                       VerticalAlignment="Top"
+                                       Foreground="{StaticResource TextMuted}"
+                                       FontFamily="Space Grotesk"
+                                       FontSize="{StaticResource FontCaption}"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- Fault alert. The scrim is what makes this modal: a fault is not something to
+             carry on pouring over, so the page underneath stops taking taps until it is
+             acknowledged. -->
+        <Border Name="AlertScrim"
+                Classes="AlertScrim"
+                Background="#A6000000"
+                IsVisible="False"
+                Opacity="0">
+            <Border Name="AlertCard"
+                    Classes="AlertCard"
+                    Width="600"
+                    CornerRadius="42"
+                    Background="#F5212522"
+                    BorderBrush="#2EFFFFFF"
+                    BorderThickness="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 30 90 0 #B3000000">
+                <StackPanel>
+                    <StackPanel Margin="48,52,48,40" Spacing="22">
+                        <Border Width="104"
+                                Height="104"
+                                CornerRadius="52"
+                                Background="#1FE5484D"
+                                BorderBrush="#4DE5484D"
+                                BorderThickness="2"
+                                HorizontalAlignment="Center">
+                            <PathIcon Name="AlertIcon"
+                                      Width="48"
+                                      Height="48"
+                                      Foreground="{StaticResource Danger}"/>
+                        </Border>
+
+                        <TextBlock Name="AlertTitle"
+                                   Foreground="{StaticResource TextPrimary}"
+                                   FontFamily="Space Grotesk"
+                                   FontWeight="SemiBold"
+                                   FontSize="{StaticResource FontSection}"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"/>
+
+                        <TextBlock Name="AlertMessage"
+                                   Foreground="{StaticResource TextMuted}"
+                                   FontFamily="Space Grotesk"
+                                   FontSize="{StaticResource FontLabel}"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   LineHeight="30"/>
+                    </StackPanel>
+
+                    <!-- Hairline then one full-width action, the way iOS closes a
+                         single-button alert. -->
+                    <Border Height="1" Background="#26FFFFFF"/>
+                    <Button Classes="AlertOkBtn"
+                            Height="78"
+                            HorizontalAlignment="Stretch"
+                            CornerRadius="0,0,42,42"
+                            Click="OnAlertOkClick">
+                        <TextBlock Text="OK"
+                                   Foreground="{StaticResource Accent}"
+                                   FontFamily="Space Grotesk"
+                                   FontWeight="SemiBold"
+                                   FontSize="{StaticResource FontTitle}"
+                                   LetterSpacing="2"/>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Panel>
+</UserControl>

@@ -18,8 +18,21 @@ public partial class ContainerFillPage : UserControl
     /// <summary>Channels above this are the pressurised kegs, not the bottle pumps.</summary>
     private const int PumpChannels = 10;
 
-    public ContainerFillPage()
+    /// <summary>
+    /// Where the back arrow goes. The page is reached both from the settings grid and
+    /// from the shortcut on the menu, and sending the second one back to the settings
+    /// grid would hand the PIN-protected pages to whoever tapped the shortcut.
+    /// </summary>
+    private readonly bool _returnToMenu;
+
+    /// <summary>Parameterless so the XAML runtime loader and the previewer can build it.</summary>
+    public ContainerFillPage() : this(false)
     {
+    }
+
+    public ContainerFillPage(bool returnToMenu)
+    {
+        _returnToMenu = returnToMenu;
         InitializeComponent();
         // Index is channel - 1: ten pumps, then the four pressurised kegs on P11-P14.
         _bottles =
@@ -79,7 +92,11 @@ public partial class ContainerFillPage : UserControl
 
     private void OnBackArrow(object? sender, RoutedEventArgs e)
     {
-        if (VisualRoot is MainWindow mainWindow)
+        if (VisualRoot is not MainWindow mainWindow) return;
+
+        if (_returnToMenu)
+            mainWindow.ShowCocktailsMenu();
+        else
             mainWindow.ShowSettingsPage();
     }
 

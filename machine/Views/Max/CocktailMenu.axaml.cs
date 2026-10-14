@@ -292,6 +292,18 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsWarningPanelOpen)));
     }
 
+    /// <summary>
+    /// Straight into the refill page, no PIN. Swapping a container is a thing the bar
+    /// does with guests waiting, and the PIN exists to keep recipes and calibration out
+    /// of reach, not the bottles. The page is told to come back here rather than to the
+    /// settings grid, so this shortcut cannot be used as a way around the lock.
+    /// </summary>
+    private void OnQuickContainersClick(object? sender, RoutedEventArgs e)
+    {
+        if (VisualRoot is MainWindow mainWindow)
+            mainWindow.ShowContainerFillPage(returnToMenu: true);
+    }
+
     private void OnWarningPanelClose(object? sender, RoutedEventArgs e)
     {
         _isWarningPanelOpen = false;
@@ -430,7 +442,13 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
     }
 
     private void SetTapError()
-        => Console.WriteLine("[CocktailMenu] The board refused to open the tap");
+    {
+        Console.WriteLine("[CocktailMenu] The board refused to open the tap");
+        MachineNotificationService.Instance.PostFault(
+            "fault:tap-open",
+            "Spina non apribile",
+            "La macchina non ha aperto la spina. Controlla che il fusto sia collegato e attivo.");
+    }
 
     private void NotifyTap()
         => Notify(nameof(IsTapOverlayOpen), nameof(TapTitle), nameof(TapImage),

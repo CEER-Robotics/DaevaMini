@@ -27,5 +27,69 @@
         <Setter Property="Foreground" Value="#000000"/>
     </Style>
     
-</Styles>
+    <!-- Top-bar chip. One material for every control in the strip across the top of a
+         screen: back, the menu shortcuts, the splash status pill, the warning badge.
+         Defined once, here, because the whole point is that they match - every page
+         styling its own is what made the bar a row of unrelated buttons. Bare template
+         so the Fluent default does not repaint it on hover. -->
+    <Style Selector="Button.ChromeChip">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <ContentPresenter Name="PART_ContentPresenter"
+                                  Background="{TemplateBinding Background}"
+                                  BorderBrush="{TemplateBinding BorderBrush}"
+                                  BorderThickness="{TemplateBinding BorderThickness}"
+                                  CornerRadius="{TemplateBinding CornerRadius}"
+                                  Content="{TemplateBinding Content}"
+                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                  Padding="{TemplateBinding Padding}"/>
+            </ControlTemplate>
+        </Setter>
+        <Setter Property="Height" Value="56"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Background" Value="{StaticResource ChromeSurface}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ChromeBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="28"/>
+    </Style>
+    <Style Selector="Button.ChromeChip:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource ChromeSurfaceHover}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ChromeBorderHover}"/>
+    </Style>
+    <Style Selector="Button.ChromeChip:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="{StaticResource ChromeSurfacePressed}"/>
+    </Style>
+    <Style Selector="Button.ChromeChip:disabled">
+        <Setter Property="Opacity" Value="0.45"/>
+    </Style>
 
+    <!-- Same chip for the things in that strip that are read-only, like the status pill. -->
+    <Style Selector="Border.ChromeChip">
+        <Setter Property="Height" Value="56"/>
+        <Setter Property="Background" Value="{StaticResource ChromeSurface}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ChromeBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="28"/>
+    </Style>
+
+    <!-- The contents of a chip: icon then caption, both quietened so the chip is a
+         background presence and the page underneath keeps the attention. -->
+    <Style Selector="Button.ChromeChip PathIcon">
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="Opacity" Value="0.85"/>
+    </Style>
+    <Style Selector="Button.ChromeChip TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="Opacity" Value="0.85"/>
+        <Setter Property="FontFamily" Value="Space Grotesk"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="FontSize" Value="{StaticResource FontBody}"/>
+        <Setter Property="LetterSpacing" Value="2"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+</Styles>

@@ -26,6 +26,17 @@
         <Color x:Key="OnAccentColorToken">#131818</Color>
         <Color x:Key="DangerColorToken">#E5484D</Color>
         <Color x:Key="WarningColorToken">#F5C518</Color>
+        <Color x:Key="OkColorToken">#7FE0A8</Color>
+
+        <!-- Top-bar chrome. Every control in the strip across the top of a screen - back,
+             the shortcuts, the status pill, the warning badge - is this one material, so
+             the bar reads as a bar and not as a row of unrelated buttons. Green-tinted
+             dark to sit in the same family as the cards (#1B1C16) and the filter bar. -->
+        <Color x:Key="ChromeSurfaceColorToken">#161816</Color>
+        <Color x:Key="ChromeSurfaceHoverColorToken">#20231F</Color>
+        <Color x:Key="ChromeSurfacePressedColorToken">#2A2E27</Color>
+        <Color x:Key="ChromeBorderColorToken">#2A2C22</Color>
+        <Color x:Key="ChromeBorderHoverColorToken">#3C4034</Color>
 
         <SolidColorBrush x:Key="TextPrimary" Color="{StaticResource TextPrimaryColorToken}"/>
         <SolidColorBrush x:Key="TextMuted" Color="{StaticResource TextMutedColorToken}"/>
@@ -33,6 +44,13 @@
         <SolidColorBrush x:Key="OnAccent" Color="{StaticResource OnAccentColorToken}"/>
         <SolidColorBrush x:Key="Danger" Color="{StaticResource DangerColorToken}"/>
         <SolidColorBrush x:Key="Warning" Color="{StaticResource WarningColorToken}"/>
+        <SolidColorBrush x:Key="Ok" Color="{StaticResource OkColorToken}"/>
+
+        <SolidColorBrush x:Key="ChromeSurface" Color="{StaticResource ChromeSurfaceColorToken}"/>
+        <SolidColorBrush x:Key="ChromeSurfaceHover" Color="{StaticResource ChromeSurfaceHoverColorToken}"/>
+        <SolidColorBrush x:Key="ChromeSurfacePressed" Color="{StaticResource ChromeSurfacePressedColorToken}"/>
+        <SolidColorBrush x:Key="ChromeBorder" Color="{StaticResource ChromeBorderColorToken}"/>
+        <SolidColorBrush x:Key="ChromeBorderHover" Color="{StaticResource ChromeBorderHoverColorToken}"/>
 
         <x:Double x:Key="FontCaption">14</x:Double>
         <x:Double x:Key="FontBody">17</x:Double>

@@ -44,6 +44,17 @@ public partial class MainWindow : Window
         ExtendClientAreaToDecorationsHint = true;
 #endif
         _pageContainer = this.FindControl<ContentControl>("PageContainer");
+
+        // Starts the container-running-out stream. Done here rather than in the menu so
+        // a bottle emptying is announced wherever the machine happens to be.
+        MachineNotificationService.Instance.Attach();
+
+#if DEBUG
+        // --DemoNotifiche: a loop of invented notifications, for looking at the two
+        // styles without emptying a bottle or unplugging the board.
+        NotificationDemo.StartIfRequested();
+#endif
+
         ShowSplash();
     }
 
@@ -194,6 +205,11 @@ public partial class MainWindow : Window
             {
                 reason = "no-ingredients"
             });
+
+            MachineNotificationService.Instance.PostFault(
+                "fault:no-ingredients",
+                "Ricetta incompleta",
+                $"{cocktail.Title} non ha dosi impostate, quindi la macchina non sa cosa versare. Controlla la ricetta nelle impostazioni.");
             return false;
         }
 
@@ -212,6 +228,11 @@ public partial class MainWindow : Window
                 {
                     reason = "no-channel-mapping"
                 });
+
+                MachineNotificationService.Instance.PostFault(
+                    "fault:no-channel-mapping",
+                    "Liquidi non collegati",
+                    $"Nessuna linea porta gli ingredienti di {cocktail.Title}. Assegna i liquidi dalle impostazioni.");
                 return false;
             }
 
@@ -241,6 +262,11 @@ public partial class MainWindow : Window
                 {
                     reason = "arduino-not-connected"
                 });
+
+                MachineNotificationService.Instance.PostFault(
+                    "fault:arduino-not-connected",
+                    "Macchina non collegata",
+                    "La scheda non risponde sulla porta seriale. Controlla il cavo e riavvia la macchina.");
                 return false;
 #endif
                 return true;
@@ -253,6 +279,11 @@ public partial class MainWindow : Window
                 {
                     reason = "send-failed"
                 });
+
+                MachineNotificationService.Instance.PostFault(
+                    "fault:send-failed",
+                    "Comando non inviato",
+                    "La macchina non ha confermato il comando di erogazione. Il drink non e stato versato.");
                 return false;
             }
 
@@ -270,6 +301,11 @@ public partial class MainWindow : Window
                     reason = "arduino-response",
                     response = response.ToString()
                 });
+
+                MachineNotificationService.Instance.PostFault(
+                    "fault:arduino-response",
+                    "Erogazione rifiutata",
+                    "La macchina era occupata o in errore e non ha accettato il comando. Riprova tra qualche secondo.");
                 return false;
             }
 
@@ -286,6 +322,11 @@ public partial class MainWindow : Window
                 reason = "exception",
                 ex.Message
             });
+
+            MachineNotificationService.Instance.PostFault(
+                "fault:exception",
+                "Guasto durante l'erogazione",
+                $"La macchina si e fermata: {ex.Message}");
         }
         finally
         {
@@ -421,11 +462,15 @@ public partial class MainWindow : Window
         }
     }
 
-    public void ShowContainerFillPage()
+    /// <summary>
+    /// <param name="returnToMenu">True when opened from the shortcut on the cocktail
+    /// menu, so its back arrow goes back to the menu and not into settings.</param>
+    /// </summary>
+    public void ShowContainerFillPage(bool returnToMenu = false)
     {
         if (_pageContainer != null)
         {
-            SetPage(new ContainerFillPage());
+            SetPage(new ContainerFillPage(returnToMenu));
         }
     }
 

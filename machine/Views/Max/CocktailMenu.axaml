@@ -446,18 +446,16 @@
         </Canvas.Background>
 
         <Button Name="BackButton"
-                Classes="InvisibleBtn"
-                Canvas.Left="48"
-                Canvas.Top="42"
-                Width="52"
-                Height="52">
-            <PathIcon Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"
-                      Foreground="{StaticResource TextPrimary}"
-                      Opacity="0.8"
-                      Width="34"
-                      Height="34"
-                      HorizontalAlignment="Center"
-                      VerticalAlignment="Center"/>
+                Classes="ChromeChip"
+                Canvas.Left="60"
+                Canvas.Top="40"
+                Width="220"
+                Height="56">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
+                <PathIcon Width="20" Height="20" Margin="0,0,12,0"
+                          Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                <TextBlock Text="INDIETRO"/>
+            </StackPanel>
         </Button>
 
         <Image Canvas.Left="860"
@@ -472,12 +470,11 @@
         </Image>
 
         <Button Name="WarningButton"
-                Classes="InvisibleBtn WarningBadge"
-                Canvas.Left="1790"
-                Canvas.Top="42"
-                Width="52"
-                Height="52"
-                Cursor="Hand"
+                Classes="ChromeChip WarningBadge"
+                Canvas.Left="1804"
+                Canvas.Top="40"
+                Width="56"
+                Height="56"
                 IsVisible="{Binding HasWarnings, ElementName=MenuHost}"
                 Click="OnWarningClick">
             <Ellipse Width="16"
@@ -487,13 +484,31 @@
                      VerticalAlignment="Center"/>
         </Button>
 
+        <!-- Right of the logo, clear of the warning badge: one tap from the menu into
+             "cambio contenitori", because during service a bottle runs out mid-queue and
+             walking the PIN and the settings grid for it costs the bar a minute. Kept
+             quiet - the shared top-bar chip - so it does not read as a guest control. -->
+        <Button Name="QuickContainersButton"
+                Classes="ChromeChip"
+                Canvas.Left="1524"
+                Canvas.Top="40"
+                Width="260"
+                Height="56"
+                Click="OnQuickContainersClick">
+            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                <PathIcon Width="20" Height="20"
+                          Data="M16,10H14V17H11L15,21L19,17H16V10M8,14H10V7H13L9,3L5,7H8V14Z"/>
+                <TextBlock Text="CONTENITORI"/>
+            </StackPanel>
+        </Button>
+
         <Border Canvas.Left="660"
                 Canvas.Top="120"
                 Width="600"
                 Height="56"
-                Background="#161816"
+                Background="{StaticResource ChromeSurface}"
                 CornerRadius="28"
-                BorderBrush="#2A2C22"
+                BorderBrush="{StaticResource ChromeBorder}"
                 BorderThickness="1"
                 Padding="4">
             <ItemsControl ItemsSource="{Binding Filters, ElementName=MenuHost}">

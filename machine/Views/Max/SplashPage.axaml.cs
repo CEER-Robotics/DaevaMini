@@ -58,7 +58,9 @@ public partial class SplashPage : UserControl
     private void UpdateStatus()
     {
         bool connected = ArduinoSerialManager.Instance.IsConnected;
-        StatusDot.Fill = new SolidColorBrush(Color.Parse(connected ? "#10B981" : "#F59E0B"));
+        // Same two colours the rest of the machine uses for "fine" and "needs attention",
+        // rather than a green and an amber that only existed on this screen.
+        StatusDot.Fill = new SolidColorBrush(Color.Parse(connected ? "#7FE0A8" : "#F5C518"));
         StatusText.Text = connected ? "PRONTA" : "NON CONNESSA";
     }
 }
