@@ -157,6 +157,77 @@ public class ArduinoSerial : IDisposable
         return false;
     }
 
+    /// <summary>
+    /// Writes one command and reads its answer without letting go of the port in between.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="Send"/> clears the input buffer before every write, so a command sent from
+    /// another thread - an idle tint on a page change, a tap keep-alive - landing between a
+    /// write and its read would discard the answer to that write. Holding the lock across the
+    /// whole exchange is what makes an acknowledgement trustworthy. Only one exchange is
+    /// attempted here: repeating is the caller's decision, so the port is never held for
+    /// several seconds and a keep-alive on another thread is not starved behind a retry.
+    /// </remarks>
+    /// <param name="isAnswer">Recognises the reply to this command. Unsolicited lines (DONE,
+    /// OK READY) are stepped over, up to <paramref name="maxLines"/> of them.</param>
+    /// <param name="answer">The reply line, or null when nothing answered in time.</param>
+    /// <returns>False when the command could not be written at all.</returns>
+    public bool Exchange(string command, int maxLines, Func<string, bool> isAnswer, out string? answer)
+    {
+        answer = null;
+
+        if (string.IsNullOrEmpty(command) || _disposed)
+            return false;
+
+        if (!EnsureConnected())
+            return false;
+
+        lock (_lockObject)
+        {
+            if (_port?.IsOpen != true)
+                return false;
+
+            try
+            {
+                _port.DiscardInBuffer();
+                _port.WriteLine(command);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ArduinoSerial] Exchange write failed: {ex.GetType().Name} - {ex.Message}");
+                return false;
+            }
+
+            for (int i = 0; i < maxLines; i++)
+            {
+                string line;
+                try
+                {
+                    line = _port.ReadLine();
+                }
+                catch (TimeoutException)
+                {
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ArduinoSerial] Exchange read failed: {ex.GetType().Name} - {ex.Message}");
+                    return true;
+                }
+
+                if (isAnswer(line))
+                {
+                    answer = line;
+                    return true;
+                }
+
+                Console.WriteLine($"[ArduinoSerial] Ignoring unsolicited line while waiting for an ack: {line.Trim()}");
+            }
+
+            return true;
+        }
+    }
+
     public string? ReadLine()
     {
         if (_disposed)

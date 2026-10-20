@@ -188,7 +188,8 @@ public partial class FlowRatePage : UserControl, INotifyPropertyChanged
             var durations = new System.Collections.Generic.Dictionary<int, int> { [line.Channel] = TestDurationMs };
             string command = ArduinoProtocolHelper.BuildActiveCommand("CYAN", durations);
 
-            if (!manager.TrySendActive(command, out ActivateResponse response) || response != ActivateResponse.Success)
+            (bool sent, ActivateResponse response) = await manager.TrySendActiveAsync(command);
+            if (!sent || response != ActivateResponse.Success)
             {
                 StatusLine.Text = $"{line.Liquid}: la macchina non ha accettato il comando. Riprova fra qualche secondo.";
                 SetStep(Step.Closed);

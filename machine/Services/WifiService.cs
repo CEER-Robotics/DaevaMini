@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -61,9 +62,74 @@ public static class WifiService
     /// connect last succeeded to, so the status line has something to report.</summary>
     private static string? _simulatedSsid;
 
+    /// <summary>
+    /// The wireless interface every command is aimed at, or null to let nmcli choose.
+    /// </summary>
+    /// <remarks>
+    /// The assembled Max has two radios: the Pi's built-in one, sealed inside the
+    /// machine's metal body, and a USB adapter whose antenna hangs outside it. The
+    /// difference is not subtle - measured on the bench, the same request to the backend
+    /// took 0.2 s over the external adapter and 10 s over the internal radio, and the
+    /// internal one can see exactly one access point where the external sees seven. Left
+    /// to itself nmcli picks whichever device it likes, so setting up a new bar's network
+    /// could silently land it on the radio that cannot reach anything.
+    ///
+    /// The external adapter is found by asking which wireless interface hangs off USB,
+    /// rather than by assuming a name: interface numbering is not guaranteed. Set
+    /// DAEVA_WIFI_INTERFACE to override. On a machine with only the built-in radio - the
+    /// Mini, or a dev box - nothing is found and nmcli is left to decide, exactly as
+    /// before.
+    /// </remarks>
+    private static string? PreferredInterface()
+    {
+        string? forced = Environment.GetEnvironmentVariable("DAEVA_WIFI_INTERFACE");
+        if (!string.IsNullOrWhiteSpace(forced))
+            return forced.Trim();
+
+        try
+        {
+            // A wireless interface is one with a "wireless" directory; a USB one resolves
+            // its device link through the USB bus. Both are Linux-only, so this simply
+            // finds nothing on the Windows dev box.
+            foreach (string netPath in Directory.EnumerateDirectories("/sys/class/net"))
+            {
+                if (!Directory.Exists(Path.Combine(netPath, "wireless")))
+                    continue;
+
+                // "device" is a symlink into the bus tree; a USB radio resolves to a path
+                // with a usb controller in it, a built-in one does not.
+                string devicePath = Path.Combine(netPath, "device");
+                string? resolved = Directory.ResolveLinkTarget(devicePath, returnFinalTarget: true)?.FullName;
+                if (resolved == null)
+                    continue;
+
+                if (resolved.Contains("usb", StringComparison.OrdinalIgnoreCase))
+                    return Path.GetFileName(netPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[WifiService] Could not work out which radio to use: {ex.Message}");
+        }
+
+        return null;
+    }
+
+    /// <summary>Appends <c>ifname &lt;dev&gt;</c> when a radio has been chosen.</summary>
+    private static string[] WithInterface(params string[] args)
+    {
+        string? device = PreferredInterface();
+        if (string.IsNullOrEmpty(device))
+            return args;
+
+        var withIfname = new List<string>(args) { "ifname", device };
+        return withIfname.ToArray();
+    }
+
     public static async Task<IReadOnlyList<WifiNetwork>> ScanAsync()
     {
-        var result = await RunAsync(Nmcli, "-t", "-f", "SSID,SIGNAL,SECURITY", "dev", "wifi", "list", "--rescan", "yes");
+        var result = await RunAsync(Nmcli, WithInterface(
+            "-t", "-f", "SSID,SIGNAL,SECURITY", "dev", "wifi", "list", "--rescan", "yes"), timeoutMs: 15000);
         if (!result.Found)
             return SimulatedNetworks;
 
@@ -94,8 +160,8 @@ public static class WifiService
     public static async Task<WifiConnectResult> ConnectAsync(string ssid, string password)
     {
         var result = string.IsNullOrEmpty(password)
-            ? await RunAsync(Nmcli, "dev", "wifi", "connect", ssid)
-            : await RunAsync(Nmcli, new[] { "dev", "wifi", "connect", ssid, "password", password }, timeoutMs: 30000);
+            ? await RunAsync(Nmcli, WithInterface("dev", "wifi", "connect", ssid), timeoutMs: 30000)
+            : await RunAsync(Nmcli, WithInterface("dev", "wifi", "connect", ssid, "password", password), timeoutMs: 30000);
 
         if (!result.Found)
         {
@@ -124,7 +190,7 @@ public static class WifiService
 
     public static async Task<WifiStatus> GetStatusAsync()
     {
-        var probe = await RunAsync(Nmcli, "-t", "-f", "active,ssid", "dev", "wifi");
+        var probe = await RunAsync(Nmcli, WithInterface("-t", "-f", "active,ssid", "dev", "wifi"), timeoutMs: 15000);
         if (!probe.Found)
         {
             return _simulatedSsid == null

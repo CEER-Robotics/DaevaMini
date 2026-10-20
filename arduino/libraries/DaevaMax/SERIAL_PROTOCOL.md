@@ -5,7 +5,11 @@ This document is the reference for anyone writing software that communicates wit
 ## 1. Connection
 
 - Arduino Due port: native USB (`SerialUSB`)
-- Teensy 4.1 port: USB (`Serial`, with USB Type set to `Serial`)
+- Teensy 4.1 port: **hardware UART `Serial1`, on pins 0 (RX1) and 1 (TX1)** — the link to the
+  Raspberry Pi's GPIO 14/15 UART. **Not USB.** The Teensy still enumerates a USB CDC device
+  when you plug it into a PC (`16c0:0483`), but the firmware neither reads from nor writes to
+  it: a serial monitor on that port stays silent for every command, which looks exactly like a
+  dead board. See `src/boards/Teensy41.h`.
 - Baud rate: `115200`
 - Data bits / parity / stop bits: `8N1`
 - Flow control: none
@@ -227,11 +231,13 @@ Possible lines emitted by firmware:
 - `ERR ACTIVE COLOR`
 - `ERR ACTIVE PARAMS`
 - `ERR TINT COLOR`
+- `ERR TAP COLOR`
 - `ERR TAP PARAMS`
 - `ERR TAP TIMEOUT`
 - `IGNORED ACTIVE`
 - `IGNORED TINT`
 - `IGNORED TAP`
+- `ERR LINE TOO LONG`
 - `DONE`
 
 `DONE` is emitted when `ACTIVE` ends and transitions to `ENDING`.
@@ -253,6 +259,10 @@ Possible lines emitted by firmware:
 - Buffer limit:
   - RX line buffer is 256 bytes including terminator.
   - Keep full command lines well under 255 characters.
+  - A longer line is discarded in full at the newline and answered with
+    `ERR LINE TOO LONG`. It is never parsed in pieces: the tail of a truncated `ACTIVE`
+    still carries pump segments, and running those on their own would pour an
+    unpredictable dose.
 
 ## 7. Host Implementation Recommendations
 

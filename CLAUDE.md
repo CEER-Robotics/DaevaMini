@@ -44,9 +44,9 @@ The host app selects the variant from a command-line arg at startup (`App.axaml.
 
 Max machines report to a remote backend. This layer is entirely in `machine/Services/` and is **not covered by `machine/CLAUDE.md`** yet.
 
-- **`LocalMachineStore`** — SQLite (`daeva-machine.db` next to the binary, WAL mode). Holds three tables: `config_documents`, `machine_events` (with an `uploaded_at_utc` upload-queue column), and `machine_sync_state`. This is the durable buffer: events are recorded locally first and survive restarts / network outages.
+- **`LocalMachineStore`** — SQLite (`daeva-machine.db` next to the binary, WAL mode). Holds four tables: `config_documents`, `machine_events` (with `uploaded_at_utc` and `upload_attempts` upload-queue columns), `machine_sync_state`, and `line_levels` (millilitres drawn per line since the bottle was last replaced). This is the durable buffer: events are recorded locally first and survive restarts / network outages. Uploaded events are pruned after 60 days.
 - **`MachineTelemetryService`** — fire-and-forget recorder. `RecordDispenseEvent`, `RecordMaintenanceEvent` (fill/clean), `RecordConfigEvent`. Every pour and maintenance action writes a row here with `completed`/`failed` status.
-- **`MachineSyncService`** — background loop (25 s). POSTs a heartbeat to `/api/machine-status` and uploads unsent pour events to `/api/machine-events`, marking them uploaded on success. Sends a final "offline" heartbeat on shutdown. Only pour events (`operation`/`dispense`/`completed`) are forwarded; other event types are marked uploaded and skipped.
+- **`MachineSyncService`** — background loop (25 s). POSTs a heartbeat to `/api/machine-status` and uploads unsent pour events to `/api/machine-events`, marking them uploaded on success. Sends a final "offline" heartbeat on shutdown (capped at 2 s, so a dead backend cannot hold up a restart). Only pour events (`operation`/`dispense`/`completed`) are forwarded; other event types are marked uploaded and skipped. The queue is uploaded oldest-first, so a rejected event is not allowed to block it: a permanent 4xx (other than 408/429) retires the row, a 5xx or network fault stops the batch and is retried next cycle, and any event is abandoned after `LocalMachineStore.MaxUploadAttempts` tries.
 - **`MachineRuntimeState`** — process-wide busy tracker. Pour/fill/clean handlers wrap their work in `using var op = MachineRuntimeState.Instance.BeginOperation("dispense")`; the heartbeat reports `GREEN`/`YELLOW` and the current operation from this.
 - **`MachineProfileHelper`** — resolves machine id / secret / backend URL from env vars (see below).
 
@@ -63,7 +63,7 @@ Key fields: `FlowRate.MillisecondsPerMilliliter` (pump calibration), `LiquidAssi
 - `DAEVA_BACKEND_URL` — backend base URL. Default: `https://demoapp-production-e677.up.railway.app`.
 - `DAEVA_MACHINE_ID` — overrides id sent to backend (defaults `daeva-max-01` / `daeva-mini-01`).
 - `DAEVA_MACHINE_SECRET` — per-machine secret; required for `/api/machine-events` and `/api/machine-status`.
-- `DAEVA_SERIAL_PORT` — force a specific serial port (e.g. `/dev/ttyAMA0` for the Pi 5 GPIO UART). Unset = auto-detect, which prefers `USB`/`ACM`/`COM` names and is unreliable on the Pi's onboard UART.
+- `DAEVA_SERIAL_PORT` — force a specific serial port (e.g. `/dev/ttyAMA0` for the Pi 5 GPIO UART). **When set it is binding**: if that port cannot be opened the app connects to nothing and says so, rather than falling back to auto-detection — guessing once left the machine talking to the console UART for hours. Unset = auto-detect, which prefers `USB`/`ACM`/`COM` names and is unreliable on the Pi's onboard UART.
 
 Those defaults are what the code falls back to, **not** what the assembled Max runs on. The deployed machine sets all four in `~/.config/daeva/daeva-max.env`: backend `https://daeva-poc.stpjkmfxnfpf0.eu-central-1.cs.amazonlightsail.com` (not Railway), `DAEVA_MACHINE_ID=MACCHINA-1` (not `daeva-max-01`), the provisioned secret, and `DAEVA_SERIAL_PORT=/dev/ttyAMA0`. Check that file before assuming which backend a pour was reported to.
 
@@ -146,21 +146,42 @@ systemctl --user start daeva-max
 
 `ACTIVE` physically runs pumps — confirm with the human first. A full cycle answers `OK ACTIVE` → `DONE` → `OK READY`; a second `ACTIVE` sent *during* the pour must answer `IGNORED ACTIVE` (this is the gate the host's retry safety depends on — leave enough time or you will accidentally test the wrong path).
 
-Pi UART config is already correct and rarely the fault (`/boot/firmware/config.txt`: `enable_uart=1`, `dtparam=uart0=on`; console on `ttyAMA10`, not `ttyAMA0`; `serial-getty@ttyAMA0` masked). Note the `rpi/` directory referenced by the deployed unit, wrapper, and `teensy_max/README.md` (`setup-uart.sh`, `setup-daeva.sh`, `deploy-machine.md`) **is not in this repo** — the Pi was provisioned by scripts that were never committed.
+**Check the Pi's UART config before anything else — it is not guaranteed to be there.** On 2026-09-08 the machine was found bound to `/dev/ttyAMA10`, the *console* UART, and had been for a 13 h uptime while reporting `Successfully connected`. The SD card had been reimaged (the previous one failed) and `/boot/firmware/config.txt` was back to the stock image: no `enable_uart=1`, no `dtparam=uart0=on`, so `/dev/ttyAMA0` never appeared. The provisioning script that sets this (`rpi/setup-uart.sh`) is not in this repo, so a reimage silently loses it.
 
-### LED strips: no level shifter is fitted
+Required state, and how to restore it:
 
-**The WS2812 data lines are driven straight from the Teensy at 3.3 V, below the 0.7 × VDD = 3.5 V threshold of a 5 V-powered WS2812.** Every `show()` is therefore a chance to latch a corrupted bit, and the symptom is scattered pixels flickering at random. Strip 2 tolerates it and strip 1 does not — consistent with different LED revisions (WS2812B-V5 enforces the threshold strictly, older WS2812B is looser). Real fix: a `74AHCT125`/`74HCT245` on both data lines, or drop strip VDD to ~4.3 V with a series diode. Series resistors and wiring are already identical on both channels, so don't re-investigate those.
+```bash
+# /boot/firmware/config.txt, under [all] — creates /dev/ttyAMA0 on GPIO 14/15
+enable_uart=1
+dtparam=uart0=on
+
+# /boot/firmware/cmdline.txt — pin the console, do NOT leave it on serial0
+sudo sed -i 's/console=serial0,115200/console=ttyAMA10,115200/' /boot/firmware/cmdline.txt
+sudo systemctl mask serial-getty@ttyAMA0.service
+sudo reboot
+```
+
+Pinning the console matters: once `uart0` is enabled, `/dev/serial0` moves from `ttyAMA10` to `ttyAMA0`, and a console left on `serial0` would put a login getty on the board's link. After the reboot expect `/dev/ttyAMA0` present, `dmesg` showing `ttyAMA0 ... is a PL011 AXI`, and the app logging `Using forced port: /dev/ttyAMA0`. If it logs `Falling back to first available port`, the UART is not configured — fix that, do not chase the symptom.
+
+Note the `rpi/` directory referenced by the deployed unit, wrapper, and `teensy_max/README.md` (`setup-uart.sh`, `setup-daeva.sh`, `deploy-machine.md`) **is not in this repo** — the Pi was provisioned by scripts that were never committed.
+
+### LED strips: data-line level shifting
+
+**A level converter has since been fitted on both data lines** (September 2026), and with it the flicker went away — which is what exposed strip 1's real length (44, not 31: the 13-LED tail had never been addressed and simply went dark once the signal was clean). `arduino/led_level_test/` parks both data pins HIGH so the converter's output can be checked with a multimeter (~5 V good, ~3.3 V passthrough, ~0 V dead); `arduino/led_count_test/` lights 80 pixels with decade markers to count a strip's physical length. The history below is why it was needed, and what to suspect if it comes back.
+
+**Before the converter, the WS2812 data lines were driven straight from the Teensy at 3.3 V, below the 0.7 × VDD = 3.5 V threshold of a 5 V-powered WS2812.** Every `show()` is therefore a chance to latch a corrupted bit, and the symptom is scattered pixels flickering at random. Strip 2 tolerates it and strip 1 does not — consistent with different LED revisions (WS2812B-V5 enforces the threshold strictly, older WS2812B is looser). The fix was a level converter on both data lines (a `74AHCT125`/`74HCT245`; dropping strip VDD to ~4.3 V with a series diode would also work). Series resistors and wiring are already identical on both channels, so don't re-investigate those.
 
 Diagnosing it: raise `Animation::kFrameWaitMs` to ~30000 temporarily. If the strip goes stable between refreshes the corruption is in *transmission* (data line); if it keeps flickering it is *power*. This is the fastest way to tell them apart.
 
 Mitigation already in firmware: `staticFill` caches the last frame and re-transmits only when the image actually changes, so WAIT sends once on entry instead of 25×/s. Any animation writing pixels directly **must** call `invalidateStaticFrame()`, or it will leave a stale cache and the next static fill will be skipped.
 
-Beware two firmware faults that mimic the electrical one: a `kStripNLen` **shorter** than the physical strip leaves the trailing LEDs unaddressed, so they hold power-on garbage and flicker (strip 1 is 31, not 30); and the margins (`kStrip1Margin`/`kStrip2Margin`) change which pixels light, never how many are transmitted.
+Beware two firmware faults that mimic the electrical one: a `kStripNLen` **shorter** than the physical strip leaves the trailing LEDs unaddressed, so they hold power-on garbage and flicker (strip 1 is 44 — it was once set to 30, then 31, both short); and the margins (`kStrip1Margin`/`kStrip2Margin`) change which pixels light, never how many are transmitted.
 
 ### Pump tester
 
-`pump-tester/index.html` uses the Web Serial API — open it in Chrome/Edge over `localhost` or `https` (not `file://`). It connects directly to the board (USB vendor `0x16c0`, PJRC/Teensy) and speaks the same protocol; use it to bench-test pumps without the host app.
+`pump-tester/index.html` uses the Web Serial API — open it in Chrome/Edge over `localhost` or `https` (not `file://`). It connects over USB (vendor `0x16c0`, PJRC/Teensy) and speaks the same protocol; use it to bench-test pumps without the host app.
+
+⚠️ **It does not work against the current Teensy firmware.** `Teensy41.h` sets `DAEVA_SERIAL` to `Serial1` (the Pi's GPIO UART), so the board reads nothing from USB CDC and answers nothing on it. Verified on the bench: the Teensy enumerates as a COM port, and `MANUTENZIONE` / `READY` sent to that port both time out with no reply. The tester is usable with the **Due** build (`SerialUSB`), or against a Teensy only if the firmware is changed to also listen on USB. Do not read the silence as a dead board — check `lsusb -d 16c0:` first, per the debugging workflow above.
 
 ## Firmware source structure
 

@@ -21,8 +21,17 @@ constexpr uint8_t kDefaultPwm = 255;
 }  // namespace Pump
 
 namespace Strips {
-// Total LED count of strip 1.
-constexpr uint16_t kStrip1Len = 31;
+// Total LED count of strip 1. Same length as strip 2, which is what you would
+// expect of two strips cut from one reel.
+//
+// Was 31, which was short by 13: that tail was never addressed. While the data
+// line was unshifted the unaddressed LEDs held power-on garbage and flickered,
+// which is easy to mistake for the electrical fault; once a level converter was
+// fitted and the signal became clean, the same 13 simply stayed dark and the
+// cause was unmistakable. If this ever looks wrong again, count from the far end
+// of the strip - an unaddressed tail and a dead LED breaking the chain produce
+// exactly the same symptom, and only one of them is fixed here.
+constexpr uint16_t kStrip1Len = 44;
 // Total LED count of strip 2.
 constexpr uint16_t kStrip2Len = 44;
 
@@ -206,7 +215,10 @@ constexpr Rgb kMaintenanceOrange = {255, 120, 0};
 
 // Named colors accepted by ACTIVE, BASE:<name> (or COLOR:<name>).
 constexpr std::array<NamedColor, 10> kPresetColors = {{
-    {"ORANGE", {120, 255, 0}},
+    // True orange. Was {120, 255, 0} - a yellow-green - to cancel out the red/green
+    // swap caused by declaring the strips NEO_GRB when they are NEO_RGB. The strip
+    // order is fixed now, so this has to be honest again or it turns green.
+    {"ORANGE", {255, 120, 0}},
     {"RED", {255, 0, 0}},
     {"GREEN", {0, 255, 0}},
     {"BLUE", {0, 0, 255}},

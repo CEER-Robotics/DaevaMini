@@ -108,7 +108,7 @@ public partial class ChangeBottle : UserControl
         string command = ArduinoProtocolHelper.BuildActiveCommand("ORANGE", channelDurations);
         Console.WriteLine($"[ChangeBottle] Sending: {command}");
 
-        bool sent = manager.Send(command);
+        (bool sent, ActivateResponse response) = await manager.TrySendActiveAsync(command);
         if (!sent)
         {
             Console.WriteLine("[ChangeBottle] Failed to send command");
@@ -120,8 +120,6 @@ public partial class ChangeBottle : UserControl
             return;
         }
 
-        string? responseLine = manager.ReadLine();
-        var response = ArduinoProtocolHelper.ParseActivateResponse(responseLine);
         Console.WriteLine($"[ChangeBottle] Response: {response}");
         if (response != ActivateResponse.Success)
         {

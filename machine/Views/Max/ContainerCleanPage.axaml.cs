@@ -134,7 +134,7 @@ public partial class ContainerCleanPage : UserControl
             channelDurations);
         Console.WriteLine($"[ContainerCleanPage] Sending: {command}");
 
-        bool sent = manager.TrySendActive(command, out ActivateResponse response);
+        (bool sent, ActivateResponse response) = await manager.TrySendActiveAsync(command);
         if (!sent)
         {
             Console.WriteLine("[ContainerCleanPage] Failed to send command");

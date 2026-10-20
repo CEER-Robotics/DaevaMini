@@ -272,7 +272,8 @@ public partial class MainWindow : Window
                 return true;
             }
 
-            if (!manager.TrySendActive(command, out ActivateResponse response))
+            (bool sent, ActivateResponse response) = await manager.TrySendActiveAsync(command);
+            if (!sent)
             {
                 Console.WriteLine("[MainWindow] Failed to send command");
                 MachineTelemetryService.Instance.RecordDispenseEvent(profileKey, "failed", cocktail, null, channelDurations, new
@@ -384,7 +385,7 @@ public partial class MainWindow : Window
     /// Opens the tap for a drink and hands back the live session, or null when it
     /// cannot start. The caller owns the session and must dispose it to close.
     /// </summary>
-    private static TapSession? OpenTap(Cocktail cocktail)
+    private static async Task<TapSession?> OpenTap(Cocktail cocktail)
     {
         var config = AppConfigService.Instance.Config;
         var channels = ArduinoProtocolHelper.MapIngredientsToChannels(
@@ -393,7 +394,7 @@ public partial class MainWindow : Window
         // A tap drink is one ingredient on one line; the dose in the config is only
         // there to describe the drink, since the guest decides how much to draw.
         foreach (int channel in channels.Keys)
-            return TapSession.TryOpen(cocktail, channel);
+            return await TapSession.TryOpenAsync(cocktail, channel);
 
         Console.WriteLine($"[MainWindow] No channel mapped for tap drink {cocktail.Title}");
         return null;

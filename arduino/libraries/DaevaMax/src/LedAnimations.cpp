@@ -9,12 +9,19 @@
 
 namespace {
 
+// NEO_RGB, not NEO_GRB: these strips take the red byte first. Declared GRB they
+// swapped red and green - asking for green on the settings colour wheel lit the
+// strips red and vice versa. The giveaway was in the preset table, where ORANGE
+// was written {120, 255, 0}: that is a yellow-green in honest RGB, and only reads
+// as orange if something downstream is swapping the first two bytes. Somebody had
+// compensated that one preset instead of fixing the order, so every other colour
+// stayed wrong. ORANGE has been put back to a true {255, 120, 0} to match.
 Adafruit_NeoPixel strip1(ProjectConfig::Strips::kStrip1Len,
                          BoardConfig::Strips::kStrip1Pin,
-                         NEO_GRB + NEO_KHZ800);
+                         NEO_RGB + NEO_KHZ800);
 Adafruit_NeoPixel strip2(ProjectConfig::Strips::kStrip2Len,
                          BoardConfig::Strips::kStrip2Pin,
-                         NEO_GRB + NEO_KHZ800);
+                         NEO_RGB + NEO_KHZ800);
 
 // The visible span of a strip. Pixels outside it are hidden by the chassis, so
 // no animation may light them: every effect addresses a window, never the raw

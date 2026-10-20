@@ -113,6 +113,7 @@ public sealed class LocalMachineStore
             command.ExecuteNonQuery();
 
             EnsureColumnExists(connection, "machine_events", "uploaded_at_utc", "TEXT NULL");
+            EnsureColumnExists(connection, "machine_events", "upload_attempts", "INTEGER NOT NULL DEFAULT 0");
             _initialized = true;
         }
     }
@@ -397,6 +398,13 @@ public sealed class LocalMachineStore
         command.ExecuteNonQuery();
     }
 
+    /// <summary>
+    /// How many times one event may fail to upload before the queue gives up on it. Without
+    /// a ceiling a single event the backend will never accept blocks every event behind it
+    /// for good, because the queue is uploaded oldest-first.
+    /// </summary>
+    public const int MaxUploadAttempts = 10;
+
     public IReadOnlyList<PendingMachineEventRecord> GetPendingEvents(string profileKey, int limit = 100)
     {
         Initialize();
@@ -422,11 +430,13 @@ public sealed class LocalMachineStore
             FROM machine_events
             WHERE profile_key = $profile_key
               AND uploaded_at_utc IS NULL
+              AND upload_attempts < $max_attempts
             ORDER BY occurred_at_utc, id
             LIMIT $limit;
             """;
         command.Parameters.AddWithValue("$profile_key", profileKey);
         command.Parameters.AddWithValue("$limit", limit);
+        command.Parameters.AddWithValue("$max_attempts", MaxUploadAttempts);
 
         using var reader = command.ExecuteReader();
         var events = new List<PendingMachineEventRecord>();
@@ -479,6 +489,49 @@ public sealed class LocalMachineStore
         }
 
         transaction.Commit();
+    }
+
+    /// <summary>
+    /// Counts one failed upload attempt for an event, so a row the backend keeps refusing
+    /// eventually drops out of <see cref="GetPendingEvents"/> instead of holding up the
+    /// whole queue behind it.
+    /// </summary>
+    public void RecordUploadFailure(long id)
+    {
+        Initialize();
+
+        using var connection = OpenConnection();
+        using var command = connection.CreateCommand();
+        command.CommandText =
+            """
+            UPDATE machine_events
+            SET upload_attempts = upload_attempts + 1
+            WHERE id = $id;
+            """;
+        command.Parameters.AddWithValue("$id", id);
+        command.ExecuteNonQuery();
+    }
+
+    /// <summary>
+    /// Deletes events that have already been uploaded and are older than
+    /// <paramref name="retention"/>. The queue is on the Pi's SD card and nothing else
+    /// ever removed a row, so without this the table grows for the life of the machine.
+    /// </summary>
+    /// <returns>How many rows were removed.</returns>
+    public int PruneUploadedEvents(TimeSpan retention)
+    {
+        Initialize();
+
+        using var connection = OpenConnection();
+        using var command = connection.CreateCommand();
+        command.CommandText =
+            """
+            DELETE FROM machine_events
+            WHERE uploaded_at_utc IS NOT NULL
+              AND occurred_at_utc < $cutoff;
+            """;
+        command.Parameters.AddWithValue("$cutoff", DateTime.UtcNow.Subtract(retention).ToString("O"));
+        return command.ExecuteNonQuery();
     }
 
     private static void EnsureColumnExists(SqliteConnection connection, string tableName, string columnName, string definition)

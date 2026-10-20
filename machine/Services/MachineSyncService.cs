@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -12,6 +13,9 @@ namespace DaevaMini.Services;
 public sealed class MachineSyncService : IDisposable
 {
     private static readonly TimeSpan DefaultPollInterval = TimeSpan.FromSeconds(25);
+
+    /// <summary>How long the final "offline" heartbeat may hold up shutdown.</summary>
+    private static readonly TimeSpan ShutdownHeartbeatTimeout = TimeSpan.FromSeconds(2);
 
     private readonly HttpClient _httpClient;
     private CancellationTokenSource? _cancellationTokenSource;
@@ -106,9 +110,13 @@ public sealed class MachineSyncService : IDisposable
                 appliedConfigVersion = syncState.AppliedRemoteConfigVersion
             };
 
+            // Shutdown waits on this, so it gets a much shorter leash than the poll loop:
+            // the machine's screen is already going away and a backend that is not
+            // answering must not hold the restart open for the client's full timeout.
+            using var timeout = new CancellationTokenSource(ShutdownHeartbeatTimeout);
             using HttpRequestMessage request = CreateJsonRequest(HttpMethod.Post, "/api/machine-status", payload);
             using HttpResponseMessage response = _httpClient
-                .SendAsync(request)
+                .SendAsync(request, timeout.Token)
                 .GetAwaiter()
                 .GetResult();
 
@@ -142,6 +150,7 @@ public sealed class MachineSyncService : IDisposable
                 LocalMachineStore.Instance.UpdateHeartbeat(_profileKey);
 
                 await UploadPendingEventsAsync(_profileKey, _machineId, cancellationToken);
+                PruneIfDue();
             }
             catch (OperationCanceledException)
             {
@@ -163,6 +172,34 @@ public sealed class MachineSyncService : IDisposable
             {
                 break;
             }
+        }
+    }
+
+    /// <summary>
+    /// Events that have been reported are kept for a while for looking things up on the
+    /// machine, then removed. The pour queue lives on the Pi's SD card and nothing else
+    /// deletes from it.
+    /// </summary>
+    private static readonly TimeSpan EventRetention = TimeSpan.FromDays(60);
+    private static readonly TimeSpan PruneInterval = TimeSpan.FromHours(6);
+    private DateTime _lastPruneUtc = DateTime.MinValue;
+
+    private void PruneIfDue()
+    {
+        if (DateTime.UtcNow - _lastPruneUtc < PruneInterval)
+            return;
+
+        _lastPruneUtc = DateTime.UtcNow;
+
+        try
+        {
+            int removed = LocalMachineStore.Instance.PruneUploadedEvents(EventRetention);
+            if (removed > 0)
+                Console.WriteLine($"[MachineSyncService] Pruned {removed} uploaded events older than {EventRetention.TotalDays:0} days");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[MachineSyncService] Prune failed: {ex.Message}");
         }
     }
 
@@ -220,10 +257,46 @@ public sealed class MachineSyncService : IDisposable
 
             using HttpRequestMessage request = CreateJsonRequest(HttpMethod.Post, "/api/machine-events", payload);
             using HttpResponseMessage response = await _httpClient.SendAsync(request, cancellationToken);
-            response.EnsureSuccessStatusCode();
 
-            LocalMachineStore.Instance.MarkEventsUploaded(new[] { pendingEvent.Id });
+            if (response.IsSuccessStatusCode)
+            {
+                LocalMachineStore.Instance.MarkEventsUploaded(new[] { pendingEvent.Id });
+                continue;
+            }
+
+            LocalMachineStore.Instance.RecordUploadFailure(pendingEvent.Id);
+
+            if (IsPermanentRejection(response.StatusCode))
+            {
+                // The backend will never accept this row however often it is offered, so
+                // it is retired rather than left at the head of a queue that is uploaded
+                // oldest-first - one bad event used to stop every later pour from ever
+                // being reported.
+                Console.WriteLine(
+                    $"[MachineSyncService] Event {pendingEvent.Id} rejected with {(int)response.StatusCode}, dropping it from the queue");
+                LocalMachineStore.Instance.MarkEventsUploaded(new[] { pendingEvent.Id });
+                continue;
+            }
+
+            // A server or network fault says nothing about this event in particular. Stop
+            // the batch and let the next cycle start again from the same place, in order.
+            Console.WriteLine(
+                $"[MachineSyncService] Upload of event {pendingEvent.Id} failed with {(int)response.StatusCode}, retrying next cycle");
+            return;
         }
+    }
+
+    /// <summary>
+    /// Whether a status code means "this request is wrong and will stay wrong". Timeout and
+    /// rate-limit are excluded: they are 4xx but worth retrying.
+    /// </summary>
+    private static bool IsPermanentRejection(HttpStatusCode statusCode)
+    {
+        int code = (int)statusCode;
+        if (code is 408 or 429)
+            return false;
+
+        return code is >= 400 and < 500;
     }
 
     private HttpRequestMessage CreateJsonRequest<T>(HttpMethod method, string requestUri, T payload)

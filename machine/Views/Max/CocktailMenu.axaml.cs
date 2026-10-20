@@ -98,7 +98,7 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
     public Func<Cocktail, Func<int, Task>, Task<bool>>? PourHandler { get; set; }
 
     /// <summary>Opens the valve for a tap drink. Returns null when it cannot start.</summary>
-    public Func<Cocktail, TapSession?>? TapHandler { get; set; }
+    public Func<Cocktail, Task<TapSession?>>? TapHandler { get; set; }
 
     public ObservableCollection<CocktailCardItem> VisibleCocktails { get; } = new();
 
@@ -420,7 +420,7 @@ public partial class CocktailMenu : UserControl, INotifyPropertyChanged
 
         if (TapHandler == null) return;
 
-        _tapSession = TapHandler(item.Cocktail);
+        _tapSession = await TapHandler(item.Cocktail);
         if (_tapSession == null)
             SetTapError();
         NotifyTap();

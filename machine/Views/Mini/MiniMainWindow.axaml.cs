@@ -170,21 +170,41 @@ public partial class MiniMainWindow : Window
             if (!manager.IsConnected)
             {
                 Console.WriteLine("[MiniMainWindow] Arduino not connected");
-                MachineTelemetryService.Instance.RecordDispenseEvent(profileKey, "failed", cocktail, mode.Name, channelDurations, new
-                {
-                    reason = "arduino-not-connected"
-                });
 #if DEBUG
                 int totalDurationDebug = 0;
                 foreach (var ms in channelDurations.Values)
                     if (ms > totalDurationDebug) totalDurationDebug = ms;
                 Console.WriteLine($"[MiniMainWindow] DEBUG: simulating dispense for {totalDurationDebug}ms");
                 await card.StartDispensing(totalDurationDebug);
+                // Recorded the way the Max does it: a simulated pour is a completed pour,
+                // marked simulated. Logging it as failed as well left the queue with two
+                // rows for one drink, one of them contradicting what the screen showed.
+                MachineTelemetryService.Instance.RecordDispenseEvent(
+                    profileKey,
+                    "completed",
+                    cocktail,
+                    mode.Name,
+                    channelDurations,
+                    new { simulated = true });
+#else
+                MachineTelemetryService.Instance.RecordDispenseEvent(profileKey, "failed", cocktail, mode.Name, channelDurations, new
+                {
+                    reason = "arduino-not-connected"
+                });
 #endif
                 return;
             }
 
-            if (!manager.Send(command))
+            int totalDuration = 0;
+            foreach (var ms in channelDurations.Values)
+                if (ms > totalDuration) totalDuration = ms;
+
+            // Same retry as the Max: the board drops inbound bytes while its LED driver
+            // has interrupts disabled, so an unanswered ACTIVE has to be repeated. Sending
+            // once and reading a single line reported a lost acknowledgement to the guest
+            // as a failure while the drink was in fact being poured.
+            (bool sent, ActivateResponse response) = await manager.TrySendActiveAsync(command);
+            if (!sent)
             {
                 Console.WriteLine("[MiniMainWindow] Failed to send command");
                 MachineTelemetryService.Instance.RecordDispenseEvent(profileKey, "failed", cocktail, mode.Name, channelDurations, new
@@ -194,12 +214,7 @@ public partial class MiniMainWindow : Window
                 return;
             }
 
-            int totalDuration = 0;
-            foreach (var ms in channelDurations.Values)
-                if (ms > totalDuration) totalDuration = ms;
             var dispensingTask = card.StartDispensing(totalDuration);
-
-            var response = ArduinoProtocolHelper.ParseActivateResponse(manager.ReadLine());
             Console.WriteLine($"[MiniMainWindow] Arduino response: {response}");
             if (response != ActivateResponse.Success)
             {

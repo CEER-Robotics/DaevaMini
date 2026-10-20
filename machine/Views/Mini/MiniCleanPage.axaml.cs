@@ -108,7 +108,7 @@ public partial class MiniCleanPage : UserControl
         string command = ArduinoProtocolHelper.BuildActiveCommand("BLUE", channelDurations);
         Console.WriteLine($"[MiniCleanPage] Sending: {command}");
 
-        bool sent = manager.Send(command);
+        (bool sent, ActivateResponse response) = await manager.TrySendActiveAsync(command);
         if (!sent)
         {
             Console.WriteLine("[MiniCleanPage] Failed to send command");
@@ -120,8 +120,6 @@ public partial class MiniCleanPage : UserControl
             return;
         }
 
-        string? responseLine = manager.ReadLine();
-        var response = ArduinoProtocolHelper.ParseActivateResponse(responseLine);
         Console.WriteLine($"[MiniCleanPage] Response: {response}");
         if (response != ActivateResponse.Success)
         {

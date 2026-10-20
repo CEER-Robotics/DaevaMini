@@ -35,7 +35,12 @@ public sealed class TapSession : IAsyncDisposable
     /// Opens the valve for a drink, or returns null when the board will not start:
     /// not connected, no channel for the ingredient, or busy with something else.
     /// </summary>
-    public static TapSession? TryOpen(Cocktail cocktail, int channel)
+    /// <remarks>
+    /// The board's answer is read, not assumed. A board that is not in WAIT replies
+    /// IGNORED TAP and opens nothing; treating the write alone as success would show the
+    /// guest a pour in progress while the valve stayed shut.
+    /// </remarks>
+    public static async Task<TapSession?> TryOpenAsync(Cocktail cocktail, int channel)
     {
         var manager = ArduinoSerialManager.Instance;
         if (!manager.IsConnected)
@@ -48,9 +53,16 @@ public sealed class TapSession : IAsyncDisposable
         string command = ArduinoProtocolHelper.BuildTapCommand(rgb, channel);
         Console.WriteLine($"[TapSession] Opening: {command}");
 
-        if (!manager.Send(command))
+        (bool sent, TapResponse response) = await manager.TrySendTapAsync(command);
+        if (!sent)
         {
             Console.WriteLine("[TapSession] Failed to write the open command");
+            return null;
+        }
+
+        if (response != TapResponse.Success)
+        {
+            Console.WriteLine($"[TapSession] The board refused to open the tap: {response}");
             return null;
         }
 
@@ -64,7 +76,19 @@ public sealed class TapSession : IAsyncDisposable
             while (!_cts.IsCancellationRequested)
             {
                 await Task.Delay(KeepAliveIntervalMs, _cts.Token);
-                ArduinoSerialManager.Instance.Send(_keepAliveCommand);
+
+                // The answer is read rather than left on the wire: an unread OK TAP would
+                // still be sitting in the buffer when the next command looks for its own
+                // acknowledgement. A refusal means the valve is already shut - the board
+                // hit its own ceiling, or lost the session - so stop renewing.
+                if (!ArduinoSerialManager.Instance.TrySendTap(_keepAliveCommand, out TapResponse response))
+                    continue;
+
+                if (response is TapResponse.ErrTimeout or TapResponse.Ignored or TapResponse.ErrParams or TapResponse.ErrColor)
+                {
+                    Console.WriteLine($"[TapSession] Keep-alive refused ({response}): the valve is closed, stopping");
+                    return;
+                }
             }
         }
         catch (OperationCanceledException)

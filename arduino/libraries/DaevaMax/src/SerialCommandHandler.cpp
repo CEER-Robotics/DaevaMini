@@ -13,6 +13,9 @@ namespace {
 
 static char rxLine[ProjectConfig::Serial::kRxBufferSize];
 static size_t rxLen = 0;
+// Set when the line being received ran past the buffer, so it can be discarded whole
+// at the newline instead of being parsed in pieces.
+static bool rxOverflow = false;
 
 static char* trimInPlace(char* s) {
   while (*s != '\0' && isspace((unsigned char)*s)) {
@@ -389,6 +392,7 @@ namespace SerialCommandHandler {
 void begin() {
   rxLen = 0;
   rxLine[0] = '\0';
+  rxOverflow = false;
 }
 
 void update() {
@@ -401,18 +405,24 @@ void update() {
     if (c == '\n') {
       rxLine[rxLen] = '\0';
 
-      if (rxLen > 0) {
+      // A line that did not fit is dropped whole. Resetting the buffer mid-line and
+      // carrying on would hand the tail of one command to the parser as if it were a
+      // command of its own - and the tail of an ACTIVE still contains pump segments.
+      if (rxOverflow) {
+        DAEVA_SERIAL.println("ERR LINE TOO LONG");
+      } else if (rxLen > 0) {
         handleSerialLine(rxLine);
       }
 
       rxLen = 0;
+      rxOverflow = false;
       return;
     }
 
     if (rxLen < sizeof(rxLine) - 1) {
       rxLine[rxLen++] = c;
     } else {
-      rxLen = 0;
+      rxOverflow = true;
     }
   }
 }

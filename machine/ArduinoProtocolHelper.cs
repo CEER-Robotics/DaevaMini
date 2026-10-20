@@ -109,6 +109,34 @@ public static class ArduinoProtocolHelper
     }
 
     /// <summary>
+    /// Parses the firmware response to a TAP or TAP OFF. Returns NoResponse for null/empty
+    /// or unknown lines.
+    /// </summary>
+    public static TapResponse ParseTapResponse(string? line)
+    {
+        if (string.IsNullOrWhiteSpace(line))
+            return TapResponse.NoResponse;
+
+        string trimmed = line.Trim();
+
+        // "OK TAP OFF" has to be tested before "OK TAP", or it would match the prefix.
+        if (trimmed.Equals("OK TAP OFF", StringComparison.OrdinalIgnoreCase))
+            return TapResponse.ClosedOk;
+        if (trimmed.Equals("OK TAP", StringComparison.OrdinalIgnoreCase))
+            return TapResponse.Success;
+        if (trimmed.Equals("ERR TAP COLOR", StringComparison.OrdinalIgnoreCase))
+            return TapResponse.ErrColor;
+        if (trimmed.Equals("ERR TAP PARAMS", StringComparison.OrdinalIgnoreCase))
+            return TapResponse.ErrParams;
+        if (trimmed.Equals("ERR TAP TIMEOUT", StringComparison.OrdinalIgnoreCase))
+            return TapResponse.ErrTimeout;
+        if (trimmed.Equals("IGNORED TAP", StringComparison.OrdinalIgnoreCase))
+            return TapResponse.Ignored;
+
+        return TapResponse.NoResponse;
+    }
+
+    /// <summary>
     /// Maps cocktail ingredients to pump channels.
     /// Returns a dictionary of channel number (1-based) to duration in milliseconds.
     /// Ingredients with no matching assignment are silently skipped.
@@ -151,6 +179,22 @@ public enum ActivateResponse
     Success,
     ErrColor,
     ErrParams,
+    Ignored,
+    NoResponse
+}
+
+/// <summary>Result of sending a TAP or TAP OFF command (from firmware response).</summary>
+public enum TapResponse
+{
+    /// <summary>OK TAP: the valve is open, or an open one was kept alive.</summary>
+    Success,
+    /// <summary>OK TAP OFF: closed on request.</summary>
+    ClosedOk,
+    ErrColor,
+    ErrParams,
+    /// <summary>ERR TAP TIMEOUT: the board's own ceiling closed the valve.</summary>
+    ErrTimeout,
+    /// <summary>IGNORED TAP: opening while not in WAIT, or closing with nothing open.</summary>
     Ignored,
     NoResponse
 }

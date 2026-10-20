@@ -1,6 +1,7 @@
 using System;
 using System.IO.Ports;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DaevaMini;
 
@@ -105,12 +106,16 @@ public sealed class ArduinoSerialManager : IDisposable
     {
         response = ActivateResponse.NoResponse;
 
+        ArduinoSerial? serial = _serial;
+        if (_disposed || serial == null)
+            return false;
+
         for (int attempt = 1; attempt <= attempts; attempt++)
         {
-            if (!Send(command))
+            if (!serial.Exchange(command, MaxAckLines, IsActivateAnswer, out string? line))
                 return false;
 
-            response = AwaitActivateResponse();
+            response = ArduinoProtocolHelper.ParseActivateResponse(line);
 
             // A resend that comes back IGNORED means the board is no longer in WAIT —
             // i.e. it is already dispensing the command we just repeated, so the lost
@@ -134,27 +139,57 @@ public sealed class ArduinoSerialManager : IDisposable
         return true;
     }
 
-    /// Reads until the firmware says something about the ACTIVE we just sent, stepping
-    /// over any unsolicited notification that arrives first.
-    private ActivateResponse AwaitActivateResponse()
-    {
-        const int maxLines = 4;
-
-        for (int i = 0; i < maxLines; i++)
+    /// <summary>
+    /// <see cref="TrySendActive"/> off the calling thread. Every UI caller should use this:
+    /// one exchange blocks for as long as the read timeout, and three attempts against a
+    /// board that has stopped answering add up to seconds of a frozen touchscreen.
+    /// </summary>
+    public Task<(bool Sent, ActivateResponse Response)> TrySendActiveAsync(string command, int attempts = 3)
+        => Task.Run(() =>
         {
-            string? line = ReadLine();
-            if (line == null)
-                return ActivateResponse.NoResponse;
+            bool sent = TrySendActive(command, out ActivateResponse response, attempts);
+            return (sent, response);
+        });
 
-            ActivateResponse parsed = ArduinoProtocolHelper.ParseActivateResponse(line);
-            if (parsed != ActivateResponse.NoResponse)
-                return parsed;
+    /// <summary>
+    /// Sends a TAP (open or keep-alive) and reports what the board answered, so a refused
+    /// open is not mistaken for a valve that is now pouring.
+    /// </summary>
+    public bool TrySendTap(string command, out TapResponse response)
+    {
+        response = TapResponse.NoResponse;
 
-            Console.WriteLine($"[ArduinoManager] Ignoring unsolicited line while waiting for ACTIVE ack: {line.Trim()}");
-        }
+        ArduinoSerial? serial = _serial;
+        if (_disposed || serial == null)
+            return false;
 
-        return ActivateResponse.NoResponse;
+        if (!serial.Exchange(command, MaxAckLines, IsTapAnswer, out string? line))
+            return false;
+
+        response = ArduinoProtocolHelper.ParseTapResponse(line);
+        return true;
     }
+
+    /// <summary><see cref="TrySendTap"/> off the calling thread.</summary>
+    public Task<(bool Sent, TapResponse Response)> TrySendTapAsync(string command)
+        => Task.Run(() =>
+        {
+            bool sent = TrySendTap(command, out TapResponse response);
+            return (sent, response);
+        });
+
+    /// <summary>Fire-and-forget write on a worker thread, for commands whose reply nobody reads.</summary>
+    public Task SendAsync(string command) => Task.Run(() => Send(command));
+
+    /// How many unsolicited lines (DONE, OK READY) an exchange will step over before
+    /// giving up on finding the acknowledgement it is waiting for.
+    private const int MaxAckLines = 4;
+
+    private static bool IsActivateAnswer(string line)
+        => ArduinoProtocolHelper.ParseActivateResponse(line) != ActivateResponse.NoResponse;
+
+    private static bool IsTapAnswer(string line)
+        => ArduinoProtocolHelper.ParseTapResponse(line) != TapResponse.NoResponse;
 
     // Explicit port override, e.g. DAEVA_SERIAL_PORT=/dev/ttyAMA0 when the board
     // is wired to the Pi's GPIO 14/15 UART instead of USB. Auto-detection cannot
@@ -180,7 +215,17 @@ public sealed class ArduinoSerialManager : IDisposable
                 }
                 catch (Exception ex)
                 {
+                    // A named port is an instruction, not a hint: fail loudly rather than
+                    // fall through to auto-detection. On the assembled Max the pump
+                    // controller is on /dev/ttyAMA0 and the only other port on the Pi is
+                    // the console UART, so guessing means opening the console, reporting
+                    // "connected", and pouring nothing for as long as nobody looks. That
+                    // happened: a reimaged SD card lost enable_uart/dtparam=uart0, ttyAMA0
+                    // never appeared, and the machine ran for hours bound to ttyAMA10.
                     Console.WriteLine($"[ArduinoManager] Forced port {ForcedPort} not available: {ex.Message}");
+                    Console.WriteLine("[ArduinoManager] DAEVA_SERIAL_PORT is set, so no other port will be tried. " +
+                                      "Check that the port exists (ls -l /dev/ttyAMA*) and that nothing else holds it.");
+                    return null;
                 }
             }
 
