@@ -141,11 +141,11 @@
                                                        FontFamily="Space Grotesk" VerticalAlignment="Center"/>
                                         </StackPanel>
 
-                                        <!-- Three seconds into a glass: enough to see the jet. -->
+                                        <!-- Five seconds into a glass: enough to see the jet. -->
                                         <Button Grid.Column="1" Classes="TestBtn" Width="230" Height="62"
                                                 IsEnabled="{Binding CanTest, ElementName=PageHost}"
                                                 Click="OnTestClick" CommandParameter="{Binding}">
-                                            <TextBlock Text="PROVA 3 s" Foreground="{StaticResource TextPrimary}"
+                                            <TextBlock Text="PROVA 5 s" Foreground="{StaticResource TextPrimary}"
                                                        FontSize="{StaticResource FontBody}" FontWeight="Bold"
                                                        FontFamily="Space Grotesk" LetterSpacing="1"/>
                                         </Button>

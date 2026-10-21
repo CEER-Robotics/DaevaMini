@@ -28,8 +28,8 @@ public partial class PumpPowerPage : UserControl, INotifyPropertyChanged
 {
     private const int Step = 5;
 
-    /// <summary>Long enough to see the jet, short enough not to fill the glass.</summary>
-    private const int TestDurationMs = 3000;
+    /// <summary>Long enough to see the jet settle, short enough not to fill the glass.</summary>
+    private const int TestDurationMs = 5000;
 
     /// <summary>
     /// Test pour plus the firmware's ENDING animation, before the board is back in WAIT
