@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -55,28 +56,73 @@ public partial class WifiSetupPage : UserControl, INotifyPropertyChanged
 
     /// <summary>Reloads both halves of the header: who we are connected to, and who else
     /// is in range. Run once at startup and again on every manual "CERCA RETI".</summary>
+    /// <remarks>
+    /// Two passes. The first answers from NetworkManager's cache and fills the page at
+    /// once; the second makes the radio scan, which takes several seconds, and refines the
+    /// list when it lands. The old single pass left the page empty, with a greyed-out
+    /// button, for about twelve seconds - long enough that it read as broken.
+    /// </remarks>
     private async Task RefreshAsync()
     {
+        if (_scanning) return;
+
         _scanning = true;
         RaiseListChanged();
 
-        var status = await WifiService.GetStatusAsync();
+        try
+        {
+            var status = await WifiService.GetStatusAsync();
+            ShowStatus(status);
+            ShowNetworks(await WifiService.ScanAsync(rescan: false), status);
+
+            ShowNetworks(await WifiService.ScanAsync(rescan: true), status);
+        }
+        catch (Exception ex)
+        {
+            // Fire-and-forget from the constructor: without this a failure would vanish
+            // and leave the page stuck in "searching" for good.
+            Console.WriteLine($"[WifiSetupPage] Refresh failed: {ex}");
+            SetStatus("Ricerca non riuscita. Riprova.");
+        }
+        finally
+        {
+            _scanning = false;
+            RaiseListChanged();
+        }
+    }
+
+    private void ShowStatus(WifiStatus status)
+    {
         _statusHeader = status.Connected
             ? $"Connesso a \"{status.Ssid}\"" + (status.IpAddress != null ? $" · {status.IpAddress}" : string.Empty)
             : "Nessuna rete collegata";
 
-        var found = await WifiService.ScanAsync();
+        // The other radio, when it is on a different network: otherwise "connected to X"
+        // hides that the machine is also on Y.
+        if (status.OtherSsid != null)
+            _statusHeader += $"\nAntenna interna su \"{status.OtherSsid}\"";
+
+        RaiseListChanged();
+    }
+
+    private void ShowNetworks(IReadOnlyList<WifiNetwork> found, WifiStatus status)
+    {
+        // An empty answer from the quick pass only means the cache was empty; keep what is
+        // on screen rather than flashing "no networks" before the real scan answers.
+        if (found.Count == 0 && Networks.Count > 0) return;
 
         Networks.Clear();
         foreach (var network in found)
             Networks.Add(new WifiNetworkRow(network, isCurrent: status.Connected
                 && network.Ssid.Equals(status.Ssid, StringComparison.Ordinal)));
 
-        _scanning = false;
         RaiseListChanged();
     }
 
+    /// <summary>Always pressable: a press while a search is running simply waits for it.</summary>
     private async void OnRescanClick(object? sender, RoutedEventArgs e) => await RefreshAsync();
+
+    public string RescanLabel => _scanning ? "RICERCA..." : "CERCA RETI";
 
     private void OnBackClick(object? sender, RoutedEventArgs e)
     {
@@ -288,6 +334,7 @@ public partial class WifiSetupPage : UserControl, INotifyPropertyChanged
     private void RaiseListChanged()
     {
         OnPropertyChanged(nameof(IsScanning));
+        OnPropertyChanged(nameof(RescanLabel));
         OnPropertyChanged(nameof(HasNetworks));
         OnPropertyChanged(nameof(IsEmpty));
         OnPropertyChanged(nameof(StatusHeader));

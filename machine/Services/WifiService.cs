@@ -24,7 +24,9 @@ public enum WifiConnectResult
 }
 
 /// <summary>Current radio state, as much as nmcli is willing to say quickly.</summary>
-public sealed record WifiStatus(bool Connected, string? Ssid, string? IpAddress);
+/// <param name="OtherSsid">What the machine's other radio is connected to, when it is on a
+/// different network from the one this page manages.</param>
+public sealed record WifiStatus(bool Connected, string? Ssid, string? IpAddress, string? OtherSsid = null);
 
 /// <summary>
 /// Wraps NetworkManager's <c>nmcli</c>, which is what Raspberry Pi OS (Bookworm and
@@ -79,46 +81,64 @@ public static class WifiService
     /// DAEVA_WIFI_INTERFACE to override. On a machine with only the built-in radio - the
     /// Mini, or a dev box - nothing is found and nmcli is left to decide, exactly as
     /// before.
+    ///
+    /// The wireless devices come from nmcli and their bus path from <c>readlink -f</c>,
+    /// not from walking /sys with .NET's directory APIs. The first version did the latter,
+    /// and on the Pi it never found the USB radio (/sys/class/net is all symlinks), so
+    /// every command silently went to whichever radio NetworkManager preferred - seen in
+    /// a trace of the calls the page made, none of which carried an ifname.
     /// </remarks>
-    private static string? PreferredInterface()
+    private static async Task<string?> PreferredInterfaceAsync()
     {
         string? forced = Environment.GetEnvironmentVariable("DAEVA_WIFI_INTERFACE");
         if (!string.IsNullOrWhiteSpace(forced))
             return forced.Trim();
 
+        if (_preferredResolved)
+            return _preferred;
+
         try
         {
-            // A wireless interface is one with a "wireless" directory; a USB one resolves
-            // its device link through the USB bus. Both are Linux-only, so this simply
-            // finds nothing on the Windows dev box.
-            foreach (string netPath in Directory.EnumerateDirectories("/sys/class/net"))
+            var devices = await RunAsync(Nmcli, new[] { "-t", "-f", "DEVICE,TYPE", "dev" }, timeoutMs: 5000);
+            if (!devices.Found || devices.ExitCode != 0)
+                return null;
+
+            foreach (string line in devices.StdOut.Split('\n', StringSplitOptions.RemoveEmptyEntries))
             {
-                if (!Directory.Exists(Path.Combine(netPath, "wireless")))
+                var fields = SplitTerse(line);
+                if (fields.Count < 2 || fields[1] != "wifi")
                     continue;
 
-                // "device" is a symlink into the bus tree; a USB radio resolves to a path
-                // with a usb controller in it, a built-in one does not.
-                string devicePath = Path.Combine(netPath, "device");
-                string? resolved = Directory.ResolveLinkTarget(devicePath, returnFinalTarget: true)?.FullName;
-                if (resolved == null)
-                    continue;
-
-                if (resolved.Contains("usb", StringComparison.OrdinalIgnoreCase))
-                    return Path.GetFileName(netPath);
+                // The interface's real place in the bus tree: a USB radio sits under a usb
+                // controller, the built-in one under the SDIO/mmc host.
+                var path = await RunAsync("readlink", new[] { "-f", $"/sys/class/net/{fields[0]}" }, timeoutMs: 3000);
+                if (path is { Found: true, ExitCode: 0 } && path.StdOut.Contains("/usb", StringComparison.Ordinal))
+                {
+                    _preferred = fields[0];
+                    break;
+                }
             }
+
+            // Remembered either way: the radios do not change while the app runs, and a
+            // machine with no USB radio should not pay for this on every call.
+            _preferredResolved = true;
+            Console.WriteLine($"[WifiService] Radio used for Wi-Fi setup: {_preferred ?? "(NetworkManager decides)"}");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"[WifiService] Could not work out which radio to use: {ex.Message}");
         }
 
-        return null;
+        return _preferred;
     }
 
+    private static string? _preferred;
+    private static bool _preferredResolved;
+
     /// <summary>Appends <c>ifname &lt;dev&gt;</c> when a radio has been chosen.</summary>
-    private static string[] WithInterface(params string[] args)
+    private static async Task<string[]> WithInterfaceAsync(params string[] args)
     {
-        string? device = PreferredInterface();
+        string? device = await PreferredInterfaceAsync();
         if (string.IsNullOrEmpty(device))
             return args;
 
@@ -126,10 +146,17 @@ public static class WifiService
         return withIfname.ToArray();
     }
 
-    public static async Task<IReadOnlyList<WifiNetwork>> ScanAsync()
+    /// <summary>
+    /// Networks in range. <paramref name="rescan"/> false answers at once from what
+    /// NetworkManager already saw on its own background scans; true asks the radio to
+    /// scan now, which takes several seconds. The page shows the first and then refines
+    /// it with the second, so the list is never empty while the radio works.
+    /// </summary>
+    public static async Task<IReadOnlyList<WifiNetwork>> ScanAsync(bool rescan = true)
     {
-        var result = await RunAsync(Nmcli, WithInterface(
-            "-t", "-f", "SSID,SIGNAL,SECURITY", "dev", "wifi", "list", "--rescan", "yes"), timeoutMs: 15000);
+        var result = await RunAsync(Nmcli, await WithInterfaceAsync(
+            "-t", "-f", "SSID,SIGNAL,SECURITY", "dev", "wifi", "list", "--rescan", rescan ? "yes" : "no"),
+            timeoutMs: 20000);
         if (!result.Found)
             return SimulatedNetworks;
 
@@ -160,8 +187,8 @@ public static class WifiService
     public static async Task<WifiConnectResult> ConnectAsync(string ssid, string password)
     {
         var result = string.IsNullOrEmpty(password)
-            ? await RunAsync(Nmcli, WithInterface("dev", "wifi", "connect", ssid), timeoutMs: 30000)
-            : await RunAsync(Nmcli, WithInterface("dev", "wifi", "connect", ssid, "password", password), timeoutMs: 30000);
+            ? await RunAsync(Nmcli, await WithInterfaceAsync("dev", "wifi", "connect", ssid), timeoutMs: 30000)
+            : await RunAsync(Nmcli, await WithInterfaceAsync("dev", "wifi", "connect", ssid, "password", password), timeoutMs: 30000);
 
         if (!result.Found)
         {
@@ -188,9 +215,24 @@ public static class WifiService
         return WifiConnectResult.Failed;
     }
 
+    /// <summary>
+    /// What each radio is connected to, from NetworkManager's cache - instant, no scan.
+    /// </summary>
+    /// <remarks>
+    /// The Max has two radios and both can be connected at once (it was found on A
+    /// through the internal one and on the bar's router through the external one). The
+    /// status names the radio this page manages - the external one when there is one -
+    /// and mentions the other, so "connected to X" is never a coin toss between them.
+    ///
+    /// Two earlier mistakes are avoided on purpose: "dev wifi" without "--rescan no"
+    /// triggered a scan and took ~4 s before the page showed anything, and the address
+    /// was looked up by SSID as if it were the connection's name, which it often is not
+    /// (the router's profile here is called "FRITZ-wlan1"), so the IP never appeared.
+    /// </remarks>
     public static async Task<WifiStatus> GetStatusAsync()
     {
-        var probe = await RunAsync(Nmcli, WithInterface("-t", "-f", "active,ssid", "dev", "wifi"), timeoutMs: 15000);
+        var probe = await RunAsync(Nmcli,
+            new[] { "-t", "-f", "ACTIVE,SSID,DEVICE", "dev", "wifi", "list", "--rescan", "no" }, timeoutMs: 8000);
         if (!probe.Found)
         {
             return _simulatedSsid == null
@@ -201,20 +243,35 @@ public static class WifiService
         if (probe.ExitCode != 0)
             return new WifiStatus(false, null, null);
 
-        string? ssid = probe.StdOut.Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(SplitTerse)
-            .FirstOrDefault(f => f.Count >= 2 && f[0].Equals("yes", StringComparison.OrdinalIgnoreCase))
-            ?.ElementAtOrDefault(1);
+        // Device -> SSID for every radio that is connected right now.
+        var active = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (string line in probe.StdOut.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var f = SplitTerse(line);
+            if (f.Count >= 3 && f[0].Equals("yes", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(f[1]))
+                active.TryAdd(f[2], f[1]);
+        }
 
-        if (ssid == null)
+        if (active.Count == 0)
             return new WifiStatus(false, null, null);
 
-        var ipResult = await RunAsync(Nmcli, "-g", "IP4.ADDRESS", "connection", "show", ssid);
+        string? preferred = await PreferredInterfaceAsync();
+        string device = preferred != null && active.ContainsKey(preferred) ? preferred : active.Keys.First();
+        string ssid = active[device];
+
+        string? other = active
+            .Where(kv => kv.Key != device && kv.Value != ssid)
+            .Select(kv => kv.Value)
+            .FirstOrDefault();
+
+        // Asked of the device, not of a connection named after the SSID.
+        var ipResult = await RunAsync(Nmcli, new[] { "-g", "IP4.ADDRESS", "dev", "show", device }, timeoutMs: 5000);
         string? ip = ipResult is { Found: true, ExitCode: 0 }
-            ? ipResult.StdOut.Split('\n', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()?.Split('/')[0].Trim()
+            ? ipResult.StdOut.Split(new[] { '\n', '|' }, StringSplitOptions.RemoveEmptyEntries)
+                .FirstOrDefault()?.Split('/')[0].Trim()
             : null;
 
-        return new WifiStatus(true, ssid, string.IsNullOrWhiteSpace(ip) ? null : ip);
+        return new WifiStatus(true, ssid, string.IsNullOrWhiteSpace(ip) ? null : ip, other);
     }
 
     /// <summary>
