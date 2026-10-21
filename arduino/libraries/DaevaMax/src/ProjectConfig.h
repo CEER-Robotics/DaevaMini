@@ -48,6 +48,15 @@ constexpr uint16_t kStrip2Len = 44;
 constexpr uint16_t kStrip1Margin = 0;
 constexpr uint16_t kStrip2Margin = 0;
 
+// The pixel the STARTUP animation grows from, or -1 for the strip's own middle.
+// The electrical middle is not the middle the guest sees: the bottom strip
+// (strip 2) wraps round the front corner of the machine, so its middle (pixels
+// 21-22) sits near the front-right corner. Pixel 14 is the centre of the front,
+// found on the machine with arduino/led_count_test. Only the startup origin
+// moves; the animation keeps growing until both ends of the strip are lit.
+constexpr int16_t kStrip1StartupCenter = -1;
+constexpr int16_t kStrip2StartupCenter = 14;
+
 // A margin only applies when the strip is long enough to keep at least one
 // visible pixel; otherwise it collapses to the whole strip. Without this guard
 // the subtractions below wrap (they are unsigned) and index far out of bounds.

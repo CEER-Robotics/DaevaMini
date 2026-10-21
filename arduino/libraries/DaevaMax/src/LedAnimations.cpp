@@ -503,6 +503,22 @@ static void bounceAnimStep() {
   strip2.show();
 }
 
+static uint16_t maxU16(uint16_t a, uint16_t b) { return a > b ? a : b; }
+
+// One of the two pixels the startup light is born on. With a configured centre
+// both are that single pixel; with -1 they are the window's own middle pair.
+// Clamped so it never leaves the window; an empty window answers its start.
+static uint16_t startupMid(const Window& w, uint16_t midInWindow, int16_t center) {
+  if (w.len == 0) {
+    return w.start;
+  }
+  int32_t idx = (center >= 0) ? (int32_t)center
+                              : (int32_t)w.start + (int32_t)midInWindow;
+  if (idx < (int32_t)w.start) idx = w.start;
+  if (idx > (int32_t)w.end) idx = w.end;
+  return (uint16_t)idx;
+}
+
 static void startupAnimStep() {
   invalidateStaticFrame();
   const uint32_t now = millis();
@@ -516,8 +532,24 @@ static void startupAnimStep() {
 
   const uint16_t strip1Len = win1.len;
   const uint16_t strip2Len = win2.len;
-  const uint16_t strip1Steps = (uint16_t)((strip1Len + 1) / 2);
-  const uint16_t strip2Steps = (uint16_t)((strip2Len + 1) / 2);
+
+  // Guarded against an empty window: `stripLen - 1` is unsigned and would wrap.
+  // The middle is the configured startup centre when there is one.
+  const uint16_t strip1MidLeft = startupMid(win1, (uint16_t)((strip1Len - 1) / 2),
+                                            ProjectConfig::Strips::kStrip1StartupCenter);
+  const uint16_t strip1MidRight = startupMid(win1, (uint16_t)(strip1Len / 2),
+                                             ProjectConfig::Strips::kStrip1StartupCenter);
+  const uint16_t strip2MidLeft = startupMid(win2, (uint16_t)((strip2Len - 1) / 2),
+                                            ProjectConfig::Strips::kStrip2StartupCenter);
+  const uint16_t strip2MidRight = startupMid(win2, (uint16_t)(strip2Len / 2),
+                                             ProjectConfig::Strips::kStrip2StartupCenter);
+
+  // Enough steps to reach the farther end: with an off-centre origin one side is
+  // longer than half the strip, and stopping at len/2 would leave its tail dark.
+  const uint16_t strip1Steps = (strip1Len == 0) ? 0
+      : maxU16((uint16_t)(strip1MidLeft - win1.start + 1), (uint16_t)(win1.end - strip1MidRight + 1));
+  const uint16_t strip2Steps = (strip2Len == 0) ? 0
+      : maxU16((uint16_t)(strip2MidLeft - win2.start + 1), (uint16_t)(win2.end - strip2MidRight + 1));
   const uint16_t totalSteps = (strip1Steps > strip2Steps) ? strip1Steps : strip2Steps;
 
   uint16_t litLevel = 0;
@@ -528,16 +560,6 @@ static void startupAnimStep() {
       litLevel = totalSteps;
     }
   }
-
-  // Guarded against an empty window: `strip1Len - 1` is unsigned and would wrap.
-  const uint16_t strip1MidLeft =
-      (strip1Len > 0) ? (uint16_t)(win1.start + ((strip1Len - 1) / 2)) : 0;
-  const uint16_t strip1MidRight =
-      (strip1Len > 0) ? (uint16_t)(win1.start + (strip1Len / 2)) : 0;
-  const uint16_t strip2MidLeft =
-      (strip2Len > 0) ? (uint16_t)(win2.start + ((strip2Len - 1) / 2)) : 0;
-  const uint16_t strip2MidRight =
-      (strip2Len > 0) ? (uint16_t)(win2.start + (strip2Len / 2)) : 0;
 
   strip1.clear();
   strip2.clear();
