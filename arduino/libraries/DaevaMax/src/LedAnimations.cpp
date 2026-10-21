@@ -853,12 +853,35 @@ void setStartupColor(uint8_t r, uint8_t g, uint8_t b) {
   STARTUP_COLOR = strip1.Color(r, g, b);
 }
 
+// A deep red becomes red-orange; anything that is not red-dominant, or already
+// has enough green, is returned untouched. See Colors::kAvoidDeepRedOnPour.
+static uint32_t pourSafeColor(uint32_t color) {
+  if (!ProjectConfig::Colors::kAvoidDeepRedOnPour) {
+    return color;
+  }
+  const uint8_t r = (uint8_t)(color >> 16);
+  uint8_t g = (uint8_t)(color >> 8);
+  const uint8_t b = (uint8_t)color;
+  if (r == 0 || r < b) {
+    return color;  // not a red: blues, purples leaning blue, greens, black
+  }
+  const uint8_t minG =
+      (uint8_t)(((uint16_t)r * ProjectConfig::Colors::kPourMinGreenPerRed + 127) / 255);
+  if (g >= minG) {
+    return color;
+  }
+  g = minG;
+  return strip1.Color(r, g, b);
+}
+
 bool startActiveWithColor(uint32_t activeUntilMs, uint32_t color) {
   if (!LedStateMachine::startActive(activeUntilMs)) {
     return false;
   }
 
-  activeColor = color;
+  // The single door every pour colour comes through, ACTIVE and TAP alike, and
+  // so also the colour the ENDING fade starts from.
+  activeColor = pourSafeColor(color);
   activeColorValid = true;
   onStateEntered(LedStateMachine::ST_ACTIVE, millis());
   return true;

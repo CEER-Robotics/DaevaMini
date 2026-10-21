@@ -224,6 +224,17 @@ constexpr Rgb kToxicMagenta = {255, 0, 255};
 // Maintenance mode color.
 constexpr Rgb kMaintenanceOrange = {255, 120, 0};
 
+// Hardware workaround, Max only: a short stretch of LEDs has a damaged red
+// channel and cannot show a deep red, while orange still looks right. When this
+// is on, every pour colour (ACTIVE and TAP) that is red-dominant with almost no
+// green is pushed to red-orange: green is raised to at least
+// kPourMinGreenPerRed/255 of red (85 -> about 20 degrees of hue, between red
+// and orange). Orange, amber, white, greens and blues pass through unchanged,
+// and so do idle, tint, maintenance and toxic colours. Turn it off once the
+// damaged piece of strip has been replaced.
+constexpr bool kAvoidDeepRedOnPour = true;
+constexpr uint8_t kPourMinGreenPerRed = 85;
+
 // Named colors accepted by ACTIVE, BASE:<name> (or COLOR:<name>).
 constexpr std::array<NamedColor, 10> kPresetColors = {{
     // True orange. Was {120, 255, 0} - a yellow-green - to cancel out the red/green
