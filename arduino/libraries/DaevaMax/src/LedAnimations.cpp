@@ -214,37 +214,21 @@ static uint32_t lerpColor(Adafruit_NeoPixel& s, uint32_t a, uint32_t b, uint8_t 
   return s.Color(r, g, bl);
 }
 
-// Brightness of the attract beat: two quick thumps and then a long rest, so it
-// reads as a heartbeat rather than as a blink or an alarm. Returns full
-// brightness outside the thumps, which lets the resting part of the cycle go
-// through the frame cache untouched.
-static uint8_t attractBrightness(uint32_t phaseMs) {
+// Brightness of the standby breath: a slow cosine from full brightness down to
+// the floor and back. It starts at the top of the curve (phase 0 = full), which
+// is exactly what WAIT was showing, so entering standby is seamless rather than
+// a sudden dip. A cosine and not a triangle: it lingers at both ends and moves
+// fastest in the middle, which is what makes it read as breathing.
+static uint8_t attractBrightness(uint32_t phaseMs, uint32_t periodMs) {
   const uint8_t lo = ProjectConfig::Animation::kAttractMinBrightness;
   const uint8_t hi = ProjectConfig::Animation::kAttractMaxBrightness;
   if (hi <= lo) {
     return hi;
   }
 
-  const uint32_t thumpMs = (ProjectConfig::Animation::kAttractThumpMs == 0)
-                               ? 1
-                               : ProjectConfig::Animation::kAttractThumpMs;
-  const uint32_t secondAt = thumpMs + ProjectConfig::Animation::kAttractGapMs;
-
-  // Where we are inside whichever thump we are in, if any.
-  uint32_t into = 0;
-  if (phaseMs < thumpMs) {
-    into = phaseMs;
-  } else if (phaseMs >= secondAt && phaseMs < secondAt + thumpMs) {
-    into = phaseMs - secondAt;
-  } else {
-    return hi;  // resting between beats
-  }
-
-  // A thump dips away from full brightness and comes straight back, so the
-  // strips look like they are pulsing rather than flickering off.
-  const float x = (float)into / (float)thumpMs;
-  const float dip = 1.0f - (4.0f * x * (1.0f - x));
-  return (uint8_t)(lo + (uint8_t)((float)(hi - lo) * dip + 0.5f));
+  const float x = (float)phaseMs / (float)periodMs;
+  const float level = 0.5f + 0.5f * cosf(2.0f * (float)PI * x);
+  return (uint8_t)(lo + (uint8_t)((float)(hi - lo) * level + 0.5f));
 }
 
 // Renders WAIT, easing into a new color whenever the host changes it. Once the
@@ -252,16 +236,20 @@ static uint8_t attractBrightness(uint32_t phaseMs) {
 // then stops re-transmitting.
 static void waitAnimStep(uint32_t now) {
   if (!waitFading) {
-    // Untouched for long enough, and not tinted: start beating to be noticed.
+    // Untouched for long enough, and not tinted: start breathing to be noticed.
     const bool attract =
         !idleTinted &&
         (uint32_t)(now - lastActivityMs) >=
             ProjectConfig::Animation::kIdleAttractDelayMs;
     if (attract) {
-      const uint32_t cycleMs = (ProjectConfig::Animation::kAttractCycleMs == 0)
+      const uint32_t cycleMs = (ProjectConfig::Animation::kAttractBreathPeriodMs == 0)
                                    ? 1
-                                   : ProjectConfig::Animation::kAttractCycleMs;
-      const uint8_t b = attractBrightness((now - lastActivityMs) % cycleMs);
+                                   : ProjectConfig::Animation::kAttractBreathPeriodMs;
+      // Phase counted from the moment standby began, so the first breath starts
+      // at the top of the curve instead of wherever the clock happens to be.
+      const uint32_t sinceStandby =
+          (uint32_t)(now - lastActivityMs) - ProjectConfig::Animation::kIdleAttractDelayMs;
+      const uint8_t b = attractBrightness(sinceStandby % cycleMs, cycleMs);
       staticFill(scaleColor(strip1, waitColorTarget, b));
       return;
     }

@@ -168,7 +168,8 @@ only by a board reboot.
 ### Attract mode
 
 After `Animation::kIdleAttractDelayMs` (5 minutes) with no pour and no tint change,
-the idle strips start beating twice per cycle to draw attention. Any `ACTIVE` or
+the idle strips start a slow breath (`kAttractBreathPeriodMs`, 6 s, full brightness
+down to `kAttractMinBrightness` and back) to draw attention. Any `ACTIVE` or
 `TINT` resets the timer. A held tint suppresses it entirely, on the grounds that a
 tinted machine is one somebody is currently using.
 

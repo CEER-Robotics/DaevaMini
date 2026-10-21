@@ -129,15 +129,16 @@ constexpr uint32_t kIdleTintFadeMs = 600;
 // before it starts breathing.
 constexpr uint32_t kActiveFadeInMs = 700;
 // How long the machine must sit untouched in WAIT before the idle color starts
-// beating to draw attention. Five minutes: long enough that it never fires
+// breathing to draw attention. Five minutes: long enough that it never fires
 // while somebody is deciding.
 constexpr uint32_t kIdleAttractDelayMs = 300000;
-// One attract cycle: two quick thumps and then a rest, like a heartbeat.
-constexpr uint32_t kAttractThumpMs = 150;
-constexpr uint32_t kAttractGapMs = 170;
-constexpr uint32_t kAttractCycleMs = 2400;
-// Brightness the attract beat falls back to between thumps, and peaks at.
-constexpr uint8_t kAttractMinBrightness = 70;
+// One full standby breath, bright -> dim -> bright. Slow on purpose: it was a
+// double heartbeat thump (two 150 ms beats every 2.4 s), which read as nervous
+// for a machine that is only waiting. Six seconds is about a resting breath.
+constexpr uint32_t kAttractBreathPeriodMs = 6000;
+// Brightness the standby breath sinks to, and peaks at. The floor keeps the
+// strips clearly lit at the bottom of the breath, so it never reads as "off".
+constexpr uint8_t kAttractMinBrightness = 60;
 constexpr uint8_t kAttractMaxBrightness = 255;
 // Brightness step per frame for WAIT breathing effect.
 constexpr int16_t kWaitBreatheStep = 10;
