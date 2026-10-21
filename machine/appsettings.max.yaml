@@ -104,8 +104,8 @@ Cocktails:
     IsActive: true
     ShowImage: true
     Category: "Gin"
-    LedR: 50
-    LedG: 255
+    LedR: 255
+    LedG: 50
     LedB: 0
     Ingredients:
       - Name: "Gin"
@@ -121,8 +121,8 @@ Cocktails:
     IsActive: true
     ShowImage: true
     Category: "Vodka"
-    LedR: 50
-    LedG: 255
+    LedR: 255
+    LedG: 50
     LedB: 0
     Ingredients:
       - Name: "Vodka"
@@ -138,8 +138,8 @@ Cocktails:
     IsActive: true
     ShowImage: true
     Category: "Vodka"
-    LedR: 30
-    LedG: 255
+    LedR: 255
+    LedG: 30
     LedB: 0
     Ingredients:
       - Name: "Vodka"
@@ -172,8 +172,8 @@ Cocktails:
     IsActive: true
     ShowImage: true
     Category: "Spritz"
-    LedR: 40
-    LedG: 255
+    LedR: 255
+    LedG: 40
     LedB: 0
     Ingredients:
       - Name: "Tonica"
@@ -191,8 +191,8 @@ Cocktails:
     IsActive: true
     ShowImage: true
     Category: "Spritz"
-    LedR: 10
-    LedG: 255
+    LedR: 255
+    LedG: 10
     LedB: 0
     Ingredients:
       - Name: "Bitter rosso"
@@ -210,8 +210,8 @@ Cocktails:
     IsActive: true
     ShowImage: true
     Category: "Negroni"
-    LedR: 0
-    LedG: 255
+    LedR: 255
+    LedG: 0
     LedB: 0
     Ingredients:
       - Name: "Gin"
@@ -229,8 +229,8 @@ Cocktails:
     IsActive: true
     ShowImage: true
     Category: "Negroni"
-    LedR: 10
-    LedG: 255
+    LedR: 255
+    LedG: 10
     LedB: 0
     Ingredients:
       - Name: "Bitter rosso"
@@ -248,8 +248,8 @@ Cocktails:
     IsActive: true
     ShowImage: true
     Category: "Negroni"
-    LedR: 0
-    LedG: 255
+    LedR: 255
+    LedG: 0
     LedB: 0
     Ingredients:
       - Name: "Bitter rosso"
