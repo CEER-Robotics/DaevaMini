@@ -40,37 +40,45 @@ public static class ArduinoProtocolHelper
     /// Builds the ACTIVE command line with RGB: ACTIVE, RGB:&lt;r&gt;,&lt;g&gt;,&lt;b&gt;, P1:&lt;ms&gt;, ...
     /// Pump segments are ordered by pump ID. At least one pump must have duration &gt; 0 (caller responsibility).
     /// </summary>
-    /// <param name="pumpDuty">PWM duty for the bottle pumps (see <see cref="FormatPumpSegments"/>).</param>
+    /// <param name="pumpDuty">PWM duty per channel for the bottle pumps, or null for full power
+    /// (see <see cref="FormatPumpSegments"/>).</param>
     public static string BuildActiveCommand((byte R, byte G, byte B) ledRgb, IReadOnlyDictionary<int, int> channelDurations,
-        byte pumpDuty = FullPumpDuty)
+        Func<int, byte>? pumpDuty = null)
         => $"ACTIVE, RGB:{ledRgb.R},{ledRgb.G},{ledRgb.B}, {FormatPumpSegments(channelDurations, pumpDuty)}";
 
     /// <summary>
     /// Builds the ACTIVE command line with a preset color name: ACTIVE, BASE:&lt;color&gt;, P1:&lt;ms&gt;, P2:&lt;ms&gt;, ...
     /// Pump segments are ordered by pump ID. At least one pump must have duration &gt; 0 (caller responsibility).
     /// </summary>
-    /// <param name="pumpDuty">PWM duty for the bottle pumps (see <see cref="FormatPumpSegments"/>).</param>
+    /// <param name="pumpDuty">PWM duty per channel for the bottle pumps, or null for full power
+    /// (see <see cref="FormatPumpSegments"/>).</param>
     public static string BuildActiveCommand(string ledColor, IReadOnlyDictionary<int, int> channelDurations,
-        byte pumpDuty = FullPumpDuty)
+        Func<int, byte>? pumpDuty = null)
         => $"ACTIVE, BASE:{NormalizeLedColor(ledColor)}, {FormatPumpSegments(channelDurations, pumpDuty)}";
 
     /// <summary>The firmware's own default drive, sent as no suffix at all.</summary>
     private const byte FullPumpDuty = 255;
 
     /// <summary>
-    /// "P1:&lt;ms&gt;, P3:&lt;ms&gt;@&lt;duty&gt;, ..." - a reduced duty is appended to the bottle pump
-    /// channels only. Keg channels never carry it: they are solenoid valves, and a valve on
+    /// "P1:&lt;ms&gt;, P3:&lt;ms&gt;@&lt;duty&gt;, ..." - each bottle pump channel carries its own
+    /// reduced duty. Keg channels never carry one: they are solenoid valves, and a valve on
     /// a partial duty can chatter or not open at all. At full duty nothing is appended, so
     /// the line is exactly what it was before power became adjustable.
     /// </summary>
-    private static string FormatPumpSegments(IReadOnlyDictionary<int, int> channelDurations, byte pumpDuty)
+    private static string FormatPumpSegments(IReadOnlyDictionary<int, int> channelDurations, Func<int, byte>? pumpDuty)
     {
         var pumpParts = channelDurations
             .Where(kvp => kvp.Value > 0)
             .OrderBy(kvp => kvp.Key)
-            .Select(kvp => kvp.Key <= AppConfig.PumpChannelCount && pumpDuty is > 0 and < FullPumpDuty
-                ? $"P{kvp.Key}:{kvp.Value}@{pumpDuty}"
-                : $"P{kvp.Key}:{kvp.Value}");
+            .Select(kvp =>
+            {
+                byte duty = pumpDuty != null && kvp.Key <= AppConfig.PumpChannelCount
+                    ? pumpDuty(kvp.Key)
+                    : FullPumpDuty;
+                return duty is > 0 and < FullPumpDuty
+                    ? $"P{kvp.Key}:{kvp.Value}@{duty}"
+                    : $"P{kvp.Key}:{kvp.Value}";
+            });
         return string.Join(", ", pumpParts);
     }
 

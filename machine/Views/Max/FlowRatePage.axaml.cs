@@ -41,8 +41,8 @@ public partial class FlowRatePage : UserControl, INotifyPropertyChanged
 
     /// <summary>
     /// Every line with a liquid on it. A keg's throughput depends on its pressure; a
-    /// pump's depends on the power it is driven at, which is adjustable (Potenza pompe),
-    /// so after changing that the pumps need measuring just like the kegs.
+    /// pump's depends on the power it is driven at, which is adjustable per line (Potenza
+    /// pompe), so after changing that the pump needs measuring just like a keg.
     /// </summary>
     private void LoadLines()
     {
@@ -191,7 +191,7 @@ public partial class FlowRatePage : UserControl, INotifyPropertyChanged
             // pump the guests never get. Keg channels ignore the duty (see the helper).
             var durations = new System.Collections.Generic.Dictionary<int, int> { [line.Channel] = TestDurationMs };
             string command = ArduinoProtocolHelper.BuildActiveCommand("CYAN", durations,
-                AppConfigService.Instance.Config.PumpDuty);
+                AppConfigService.Instance.Config.GetPumpDuty);
 
             (bool sent, ActivateResponse response) = await manager.TrySendActiveAsync(command);
             if (!sent || response != ActivateResponse.Success)

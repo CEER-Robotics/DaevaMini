@@ -8,7 +8,11 @@ FlowRate:
 # massimo (60-100). Al massimo spruzzano; sotto il 60% non pescano dal contenitore.
 # Cambio contenitore e risciacquo vanno sempre al 100%, e i fusti pure. Cambiandola
 # cambia quanto versano al secondo: rimisurare le linee. Impostazioni > Potenza pompe.
+# PumpPowerPercent vale per le linee che non hanno un valore proprio in
+# PumpPowerPercents (stesso ordine di LiquidAssignments, 0 = usa PumpPowerPercent):
+# le pompe non vanno tutte alla stessa velocita', quindi ognuna si regola da sola.
 PumpPowerPercent: 100
+PumpPowerPercents: []
 
 FillDurationMs: 5000
 CleanDurationMs: 15000

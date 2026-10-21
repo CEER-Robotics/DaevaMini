@@ -239,7 +239,7 @@ public partial class MainWindow : Window
             // Drinks pour at the configured pump power, so the pumps do not spray into the
             // glass. Fill and rinse deliberately stay at full power: there the job is to
             // push liquid through the whole line, and nobody is holding a glass.
-            byte pumpDuty = AppConfigService.Instance.Config.PumpDuty;
+            Func<int, byte> pumpDuty = AppConfigService.Instance.Config.GetPumpDuty;
             string command = cocktail.LedRgb is { } rgb
                 ? ArduinoProtocolHelper.BuildActiveCommand(rgb, channelDurations, pumpDuty)
                 : ArduinoProtocolHelper.BuildActiveCommand("ORANGE", channelDurations, pumpDuty);

@@ -86,8 +86,52 @@ public sealed class AppConfig
     /// changes how much a pump delivers per second, so the pump lines need measuring
     /// again afterwards (Impostazioni > Velocità delle linee).
     /// </summary>
+    /// <remarks>
+    /// The machine-wide value, kept as the fallback for any line without one of its own in
+    /// <see cref="PumpPowerPercents"/>. It came first; a config saved before power became
+    /// per line still has only this, and keeps pouring exactly as it did.
+    /// </remarks>
     [YamlMember(Alias = "PumpPowerPercent")]
     public int PumpPowerPercent { get; set; } = 100;
+
+    /// <summary>
+    /// Power of each bottle pump, same order as LiquidAssignments. The pumps are the same
+    /// model but do not run at the same speed - lines 4 to 7 were measured noticeably
+    /// apart - so one figure for all of them left some spraying and others too timid.
+    /// Zero or missing falls back to <see cref="PumpPowerPercent"/>.
+    /// </summary>
+    [YamlMember(Alias = "PumpPowerPercents")]
+    public int[] PumpPowerPercents { get; set; } = Array.Empty<int>();
+
+    /// <summary>Power of one pump line (1-based), always within the allowed range.</summary>
+    public int GetPumpPowerPercent(int channel)
+    {
+        int index = channel - 1;
+        int percent = index >= 0 && index < PumpPowerPercents.Length && PumpPowerPercents[index] > 0
+            ? PumpPowerPercents[index]
+            : PumpPowerPercent;
+        return Math.Clamp(percent, MinPumpPowerPercent, 100);
+    }
+
+    /// <summary>
+    /// Sets one pump line's power. The array is grown to cover every pump, and lines that
+    /// had no value of their own are pinned to what they were using, so editing one line
+    /// can never silently move another.
+    /// </summary>
+    public void SetPumpPowerPercent(int channel, int percent)
+    {
+        if (channel < 1 || channel > PumpChannelCount) return;
+
+        if (PumpPowerPercents.Length < PumpChannelCount)
+        {
+            var grown = new int[PumpChannelCount];
+            for (int i = 0; i < PumpChannelCount; i++)
+                grown[i] = GetPumpPowerPercent(i + 1);
+            PumpPowerPercents = grown;
+        }
+
+        PumpPowerPercents[channel - 1] = Math.Clamp(percent, MinPumpPowerPercent, 100);
+    }
 
     /// <summary>
     /// Floor for <see cref="PumpPowerPercent"/>. The pumps used to run at 110/255 (~43%)
@@ -98,10 +142,14 @@ public sealed class AppConfig
     [YamlIgnore]
     public const int MinPumpPowerPercent = 60;
 
-    /// <summary><see cref="PumpPowerPercent"/> as the 0-255 PWM duty the firmware takes.</summary>
-    [YamlIgnore]
-    public byte PumpDuty => (byte)Math.Round(
-        Math.Clamp(PumpPowerPercent, MinPumpPowerPercent, 100) * 255 / 100.0);
+    /// <summary>
+    /// A channel's power as the 1-255 PWM duty the firmware takes. Kegs always get full
+    /// duty, whatever the arrays say.
+    /// </summary>
+    public byte GetPumpDuty(int channel)
+        => channel > PumpChannelCount
+            ? (byte)255
+            : (byte)Math.Round(GetPumpPowerPercent(channel) * 255 / 100.0);
 
     [YamlIgnore]
     public bool IsLargeEvent => EventMode.Trim().Equals("Large", StringComparison.OrdinalIgnoreCase);

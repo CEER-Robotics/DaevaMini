@@ -189,7 +189,7 @@
                             <TextBlock Text="Potenza pompe" Foreground="{StaticResource TextPrimary}"
                                        FontSize="{StaticResource FontTitle}"
                                        FontFamily="Space Grotesk" FontWeight="Medium"/>
-                            <TextBlock Text="Quanto spingono, per non spruzzare" Foreground="{StaticResource TextMuted}"
+                            <TextBlock Text="Quanto spinge ognuna, per non spruzzare" Foreground="{StaticResource TextMuted}"
                                        FontSize="{StaticResource FontCaption}"
                                        FontFamily="Space Grotesk"/>
                         </StackPanel>

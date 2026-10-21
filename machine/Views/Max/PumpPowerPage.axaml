@@ -13,7 +13,7 @@
             <Setter Property="Background" Value="#1F211C"/>
             <Setter Property="BorderBrush" Value="#3A3D33"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="60"/>
+            <Setter Property="CornerRadius" Value="33"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -66,42 +66,17 @@
                    TextAlignment="Center" LetterSpacing="3"/>
 
         <TextBlock Canvas.Top="88" Width="1920"
-                   Text="Quanto spingono le pompe delle bottiglie quando versano un drink. I fusti restano sempre al massimo."
+                   Text="Quanto spinge ogni pompa quando versa un drink, dal 60% al 100%. I fusti restano sempre al massimo."
                    Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
                    FontFamily="Space Grotesk" TextAlignment="Center"/>
 
-        <!-- The one value on the page, big, between its two buttons. -->
-        <Border Canvas.Left="260" Canvas.Top="150" Width="1400" Height="230" CornerRadius="32"
-                Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1">
-            <Grid ColumnDefinitions="*,Auto,*" VerticalAlignment="Center">
-                <Button Grid.Column="0" Classes="StepBtn" Width="120" Height="120" HorizontalAlignment="Right"
-                        IsEnabled="{Binding CanDecrease, ElementName=PageHost}" Click="OnDecreaseClick">
-                    <PathIcon Width="40" Height="40" Foreground="{StaticResource TextPrimary}" Data="M19,13H5V11H19V13Z"/>
-                </Button>
-
-                <StackPanel Grid.Column="1" Width="640" VerticalAlignment="Center" Spacing="6">
-                    <TextBlock Text="{Binding PowerLabel, ElementName=PageHost}"
-                               Foreground="{StaticResource Accent}" FontSize="{StaticResource FontHero}"
-                               FontWeight="Bold" FontFamily="Space Grotesk" TextAlignment="Center"/>
-                    <TextBlock Text="{Binding PowerDetail, ElementName=PageHost}"
-                               Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
-                               FontFamily="Space Grotesk" TextAlignment="Center"/>
-                </StackPanel>
-
-                <Button Grid.Column="2" Classes="StepBtn" Width="120" Height="120" HorizontalAlignment="Left"
-                        IsEnabled="{Binding CanIncrease, ElementName=PageHost}" Click="OnIncreaseClick">
-                    <PathIcon Width="40" Height="40" Foreground="{StaticResource TextPrimary}" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
-                </Button>
-            </Grid>
-        </Border>
-
-        <!-- Once the value moves, the pumps no longer deliver what the doses assume. -->
-        <Border Canvas.Left="260" Canvas.Top="400" Width="1400" Height="90" CornerRadius="20"
+        <!-- Once a value moves, that pump no longer delivers what its doses assume. -->
+        <Border Canvas.Left="260" Canvas.Top="140" Width="1400" Height="90" CornerRadius="20"
                 Background="#141008" BorderBrush="#5A4A16" BorderThickness="1" Padding="30,0,16,0"
                 IsVisible="{Binding ShowRecalibrate, ElementName=PageHost}">
             <Grid ColumnDefinitions="*,Auto">
                 <TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap"
-                           Text="Con una potenza diversa le pompe versano più o meno al secondo: misurale di nuovo, o le dosi non tornano."
+                           Text="Le pompe che hai cambiato versano più o meno al secondo: misurale di nuovo, o le dosi non tornano."
                            Foreground="{StaticResource Warning}" FontSize="{StaticResource FontBody}"
                            FontFamily="Space Grotesk"/>
                 <Button Grid.Column="1" Classes="TestBtn" Width="300" Height="62" Margin="20,0,0,0"
@@ -113,7 +88,7 @@
             </Grid>
         </Border>
 
-        <Border Canvas.Left="260" Canvas.Top="510" Width="1400" Height="450" CornerRadius="32"
+        <Border Canvas.Left="260" Canvas.Top="250" Width="1400" Height="715" CornerRadius="32"
                 Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1" Padding="34,24">
             <Grid>
                 <TextBlock IsVisible="{Binding IsEmpty, ElementName=PageHost}"
@@ -128,8 +103,8 @@
                     <ItemsControl ItemsSource="{Binding Lines, ElementName=PageHost}" Margin="0,0,14,0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="max:PumpLine">
-                                <Border Height="96" CornerRadius="22" Background="#0CFFFFFF" Padding="30,0" Margin="0,0,0,12">
-                                    <Grid ColumnDefinitions="*,Auto">
+                                <Border Height="104" CornerRadius="22" Background="#0CFFFFFF" Padding="30,0" Margin="0,0,0,12">
+                                    <Grid ColumnDefinitions="*,Auto,Auto">
                                         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Liquid}"
                                                        Foreground="{StaticResource TextPrimary}"
@@ -141,9 +116,28 @@
                                                        FontFamily="Space Grotesk" VerticalAlignment="Center"/>
                                         </StackPanel>
 
+                                        <!-- This pump's own power, between its two buttons. -->
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="18"
+                                                    VerticalAlignment="Center" Margin="0,0,40,0">
+                                            <Button Classes="StepBtn" Width="66" Height="66"
+                                                    IsEnabled="{Binding CanDecrease}"
+                                                    Click="OnDecreaseClick" CommandParameter="{Binding}">
+                                                <PathIcon Width="26" Height="26" Foreground="{StaticResource TextPrimary}" Data="M19,13H5V11H19V13Z"/>
+                                            </Button>
+                                            <TextBlock Text="{Binding PowerLabel}" Width="150"
+                                                       Foreground="{StaticResource Accent}" FontSize="{StaticResource FontSection}"
+                                                       FontWeight="Bold" FontFamily="Space Grotesk"
+                                                       TextAlignment="Center" VerticalAlignment="Center"/>
+                                            <Button Classes="StepBtn" Width="66" Height="66"
+                                                    IsEnabled="{Binding CanIncrease}"
+                                                    Click="OnIncreaseClick" CommandParameter="{Binding}">
+                                                <PathIcon Width="26" Height="26" Foreground="{StaticResource TextPrimary}" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                                            </Button>
+                                        </StackPanel>
+
                                         <!-- Five seconds into a glass: enough to see the jet. -->
-                                        <Button Grid.Column="1" Classes="TestBtn" Width="230" Height="62"
-                                                IsEnabled="{Binding CanTest, ElementName=PageHost}"
+                                        <Button Grid.Column="2" Classes="TestBtn" Width="230" Height="62"
+                                                IsEnabled="{Binding CanTest}"
                                                 Click="OnTestClick" CommandParameter="{Binding}">
                                             <TextBlock Text="PROVA 5 s" Foreground="{StaticResource TextPrimary}"
                                                        FontSize="{StaticResource FontBody}" FontWeight="Bold"
@@ -159,7 +153,7 @@
         </Border>
 
         <TextBlock Name="StatusLine"
-                   Canvas.Top="985" Width="1920" Text=""
+                   Canvas.Top="990" Width="1920" Text=""
                    Foreground="{StaticResource Accent}" FontSize="{StaticResource FontBody}"
                    FontFamily="Space Grotesk" TextAlignment="Center"/>
     </Canvas>
