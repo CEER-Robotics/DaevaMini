@@ -116,6 +116,14 @@ Pump parsing details:
 - Duration unit is milliseconds.
 - `P<n>:0` explicitly turns that pump off.
 - At least one pump must have duration `> 0` for command acceptance.
+- Optional power: `P<n>:<ms>@<duty>` drives that channel at PWM duty `<duty>` (`1`–`255`)
+  instead of the default `255` (`Pump::kDefaultPwm`). Example: `P3:1200@180`.
+  - The host uses it to slow the bottle pumps, which spray when run flat out. Keg valves
+    (P11+) are always sent without it: a solenoid needs full drive to open cleanly.
+  - A missing, `0` or out-of-range duty falls back to `255`; the segment is never refused
+    for it, so the pour happens at the power an older host would have used.
+  - Backward compatible both ways: firmware older than this skips `@<duty>` as noise and
+    pours at full power; a host that never sends it gets full power from this firmware.
 
 Possible responses:
 - `OK ACTIVE`
@@ -254,7 +262,8 @@ Possible lines emitted by firmware:
   - First CSV token must be exactly `ACTIVE` (uppercase).
   - Field separator is comma `,`.
   - Color field key must be `BASE` or `COLOR` (uppercase).
-  - Pump segments can appear anywhere in the line and are scanned as `P<number>:<digits>`.
+  - Pump segments can appear anywhere in the line and are scanned as `P<number>:<digits>`,
+    optionally followed by `@<digits>` (PWM duty, see 3.4).
 
 - Buffer limit:
   - RX line buffer is 256 bytes including terminator.

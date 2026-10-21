@@ -10,9 +10,16 @@ namespace BoardConfig {
 
 namespace Pump {
 // Pump channels P1..P17 on the Teensy 4.1 pump controller board.
+//
+// P2 and P15 are SWAPPED on purpose. The board's P2 output (pin 7) is broken, so
+// the pump of line 2 was rewired to the free P15 connector (pin 24) in October
+// 2026. Channel 2 therefore drives pin 24, and the dead pin 7 is parked on
+// channel 15, which no line uses. The host, the config and the "Linea 2" on the
+// touchscreen are untouched: only the wire and this table moved. If the board is
+// repaired or replaced, swap these two back AND move the wire back to P2.
 constexpr std::array<uint8_t, 17> kPins = {
-    6,  7,  8,  9,  10, 11, 12, 13, 14,
-    15, 18, 19, 22, 23, 24, 25, 28};
+    6,  24, 8,  9,  10, 11, 12, 13, 14,
+    15, 18, 19, 22, 23, 7,  25, 28};
 
 inline void configurePwm() {
   analogWriteResolution(8);

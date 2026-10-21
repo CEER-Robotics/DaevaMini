@@ -23,6 +23,7 @@ This is the single most important cross-cutting fact. The C# `ArduinoProtocolHel
 - Command shape: `ACTIVE, RGB:r,g,b, P1:ms, P3:ms` or `ACTIVE, BASE:COLOR_NAME, ...`; plus `READY`, `TOXIC`, `MANUTENZIONE`.
 - Firmware state machine: `STARTUP → WAIT → ACTIVE → ENDING → WAIT`. `ACTIVE` is accepted **only in `WAIT`**; otherwise the firmware replies `IGNORED ACTIVE`.
 - Pump durations are computed host-side as `milliliters × FlowRate.MillisecondsPerMilliliter`, per liquid, mapped to a pump channel by position in `LiquidAssignments`.
+- Pump power: a segment may end in `@<duty>` (`P3:1200@180`, PWM 1–255, default 255). The host appends it only to bottle pumps (P1–P10), only for drinks and flow measurement, from `PumpPowerPercent` (60–100) — the pumps spray at full power. Kegs (P11+) are solenoid valves and never get it; container change and rinse always run at 100%. The 60% floor is not arbitrary: the firmware used to drive every pump at 110/255 (~43%), where they **could not draw liquid up from the container**, which is why it was raised to 255 in Aug 2026 — and why the pumps then started spraying. Old firmware skips the suffix, so the two sides can be updated in either order. Lowering the power changes ml/s, so pump lines must be re-measured (the flow-rate page now covers pumps as well as kegs).
 
 **ACTIVE is sent with retry and is safe to retry.** `ArduinoSerialManager.TrySendActive` resends up to 3× when no ack arrives, because the firmware drops inbound bytes while its LED driver has interrupts disabled. This can't double-pour: once dispensing, the board is no longer in `WAIT` and answers `IGNORED ACTIVE` without scheduling a pump.
 
@@ -187,6 +188,7 @@ Beware two firmware faults that mimic the electrical one: a `kStripNLen` **short
 
 - `arduino/libraries/DaevaMax/` — shared MAX firmware (Due + Teensy 4.1). `SerialCommandHandler`, `PumpControl`, `LedStateMachine`/`LedAnimations`, `DaevaMaxFirmware`.
   - `src/boards/ArduinoDue.h`, `src/boards/Teensy41.h` — per-board pin maps and serial setup (Due uses `SerialUSB`; Teensy uses `Serial1` on pins 0/1 for the Pi GPIO UART link).
+  - ⚠️ **On the Max, P2 and P15 are swapped in `Teensy41.h`.** The board's P2 output (pin 7) is broken; the line-2 pump is physically wired to the P15 connector (pin 24), and channel 2 is mapped there. Protocol channel numbers, `LiquidAssignments` and the UI still say "line 2" — when tracing a line-2 fault, look at the **P15** connector. Channel 15 now points at the dead pin and must stay unused. Swap back only together with the wire, if the board is repaired or replaced.
   - `src/ProjectConfig.h` — shared tunables: pin counts, strip lengths, colors, animation params, timeouts (e.g. `Timing::kToxicTimeoutMs`, `Animation::kToxicAnim`).
 - `arduino/main/main.ino`, `arduino/teensy_max/teensy_max.ino` — thin sketches that just call the shared library.
 - `arduino/mini/` — the Mini variant is a **separate, self-contained sketch** (does not use `libraries/DaevaMax`).

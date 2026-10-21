@@ -4,6 +4,12 @@ EventMode: "Small"
 FlowRate:
   MillisecondsPerMilliliter: 117
 
+# Potenza delle pompe delle bottiglie (linee 1-10) quando versano un drink, in % del
+# massimo (60-100). Al massimo spruzzano; sotto il 60% non pescano dal contenitore.
+# Cambio contenitore e risciacquo vanno sempre al 100%, e i fusti pure. Cambiandola
+# cambia quanto versano al secondo: rimisurare le linee. Impostazioni > Potenza pompe.
+PumpPowerPercent: 100
+
 FillDurationMs: 5000
 CleanDurationMs: 15000
 SettingsPin: "1234"

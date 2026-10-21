@@ -79,6 +79,30 @@ public sealed class AppConfig
     [YamlIgnore]
     public const int PumpChannelCount = 10;
 
+    /// <summary>
+    /// How hard the bottle pumps are driven when pouring a drink, as a percentage of full
+    /// PWM. Flat out they spray into the glass. Applies to lines 1..PumpChannelCount only:
+    /// the kegs are solenoid valves, which need full drive to open cleanly. Changing it
+    /// changes how much a pump delivers per second, so the pump lines need measuring
+    /// again afterwards (Impostazioni > Velocità delle linee).
+    /// </summary>
+    [YamlMember(Alias = "PumpPowerPercent")]
+    public int PumpPowerPercent { get; set; } = 100;
+
+    /// <summary>
+    /// Floor for <see cref="PumpPowerPercent"/>. The pumps used to run at 110/255 (~43%)
+    /// and at that power they could not draw liquid up from the container, which is why
+    /// the firmware was raised to full power in August 2026. Sixty keeps well clear of it.
+    /// Filling a new container and rinsing ignore this setting and always run at 100%.
+    /// </summary>
+    [YamlIgnore]
+    public const int MinPumpPowerPercent = 60;
+
+    /// <summary><see cref="PumpPowerPercent"/> as the 0-255 PWM duty the firmware takes.</summary>
+    [YamlIgnore]
+    public byte PumpDuty => (byte)Math.Round(
+        Math.Clamp(PumpPowerPercent, MinPumpPowerPercent, 100) * 255 / 100.0);
+
     [YamlIgnore]
     public bool IsLargeEvent => EventMode.Trim().Equals("Large", StringComparison.OrdinalIgnoreCase);
 

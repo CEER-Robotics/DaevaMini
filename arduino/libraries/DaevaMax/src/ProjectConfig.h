@@ -16,7 +16,8 @@ constexpr size_t kRxBufferSize = 256;
 namespace Pump {
 // Number of pump channels supported by firmware.
 constexpr uint8_t kCount = 17;
-// Default PWM duty for pump activation (0-255).
+// Default PWM duty for pump activation (0-255), used whenever a pump segment
+// carries no "@<duty>" of its own (see SERIAL_PROTOCOL.md, ACTIVE).
 constexpr uint8_t kDefaultPwm = 255;
 }  // namespace Pump
 

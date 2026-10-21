@@ -236,9 +236,13 @@ public partial class MainWindow : Window
                 return false;
             }
 
+            // Drinks pour at the configured pump power, so the pumps do not spray into the
+            // glass. Fill and rinse deliberately stay at full power: there the job is to
+            // push liquid through the whole line, and nobody is holding a glass.
+            byte pumpDuty = AppConfigService.Instance.Config.PumpDuty;
             string command = cocktail.LedRgb is { } rgb
-                ? ArduinoProtocolHelper.BuildActiveCommand(rgb, channelDurations)
-                : ArduinoProtocolHelper.BuildActiveCommand("ORANGE", channelDurations);
+                ? ArduinoProtocolHelper.BuildActiveCommand(rgb, channelDurations, pumpDuty)
+                : ArduinoProtocolHelper.BuildActiveCommand("ORANGE", channelDurations, pumpDuty);
             Console.WriteLine($"[MainWindow] Sending command: {command}");
 
             if (!manager.IsConnected)
@@ -414,6 +418,12 @@ public partial class MainWindow : Window
     {
         if (_pageContainer != null)
             SetPage(new FlowRatePage());
+    }
+
+    public void ShowPumpPowerPage()
+    {
+        if (_pageContainer != null)
+            SetPage(new PumpPowerPage());
     }
 
     public void ShowSettingsPage()

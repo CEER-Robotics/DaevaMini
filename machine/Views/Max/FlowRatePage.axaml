@@ -141,12 +141,12 @@
             </StackPanel>
         </Button>
 
-        <TextBlock Canvas.Top="40" Width="1920" Text="VELOCITÀ DEI FUSTI" Foreground="{StaticResource TextPrimary}"
+        <TextBlock Canvas.Top="40" Width="1920" Text="VELOCITÀ DELLE LINEE" Foreground="{StaticResource TextPrimary}"
                    FontSize="{StaticResource FontSection}" FontWeight="Bold" FontFamily="Space Grotesk"
                    TextAlignment="Center" LetterSpacing="3"/>
 
         <TextBlock Canvas.Top="88" Width="1920"
-                   Text="Ogni fusto versa a una velocità diversa. Misurala una volta e i cocktail verranno giusti."
+                   Text="Ogni linea versa a una velocità diversa. Misurala una volta, e di nuovo se cambi la potenza delle pompe."
                    Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
                    FontFamily="Space Grotesk" TextAlignment="Center"/>
 
@@ -154,7 +154,7 @@
         <Border Canvas.Left="360" Canvas.Top="140" Width="1200" Height="70" CornerRadius="20"
                 Background="#141008" BorderBrush="#5A4A16" BorderThickness="1"
                 IsVisible="{Binding AreKegsOff, ElementName=PageHost}">
-            <TextBlock Text="I fusti sono spenti. Accendi &quot;Attiva fusti&quot; nelle impostazioni per poterli misurare."
+            <TextBlock Text="I fusti sono spenti: le pompe si misurano, i fusti solo dopo &quot;Attiva fusti&quot;."
                        Foreground="{StaticResource Warning}" FontSize="{StaticResource FontBody}"
                        FontFamily="Space Grotesk" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Border>
@@ -163,7 +163,7 @@
                 Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1" Padding="34,28">
             <Grid>
                 <TextBlock IsVisible="{Binding IsEmpty, ElementName=PageHost}"
-                           Text="Nessun fusto configurato. Assegna un liquido a un fusto in &quot;Selezione liquidi&quot;."
+                           Text="Nessuna linea configurata. Assegna i liquidi in &quot;Selezione liquidi&quot;."
                            Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontTitle}"
                            FontFamily="Space Grotesk" TextAlignment="Center" TextWrapping="Wrap"
                            VerticalAlignment="Center" Margin="60,0"/>
@@ -200,7 +200,7 @@
                                         </StackPanel>
 
                                         <Button Grid.Column="1" Classes="TestBtn" Width="230" Height="66"
-                                                IsEnabled="{Binding CanMeasure, ElementName=PageHost}"
+                                                IsEnabled="{Binding CanMeasure}"
                                                 Click="OnMeasureClick" CommandParameter="{Binding}">
                                             <TextBlock Text="MISURA" Foreground="{StaticResource TextPrimary}"
                                                        FontSize="{StaticResource FontBody}" FontWeight="Bold"
@@ -242,9 +242,9 @@
                         <TextBlock Text="{Binding WizardTitle, ElementName=PageHost}"
                                    Foreground="{StaticResource Accent}" FontSize="{StaticResource FontTitle}"
                                    FontWeight="Bold" FontFamily="Space Grotesk" TextAlignment="Center"/>
-                        <TextBlock Classes="StepTitle" Text="Metti un bicchiere vuoto sotto questo fusto"/>
+                        <TextBlock Classes="StepTitle" Text="Metti un bicchiere vuoto sotto questa linea"/>
                         <TextBlock Classes="StepBody"
-                                   Text="Quando premi, il fusto versa per 10 secondi. Raccogli tutto il liquido: fra poco ti chiedo quanto ne è uscito."/>
+                                   Text="Quando premi, la linea versa per 10 secondi. Raccogli tutto il liquido: fra poco ti chiedo quanto ne è uscito."/>
                         <Grid ColumnDefinitions="*,20,*" Margin="0,20,0,0">
                             <Button Grid.Column="0" Classes="GhostBtn" Click="OnCancelWizard">
                                 <TextBlock Text="ANNULLA" Foreground="{StaticResource TextMuted}"

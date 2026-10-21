@@ -1,0 +1,166 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:max="clr-namespace:DaevaMini.Views.Max"
+             xmlns:controls="clr-namespace:DaevaMini.Controls"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+             x:Class="DaevaMini.Views.Max.PumpPowerPage"
+             x:Name="PageHost">
+
+    <UserControl.Styles>
+        <Style Selector="Button.StepBtn">
+            <Setter Property="Background" Value="#1F211C"/>
+            <Setter Property="BorderBrush" Value="#3A3D33"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="60"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.StepBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#2A3030"/>
+        </Style>
+        <Style Selector="Button.StepBtn:disabled">
+            <Setter Property="Opacity" Value="0.3"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
+        <Style Selector="Button.TestBtn">
+            <Setter Property="Background" Value="#26FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#4DFFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="22"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.TestBtn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#3DFFFFFF"/>
+        </Style>
+        <Style Selector="Button.TestBtn:disabled">
+            <Setter Property="Opacity" Value="0.3"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Canvas Width="1920" Height="1080">
+        <Canvas.Background>
+            <RadialGradientBrush Center="50%,50%" GradientOrigin="50%,50%" RadiusX="80%" RadiusY="80%">
+                <GradientStop Color="#1A2222" Offset="0"/>
+                <GradientStop Color="#0B0D0D" Offset="1"/>
+            </RadialGradientBrush>
+        </Canvas.Background>
+
+        <Button Canvas.Left="60" Canvas.Top="40" Classes="ChromeChip" Click="OnBackClick" Width="220" Height="56">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Background="Transparent">
+                <PathIcon Width="20" Height="20" Foreground="{StaticResource TextPrimary}" Margin="0,0,12,0"
+                          Data="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                <TextBlock Text="INDIETRO" Foreground="{StaticResource TextPrimary}" FontSize="{StaticResource FontBody}"
+                           FontFamily="Space Grotesk" FontWeight="Bold" LetterSpacing="2" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+
+        <TextBlock Canvas.Top="40" Width="1920" Text="POTENZA POMPE" Foreground="{StaticResource TextPrimary}"
+                   FontSize="{StaticResource FontSection}" FontWeight="Bold" FontFamily="Space Grotesk"
+                   TextAlignment="Center" LetterSpacing="3"/>
+
+        <TextBlock Canvas.Top="88" Width="1920"
+                   Text="Quanto spingono le pompe delle bottiglie quando versano un drink. I fusti restano sempre al massimo."
+                   Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
+                   FontFamily="Space Grotesk" TextAlignment="Center"/>
+
+        <!-- The one value on the page, big, between its two buttons. -->
+        <Border Canvas.Left="260" Canvas.Top="150" Width="1400" Height="230" CornerRadius="32"
+                Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1">
+            <Grid ColumnDefinitions="*,Auto,*" VerticalAlignment="Center">
+                <Button Grid.Column="0" Classes="StepBtn" Width="120" Height="120" HorizontalAlignment="Right"
+                        IsEnabled="{Binding CanDecrease, ElementName=PageHost}" Click="OnDecreaseClick">
+                    <PathIcon Width="40" Height="40" Foreground="{StaticResource TextPrimary}" Data="M19,13H5V11H19V13Z"/>
+                </Button>
+
+                <StackPanel Grid.Column="1" Width="640" VerticalAlignment="Center" Spacing="6">
+                    <TextBlock Text="{Binding PowerLabel, ElementName=PageHost}"
+                               Foreground="{StaticResource Accent}" FontSize="{StaticResource FontHero}"
+                               FontWeight="Bold" FontFamily="Space Grotesk" TextAlignment="Center"/>
+                    <TextBlock Text="{Binding PowerDetail, ElementName=PageHost}"
+                               Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontBody}"
+                               FontFamily="Space Grotesk" TextAlignment="Center"/>
+                </StackPanel>
+
+                <Button Grid.Column="2" Classes="StepBtn" Width="120" Height="120" HorizontalAlignment="Left"
+                        IsEnabled="{Binding CanIncrease, ElementName=PageHost}" Click="OnIncreaseClick">
+                    <PathIcon Width="40" Height="40" Foreground="{StaticResource TextPrimary}" Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Once the value moves, the pumps no longer deliver what the doses assume. -->
+        <Border Canvas.Left="260" Canvas.Top="400" Width="1400" Height="90" CornerRadius="20"
+                Background="#141008" BorderBrush="#5A4A16" BorderThickness="1" Padding="30,0,16,0"
+                IsVisible="{Binding ShowRecalibrate, ElementName=PageHost}">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap"
+                           Text="Con una potenza diversa le pompe versano più o meno al secondo: misurale di nuovo, o le dosi non tornano."
+                           Foreground="{StaticResource Warning}" FontSize="{StaticResource FontBody}"
+                           FontFamily="Space Grotesk"/>
+                <Button Grid.Column="1" Classes="TestBtn" Width="300" Height="62" Margin="20,0,0,0"
+                        Click="OnMeasureClick">
+                    <TextBlock Text="MISURA LE LINEE" Foreground="{StaticResource TextPrimary}"
+                               FontSize="{StaticResource FontBody}" FontWeight="Bold"
+                               FontFamily="Space Grotesk" LetterSpacing="1"/>
+                </Button>
+            </Grid>
+        </Border>
+
+        <Border Canvas.Left="260" Canvas.Top="510" Width="1400" Height="450" CornerRadius="32"
+                Background="#0AFFFFFF" BorderBrush="#15FFFFFF" BorderThickness="1" Padding="34,24">
+            <Grid>
+                <TextBlock IsVisible="{Binding IsEmpty, ElementName=PageHost}"
+                           Text="Nessuna pompa configurata. Assegna i liquidi in &quot;Selezione liquidi&quot;."
+                           Foreground="{StaticResource TextMuted}" FontSize="{StaticResource FontTitle}"
+                           FontFamily="Space Grotesk" TextAlignment="Center" TextWrapping="Wrap"
+                           VerticalAlignment="Center" Margin="60,0"/>
+
+                <!-- Dragged with a finger like the other lists; see Controls/DragScroll.cs. -->
+                <ScrollViewer controls:DragScroll.Enabled="True" HorizontalScrollBarVisibility="Disabled"
+                              IsVisible="{Binding HasLines, ElementName=PageHost}">
+                    <ItemsControl ItemsSource="{Binding Lines, ElementName=PageHost}" Margin="0,0,14,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="max:PumpLine">
+                                <Border Height="96" CornerRadius="22" Background="#0CFFFFFF" Padding="30,0" Margin="0,0,0,12">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Liquid}"
+                                                       Foreground="{StaticResource TextPrimary}"
+                                                       FontSize="{StaticResource FontTitle}" FontWeight="Bold"
+                                                       FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding ChannelLabel}"
+                                                       Foreground="{StaticResource TextMuted}"
+                                                       FontSize="{StaticResource FontCaption}"
+                                                       FontFamily="Space Grotesk" VerticalAlignment="Center"/>
+                                        </StackPanel>
+
+                                        <!-- Three seconds into a glass: enough to see the jet. -->
+                                        <Button Grid.Column="1" Classes="TestBtn" Width="230" Height="62"
+                                                IsEnabled="{Binding CanTest, ElementName=PageHost}"
+                                                Click="OnTestClick" CommandParameter="{Binding}">
+                                            <TextBlock Text="PROVA 3 s" Foreground="{StaticResource TextPrimary}"
+                                                       FontSize="{StaticResource FontBody}" FontWeight="Bold"
+                                                       FontFamily="Space Grotesk" LetterSpacing="1"/>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <TextBlock Name="StatusLine"
+                   Canvas.Top="985" Width="1920" Text=""
+                   Foreground="{StaticResource Accent}" FontSize="{StaticResource FontBody}"
+                   FontFamily="Space Grotesk" TextAlignment="Center"/>
+    </Canvas>
+</UserControl>

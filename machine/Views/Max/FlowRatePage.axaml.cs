@@ -10,8 +10,8 @@ using DaevaMini.Services;
 namespace DaevaMini.Views.Max;
 
 /// <summary>
-/// Teaches the machine how fast each keg pours, by pouring for a fixed time and asking
-/// how much came out.
+/// Teaches the machine how fast each line pours - keg or pump - by pouring for a fixed
+/// time and asking how much came out.
 /// </summary>
 /// <remarks>
 /// This used to be a table of millilitres per second with a "-" and a "+": you poured for
@@ -40,8 +40,9 @@ public partial class FlowRatePage : UserControl, INotifyPropertyChanged
     public ObservableCollection<LineFlowRate> Lines { get; } = new();
 
     /// <summary>
-    /// Kegs only: the pumps have a fixed throughput the machine already knows, while a
-    /// keg's depends on its pressure, so it is the one thing that has to be measured.
+    /// Every line with a liquid on it. A keg's throughput depends on its pressure; a
+    /// pump's depends on the power it is driven at, which is adjustable (Potenza pompe),
+    /// so after changing that the pumps need measuring just like the kegs.
     /// </summary>
     private void LoadLines()
     {
@@ -50,15 +51,18 @@ public partial class FlowRatePage : UserControl, INotifyPropertyChanged
         var config = AppConfigService.Instance.Config;
         var assignments = config.LiquidAssignments;
 
-        for (int index = AppConfig.PumpChannelCount; index < assignments.Length; index++)
+        for (int index = 0; index < assignments.Length; index++)
         {
             if (string.IsNullOrWhiteSpace(assignments[index]))
                 continue;
 
             int channel = index + 1;
+            bool isKeg = index >= AppConfig.PumpChannelCount;
             Lines.Add(new LineFlowRate(channel, assignments[index],
                 config.GetFlowRateMlPerSecond(channel),
-                1000.0 / config.FlowRate.MillisecondsPerMilliliter));
+                1000.0 / config.FlowRate.MillisecondsPerMilliliter,
+                isKeg,
+                canMeasure: !isKeg || config.IsLargeEvent));
         }
 
         OnPropertyChanged(nameof(HasLines));
@@ -73,8 +77,6 @@ public partial class FlowRatePage : UserControl, INotifyPropertyChanged
     /// so up front rather than letting someone run ten fruitless tests.
     /// </summary>
     public bool AreKegsOff => !AppConfigService.Instance.Config.IsLargeEvent;
-
-    public bool CanMeasure => !AreKegsOff;
 
     private void OnBackClick(object? sender, RoutedEventArgs e)
     {
@@ -185,8 +187,11 @@ public partial class FlowRatePage : UserControl, INotifyPropertyChanged
         using var operation = MachineRuntimeState.Instance.BeginOperation("flow-test");
         try
         {
+            // Measured at the power drinks are poured at, or the figure would describe a
+            // pump the guests never get. Keg channels ignore the duty (see the helper).
             var durations = new System.Collections.Generic.Dictionary<int, int> { [line.Channel] = TestDurationMs };
-            string command = ArduinoProtocolHelper.BuildActiveCommand("CYAN", durations);
+            string command = ArduinoProtocolHelper.BuildActiveCommand("CYAN", durations,
+                AppConfigService.Instance.Config.PumpDuty);
 
             (bool sent, ActivateResponse response) = await manager.TrySendActiveAsync(command);
             if (!sent || response != ActivateResponse.Success)
@@ -262,7 +267,7 @@ public partial class FlowRatePage : UserControl, INotifyPropertyChanged
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
 
-/// <summary>One keg line on the page.</summary>
+/// <summary>One line on the page, pump or keg.</summary>
 public sealed class LineFlowRate : INotifyPropertyChanged
 {
     /// <summary>A glassful, used to say the rate in something you can picture.</summary>
@@ -270,16 +275,25 @@ public sealed class LineFlowRate : INotifyPropertyChanged
 
     private double _stored;
 
-    public LineFlowRate(int channel, string liquid, double stored, double fallback)
+    public LineFlowRate(int channel, string liquid, double stored, double fallback, bool isKeg, bool canMeasure)
     {
         Channel = channel;
         Liquid = liquid;
         Fallback = fallback;
+        IsKeg = isKeg;
+        CanMeasure = canMeasure;
         _stored = stored;
     }
 
     public int Channel { get; }
     public string Liquid { get; }
+    public bool IsKeg { get; }
+
+    /// <summary>
+    /// A keg with the kegs switched off would pour into a closed valve; a pump can always
+    /// be measured.
+    /// </summary>
+    public bool CanMeasure { get; }
 
     /// <summary>Machine-wide throughput, used whenever this line has none of its own.</summary>
     public double Fallback { get; }
@@ -302,7 +316,7 @@ public sealed class LineFlowRate : INotifyPropertyChanged
 
     public double Effective => _stored > 0 ? _stored : Fallback;
 
-    public string ChannelLabel => $"Fusto {Channel}";
+    public string ChannelLabel => IsKeg ? $"Fusto {Channel}" : $"Linea {Channel}";
 
     /// <summary>
     /// The rate as a thing you can picture. "45 mL/s" means nothing to most people;
@@ -328,7 +342,7 @@ public sealed class LineFlowRate : INotifyPropertyChanged
     /// measured by anyone.
     /// </summary>
     public string SourceLabel => _stored > 0
-        ? "Velocità impostata per questo fusto"
+        ? "Velocità impostata per questa linea"
         : "Non ancora misurata: usa il valore standard";
 
     public event PropertyChangedEventHandler? PropertyChanged;

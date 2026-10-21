@@ -67,6 +67,12 @@ public partial class SettingsDaevaMax : UserControl
             mainWindow.ShowFlowRatePage();
     }
 
+    private void OnPumpPowerClick(object? sender, RoutedEventArgs e)
+    {
+        if (VisualRoot is MainWindow mainWindow)
+            mainWindow.ShowPumpPowerPage();
+    }
+
     private void OnLedColorClick(object? sender, RoutedEventArgs e)
     {
         if (VisualRoot is MainWindow mainWindow)

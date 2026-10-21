@@ -13,8 +13,8 @@ static inline void pumpOff(uint8_t idx) {
   offAtMs[idx] = 0;
 }
 
-static inline void pumpOnFor(uint8_t idx, uint32_t durationMs) {
-  analogWrite(BoardConfig::Pump::kPins[idx], ProjectConfig::Pump::kDefaultPwm);
+static inline void pumpOnFor(uint8_t idx, uint32_t durationMs, uint8_t duty) {
+  analogWrite(BoardConfig::Pump::kPins[idx], duty);
   offAtMs[idx] = millis() + durationMs;
 }
 
@@ -82,11 +82,33 @@ uint32_t scheduleFromLine(const char* s) {
         continue;
       }
 
+      // Optional "@<duty>" after the duration, 1-255: how hard this channel is
+      // driven. The bottle pumps spray when run flat out, so the host slows them;
+      // the keg valves never carry it and stay at the default. Anything missing or
+      // out of range falls back to the default rather than refusing the segment,
+      // so the pour still happens at the power every older host already used.
+      uint8_t duty = ProjectConfig::Pump::kDefaultPwm;
+      if (*s == '@') {
+        s++;
+        uint32_t requested = 0;
+        bool hasDuty = false;
+        while (*s >= '0' && *s <= '9') {
+          hasDuty = true;
+          if (requested <= 255u) {
+            requested = requested * 10u + (uint32_t)(*s - '0');
+          }
+          s++;
+        }
+        if (hasDuty && requested >= 1u && requested <= 255u) {
+          duty = (uint8_t)requested;
+        }
+      }
+
       const uint8_t idx = (uint8_t)(pumpNum - 1);
       if (dur == 0) {
         pumpOff(idx);
       } else {
-        pumpOnFor(idx, dur);
+        pumpOnFor(idx, dur, duty);
         if (offAtMs[idx] > maxEnd) {
           maxEnd = offAtMs[idx];
         }
