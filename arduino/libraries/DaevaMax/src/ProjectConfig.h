@@ -125,8 +125,9 @@ constexpr uint32_t kToxicPatternDurationMs = 1800;
 namespace Animation {
 // Active animation selector: 1 chase, 2 dual-breathe, 3 bounce, 4 slow pulse.
 constexpr uint8_t kActiveAnim = 4;
-// Global strip brightness applied at LED driver level (0-255).
-constexpr uint8_t kGlobalBrightness = 36;
+// Global strip brightness applied at LED driver level (0-255). Halved from 36
+// to 18 on 2026-10-23 at the bar's request: the strips were too bright.
+constexpr uint8_t kGlobalBrightness = 18;
 // Accent brightness used by active animation 1 (0-255).
 constexpr uint8_t kActiveAccentBrightness = 120;
 // Crossfade time when the host retints the idle strips (for example on entering
