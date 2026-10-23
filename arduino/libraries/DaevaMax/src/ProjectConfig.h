@@ -125,9 +125,13 @@ constexpr uint32_t kToxicPatternDurationMs = 1800;
 namespace Animation {
 // Active animation selector: 1 chase, 2 dual-breathe, 3 bounce, 4 slow pulse.
 constexpr uint8_t kActiveAnim = 4;
-// Global strip brightness applied at LED driver level (0-255). Halved from 36
-// to 18 on 2026-10-23 at the bar's request: the strips were too bright.
-constexpr uint8_t kGlobalBrightness = 18;
+// Global strip brightness applied at LED driver level (0-255). Lowered from 36
+// on 2026-10-23 at the bar's request: 18 still looked bright (perceived
+// brightness is far from linear), 1 was approved on the machine. At 1 each colour
+// channel is either off or at its lowest step, so colours lose their mix (the
+// red-orange of kAvoidDeepRedOnPour collapses back to pure red) and breaths and
+// fades turn into on/off. 3 keeps four steps per channel if that matters.
+constexpr uint8_t kGlobalBrightness = 1;
 // Accent brightness used by active animation 1 (0-255).
 constexpr uint8_t kActiveAccentBrightness = 120;
 // Crossfade time when the host retints the idle strips (for example on entering
